@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from pathlib import Path
 
+from zeus_agent.agent.session import ZeusAgentSession
 from zeus_agent.core.mneme import diff_gate, record_checkpoint_evidence, record_evidence
 from zeus_agent.runtime.sandbox import SandboxRuntime, SandboxPolicyError
 from zeus_agent.schemas.sisyphus import RunStepResult, SisyphusRunReport
@@ -102,9 +103,10 @@ def pursue_run(run_id: str, *, home: Path | None = None, max_iterations: int = 1
         )
     )
 
+    agent_report = ZeusAgentSession(run_id, home=home).run_control_cycle()
     implementation_reason = (
-        "No concrete implementation task executor is attached yet; controlled implementation "
-        "requires a tool plan from milestones beyond the current scaffold."
+        "Zeus agent session and guarded tool broker are attached. A concrete model-generated "
+        "or scripted implementation tool plan is still required before code synthesis can proceed."
     )
     escalation_reasons.append(implementation_reason)
     impl_evidence = record_evidence(
@@ -112,7 +114,7 @@ def pursue_run(run_id: str, *, home: Path | None = None, max_iterations: int = 1
         "note",
         "Controlled implementation gate reached.",
         passed=False,
-        payload={"reason": implementation_reason},
+        payload={"reason": implementation_reason, "agent_report_id": agent_report.report_id},
         home=home,
     )
     step_results.append(

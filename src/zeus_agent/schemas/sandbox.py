@@ -30,6 +30,8 @@ class SandboxCheckpoint(BaseModel):
     total_bytes: int
     files: list[FileFingerprint]
     omitted: list[str] = Field(default_factory=list)
+    content_snapshot_path: str | None = None
+    restorable: bool = False
 
 
 class SandboxCommand(BaseModel):
@@ -63,3 +65,7 @@ class SandboxResult(BaseModel):
     redaction_status: Literal["clean", "redacted"] = "clean"
     redaction_findings: list[str] = Field(default_factory=list)
     artifact_path: str | None = None
+    stdout_artifact_path: str | None = None
+    stderr_artifact_path: str | None = None
+    stdout_truncated: bool = False
+    stderr_truncated: bool = False

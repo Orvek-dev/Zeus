@@ -21,6 +21,7 @@ from zeus_agent.security.redaction import redact_data
 from zeus_agent.storage.event_log import EventLog
 from zeus_agent.storage.jsonio import append_private_jsonl, read_json, write_private_json
 from zeus_agent.storage.run_store import RunStore
+from zeus_agent.storage.state import StateStore
 
 
 EvidenceType = Literal["checkpoint", "command", "diff", "verification", "skill", "note"]
@@ -49,6 +50,13 @@ def record_evidence(
         redaction_findings=list(findings),
     )
     append_private_jsonl(_evidence_path(store, run_id), record.model_dump(mode="json"))
+    StateStore(store.home).index_evidence(
+        run_id,
+        record.evidence_id,
+        record.evidence_type,
+        record.summary,
+        passed=record.passed,
+    )
     EventLog(home).append(
         new_trace_event(
             "mneme.evidence.recorded",

@@ -53,7 +53,7 @@ Everything else is orchestration around those two truth sources.
 
 ## Implemented
 
-Zeus currently includes milestones 1-10:
+Zeus currently includes milestones 1-10 plus the first Hermes absorption pass:
 
 - Isolated Python package and CLI: `zeus`.
 - Private local state under `~/.zeus` or `ZEUS_HOME`.
@@ -72,6 +72,16 @@ Zeus currently includes milestones 1-10:
 - Skill lifecycle: draft, test, promote, retire.
 - Provider auth references, model routes, tool registry, and GitHub publishing
   preparation.
+- Hermes-style guarded agent session: model-transport-neutral tool calls route
+  through approval, sandbox, Mneme evidence, and local SQLite state.
+- Content-addressed restorable checkpoints and restore reports.
+- SQLite session/message/evidence/artifact index with local search.
+- Large tool output artifact persistence with context previews.
+- Background skill review that drafts candidates from repeated blocked evidence.
+- Runtime backend slots for local process, Docker, SSH, Modal, Daytona,
+  Singularity, and future microVM isolation.
+- Plugin/MCP/tool-pack registry, cron-style schedule registry, gateway adapter
+  registry, trajectory export, and local doctor report.
 
 ## Install
 
@@ -91,6 +101,7 @@ uv run zeus approve <run_id>
 uv run zeus sandbox-snapshot <run_id>
 uv run zeus sandbox-run <run_id> -- python -c "print('hello from Zeus')"
 uv run zeus execute <run_id>
+uv run zeus agent-run <run_id>
 uv run zeus evidence <run_id>
 ```
 
@@ -113,6 +124,9 @@ Execution and evidence:
 - `zeus pursue`
 - `zeus mneme-diff`
 - `zeus evidence`
+- `zeus agent-run`
+- `zeus sandbox-restore`
+- `zeus memory-search`
 
 Skills:
 
@@ -132,6 +146,18 @@ Registries:
 - `zeus tools`
 - `zeus github-prep`
 - `zeus github-plans`
+
+Hermes absorption:
+
+- `zeus runtime-backends`
+- `zeus plugin-register`
+- `zeus plugins`
+- `zeus cron-add`
+- `zeus cron-jobs`
+- `zeus gateway-register`
+- `zeus gateways`
+- `zeus trajectory-export`
+- `zeus doctor`
 
 ## Safety Model
 
@@ -166,11 +192,21 @@ src/zeus_agent/
     mneme.py             # evidence and diff gates
     skills.py            # skill lifecycle
     registry.py          # provider/model/tool/github prep registries
+  agent/
+    session.py           # guarded agent session loop
+    background_review.py # memory/skill review pass
   runtime/
     sandbox.py           # local process sandbox
+    checkpoints.py       # content-addressed snapshots and restore
+    backends.py          # runtime backend slots
+  tools/
+    registry.py          # self-registering governed tool broker
+  gateway/               # gateway adapter registry
+  eval/                  # trajectory export
+  observability/         # local doctor/system report
   schemas/               # pydantic contracts
   security/              # redaction and path guards
-  storage/               # private JSON/JSONL stores
+  storage/               # private JSON/JSONL stores and SQLite state
 ```
 
 ## Verification
@@ -183,7 +219,7 @@ uv build
 
 Current local status:
 
-- Tests: 13 passed.
+- Tests: 17 passed.
 - Compile check: passed.
 - Build: wheel and source distribution generated successfully.
 

@@ -40,6 +40,39 @@ Hermes' strongest lesson:
 
 > Capture operational evidence broadly, but promote durable knowledge narrowly.
 
+## 2.1 Hermes Absorption Pass
+
+Zeus now absorbs Hermes in layers instead of copying it as a monolith.
+
+P0 runtime substrate:
+
+- Agent session loop around governed tool calls.
+- Self-registering tool broker.
+- SQLite state/search index.
+- Restorable content-addressed checkpoints.
+- Command risk classifier.
+- Large tool-output artifact storage.
+- Background memory/skill review.
+
+P1 extensibility substrate:
+
+- Runtime backend slots for local, Docker, SSH, Modal, Daytona, Singularity,
+  and future microVM execution.
+- Plugin, MCP, and tool-pack registry.
+- Cron-style schedule registry.
+- Context compaction helpers.
+
+P2 platform substrate:
+
+- Gateway adapter registry.
+- Trajectory export for evaluation and replay.
+- Local observability report.
+
+Absorption rule:
+
+> Hermes supplies platform breadth; Zeus keeps GoalContract, approval, sandbox,
+> Mneme evidence, and Sisyphus as the governing center.
+
 ## 3. Operating Modes
 
 Zeus must not trigger the full execution engine for every user turn. The first
@@ -200,6 +233,21 @@ Truth and Data Plane
   - Hestia Local Vault
   - Demeter Skill Evolution
   - Hades Archive
+```
+
+Current code map:
+
+```text
+agent/session.py           ZeusAgentSession and tool-call loop
+tools/registry.py          self-registering governed tool broker
+runtime/checkpoints.py     content-addressed checkpoint and restore
+runtime/backends.py        execution backend slots
+storage/state.py           SQLite sessions/messages/evidence/artifacts
+core/plugins.py            plugin/MCP/tool-pack registry
+core/scheduler.py          cron-style schedule registry
+gateway/adapters.py        gateway adapter registry
+eval/trajectory.py         trajectory export
+observability/reports.py   local doctor report
 ```
 
 ## 7. Sisyphus Core

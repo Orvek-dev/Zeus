@@ -11,9 +11,11 @@ from rich.panel import Panel
 from rich.table import Table
 import typer
 
+from zeus_agent.agent.session import ZeusAgentSession
 from zeus_agent.core.approvals import approve_run, reject_run, run_status
 from zeus_agent.core.blueprint import build_blueprint
 from zeus_agent.core.mneme import diff_gate, list_evidence, record_command_evidence
+from zeus_agent.core.plugins import list_plugins, register_plugin
 from zeus_agent.core.registry import (
     add_model_route,
     add_provider,
@@ -24,6 +26,10 @@ from zeus_agent.core.registry import (
     provider_status,
     register_tool,
 )
+from zeus_agent.core.scheduler import add_cron_job, list_cron_jobs
+from zeus_agent.eval.trajectory import export_run_trajectory
+from zeus_agent.gateway.adapters import list_gateway_adapters, register_gateway_adapter
+from zeus_agent.observability.reports import build_system_report
 from zeus_agent.core.sisyphus import pursue_run
 from zeus_agent.core.skills import (
     draft_skill,
@@ -33,10 +39,12 @@ from zeus_agent.core.skills import (
     test_skill,
 )
 from zeus_agent.paths import init_home
+from zeus_agent.runtime.backends import DEFAULT_RUNTIME_BACKENDS
 from zeus_agent.runtime.sandbox import SandboxRuntime
 from zeus_agent.schemas.trace_event import new_trace_event
 from zeus_agent.storage.event_log import EventLog
 from zeus_agent.storage.run_store import RunStore
+from zeus_agent.storage.state import StateStore
 
 app = typer.Typer(
     name="zeus",
@@ -737,3 +745,313 @@ def github_plans_cmd(
     for plan in plans:
         table.add_row(str(plan["plan_id"]), str(plan["repo"]), str(plan["ready"]))
     console.print(table)
+
+
+@app.command("agent-run")
+def agent_run_cmd(
+    run_id: Annotated[str, typer.Argument(help="Approved run id.")],
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Run one Zeus agent control cycle through the guarded tool broker."""
+
+    report = ZeusAgentSession(run_id, home=home).run_control_cycle()
+    if json_output:
+        _print_json(report.model_dump(mode="json"))
+        return
+    console.print(f"Agent session: {report.session_id}")
+    console.print(f"Status: {report.status}")
+    for result in report.tool_results:
+        console.print(f"- {result.name}: {result.status} - {result.summary}")
+
+
+@app.command("memory-search")
+def memory_search_cmd(
+    query: Annotated[str, typer.Argument(help="Search query for local Zeus session memory.")],
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Search the local SQLite state store."""
+
+    rows = StateStore(home).search_messages(query)
+    if json_output:
+        _print_json(rows)
+        return
+    table = Table(title="Zeus memory search")
+    table.add_column("Session")
+    table.add_column("Role")
+    table.add_column("Content")
+    for row in rows:
+        table.add_row(str(row["session_id"]), str(row["role"]), str(row["content"])[:120])
+    console.print(table)
+
+
+@app.command("sandbox-restore")
+def sandbox_restore_cmd(
+    run_id: Annotated[str, typer.Argument(help="Approved run id.")],
+    snapshot_id: Annotated[str, typer.Argument(help="Snapshot id from a checkpoint manifest.")],
+    prune_untracked: Annotated[
+        bool,
+        typer.Option("--prune-untracked", help="Remove untracked files not present in the snapshot."),
+    ] = False,
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Restore files from a content-addressed checkpoint snapshot."""
+
+    report = SandboxRuntime(home).restore_checkpoint(run_id, snapshot_id, prune_untracked=prune_untracked)
+    if json_output:
+        _print_json(report.model_dump(mode="json"))
+        return
+    console.print(f"Restore: {report.restore_id}")
+    console.print(f"Restored files: {len(report.restored_files)}")
+    if report.skipped_files:
+        console.print(f"[yellow]Skipped:[/yellow] {len(report.skipped_files)}")
+
+
+@app.command("runtime-backends")
+def runtime_backends_cmd(
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """List configured runtime backend slots."""
+
+    backends = [backend.__dict__ for backend in DEFAULT_RUNTIME_BACKENDS.list()]
+    if json_output:
+        _print_json(backends)
+        return
+    table = Table(title="Zeus runtime backends")
+    table.add_column("Name")
+    table.add_column("Isolation")
+    table.add_column("Available")
+    table.add_column("Notes")
+    for backend in backends:
+        table.add_row(str(backend["name"]), str(backend["isolation"]), str(backend["available"]), str(backend["notes"]))
+    console.print(table)
+
+
+@app.command("plugin-register")
+def plugin_register_cmd(
+    name: Annotated[str, typer.Argument(help="Plugin or MCP server name.")],
+    kind: Annotated[str, typer.Option("--kind", help="local_plugin, mcp_server, or tool_pack.")] = "local_plugin",
+    description: Annotated[str, typer.Option("--description", help="Plugin description.")] = "",
+    entrypoint: Annotated[str, typer.Option("--entrypoint", help="Command, URL, or module reference.")] = "",
+    risk_level: Annotated[str, typer.Option("--risk", help="low, medium, or high.")] = "medium",
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Register a local plugin, MCP server, or tool pack."""
+
+    plugin = register_plugin(
+        name,
+        kind=kind,  # type: ignore[arg-type]
+        description=description,
+        entrypoint=entrypoint,
+        risk_level=risk_level,  # type: ignore[arg-type]
+        home=home,
+    )
+    if json_output:
+        _print_json(plugin.model_dump(mode="json"))
+        return
+    console.print(f"Plugin registered: {plugin.plugin_id}")
+
+
+@app.command("plugins")
+def plugins_cmd(
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """List plugin and MCP registrations."""
+
+    plugins = [plugin.model_dump(mode="json") for plugin in list_plugins(home=home)]
+    if json_output:
+        _print_json(plugins)
+        return
+    table = Table(title="Zeus plugins")
+    table.add_column("Name")
+    table.add_column("Kind")
+    table.add_column("Risk")
+    table.add_column("Enabled")
+    for plugin in plugins:
+        table.add_row(str(plugin["name"]), str(plugin["kind"]), str(plugin["risk_level"]), str(plugin["enabled"]))
+    console.print(table)
+
+
+@app.command("cron-add")
+def cron_add_cmd(
+    name: Annotated[str, typer.Argument(help="Job name.")],
+    schedule: Annotated[str, typer.Argument(help="Cron expression or schedule label.")],
+    command: list[str] = typer.Option([], "--command", help="Command element. Repeatable."),
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Record a cron-style job plan without installing a daemon."""
+
+    job = add_cron_job(name, schedule, command, home=home)
+    if json_output:
+        _print_json(job.model_dump(mode="json"))
+        return
+    console.print(f"Cron job registered: {job.job_id}")
+
+
+@app.command("cron-jobs")
+def cron_jobs_cmd(
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """List cron-style job plans."""
+
+    jobs = [job.model_dump(mode="json") for job in list_cron_jobs(home=home)]
+    if json_output:
+        _print_json(jobs)
+        return
+    table = Table(title="Zeus cron jobs")
+    table.add_column("Name")
+    table.add_column("Schedule")
+    table.add_column("Enabled")
+    for job in jobs:
+        table.add_row(str(job["name"]), str(job["schedule"]), str(job["enabled"]))
+    console.print(table)
+
+
+@app.command("gateway-register")
+def gateway_register_cmd(
+    platform: Annotated[str, typer.Argument(help="Platform name, e.g. slack, discord, api.")],
+    mode: Annotated[str, typer.Option("--mode", help="read_only, draft_only, or approved_send.")] = "draft_only",
+    secret_env: list[str] = typer.Option([], "--secret-env", help="Secret env var reference. Repeatable."),
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Register a gateway adapter in disabled/draft-first mode."""
+
+    adapter = register_gateway_adapter(
+        platform,
+        mode=mode,  # type: ignore[arg-type]
+        secret_env_vars=secret_env,
+        home=home,
+    )
+    if json_output:
+        _print_json(adapter.model_dump(mode="json"))
+        return
+    console.print(f"Gateway adapter registered: {adapter.adapter_id}")
+
+
+@app.command("gateways")
+def gateways_cmd(
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """List gateway adapters."""
+
+    adapters = [adapter.model_dump(mode="json") for adapter in list_gateway_adapters(home=home)]
+    if json_output:
+        _print_json(adapters)
+        return
+    table = Table(title="Zeus gateways")
+    table.add_column("Platform")
+    table.add_column("Mode")
+    table.add_column("Enabled")
+    for adapter in adapters:
+        table.add_row(str(adapter["platform"]), str(adapter["mode"]), str(adapter["enabled"]))
+    console.print(table)
+
+
+@app.command("trajectory-export")
+def trajectory_export_cmd(
+    run_id: Annotated[str, typer.Argument(help="Run id to export.")],
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Export a run trajectory for evaluation and replay."""
+
+    path = export_run_trajectory(run_id, home=home)
+    payload = {"run_id": run_id, "trajectory_path": str(path)}
+    if json_output:
+        _print_json(payload)
+        return
+    console.print(f"Trajectory: {path}")
+
+
+@app.command("doctor")
+def doctor_cmd(
+    home: Annotated[
+        Path | None,
+        typer.Option("--home", help="Override ZEUS_HOME for this command."),
+    ] = None,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Show a local Zeus system report."""
+
+    report = build_system_report(home=home)
+    if json_output:
+        _print_json(report)
+        return
+    console.print(Panel.fit(f"Home: {report['home']}\nState DB: {report['state_db']}", title="Zeus doctor"))
+    console.print(f"Runs: {len(report['runs'])}")
+    console.print(f"Runtime backends: {len(report['runtime_backends'])}")
+    console.print(f"Plugins: {len(report['plugins'])}")

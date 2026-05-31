@@ -76,6 +76,14 @@ def registry_dir(home: Path | None = None) -> Path:
     return data_dir(home) / "registry"
 
 
+def checkpoints_dir(home: Path | None = None) -> Path:
+    return data_dir(home) / "checkpoints"
+
+
+def state_db_path(home: Path | None = None) -> Path:
+    return data_dir(home) / "state.db"
+
+
 def init_home(home: Path | None = None) -> dict[str, Path]:
     root = ensure_private_dir(home or zeus_home())
     paths = {
@@ -89,6 +97,7 @@ def init_home(home: Path | None = None) -> dict[str, Path]:
         "logs": ensure_private_dir(logs_dir(root)),
         "sandboxes": ensure_private_dir(sandboxes_dir(root)),
         "registry": ensure_private_dir(registry_dir(root)),
+        "checkpoints": ensure_private_dir(checkpoints_dir(root)),
     }
     marker = root / ".gitignore"
     if not marker.exists():
