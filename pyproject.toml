@@ -1,0 +1,31 @@
+[project]
+name = "zeus-agent"
+version = "0.1.0"
+description = "Local-first goal-to-agent control plane with blueprint approval."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Orvek-dev" }
+]
+dependencies = [
+  "pydantic>=2.7",
+  "rich>=13.7",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+]
+
+[project.scripts]
+zeus = "zeus_agent.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
