@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.0.0"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v0.1.0"><img alt="Version" src="https://img.shields.io/badge/version-0.1.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
@@ -33,7 +33,7 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v1.0.0` release is a deterministic local
+an unconstrained chat loop. The public `v0.1.0` release is a deterministic local
 runtime foundation: kernel contracts, provider interfaces, tool and connector
 runtimes, transport state, work-loop planning, verification, and skill-evolution
 guards. Live external AI APIs, MCP servers, gateway delivery, browser control,
@@ -116,7 +116,7 @@ gravity is different.
 | --- | --- | --- |
 | Primary product shape | General-purpose self-improving agent that lives across CLI, gateway, ACP, batch, API, and library surfaces | Goal-oriented governed runtime that turns objectives into contracts and evidence obligations |
 | Core loop | `AIAgent` builds prompts, resolves providers, dispatches tools, persists sessions, and continues conversation | Objective compiler -> authority gate -> work-loop plan -> runtime dispatch -> evidence -> promotion decision |
-| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.0.0 foundation with deterministic local provider/tool/connector/transport/workflow/gateway scaffolds and evals |
+| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v0.1.0 foundation with deterministic local provider/tool/connector/transport/workflow/gateway scaffolds and evals |
 | Safety center | Approval, profile isolation, tool availability, command checks, gateway authorization, and platform controls | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo checks, and promotion blocks |
 | Self-improvement | Built-in learning loop and skill creation from experience | Validation-gated skill-evolution queue; proposed skills cannot self-promote, widen authority, enable live transport, or bypass evidence |
 | Completion model | Conversational progress and tool-visible execution | Evidence-backed completion; "done" is blocked when objective, artifact, verification, or promotion evidence is missing |
@@ -141,7 +141,7 @@ release, not as proof of broad production readiness.
 | Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway, verification, and skill-evolution surfaces | `204` tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, no secret echo, state reload | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.0.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==0.1.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | passed |
 | Public safety boundary | Local Codex harness packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -151,9 +151,9 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v1.0.0 Readiness
+## v0.1.0 Readiness
 
-`v1.0.0` is the first public Zeus Agent source release. The supported public
+`v0.1.0` is the first public Zeus Agent source release. The supported public
 surface is:
 
 - local deterministic CLI scenarios through `zeus`;
@@ -214,7 +214,7 @@ docs/                     public architecture and Hermes comparison notes
 | Document | Purpose |
 | --- | --- |
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus should keep a governed kernel/runtime split |
-| [Security policy](SECURITY.md) | Public security posture and current v1.0.0 boundary |
+| [Security policy](SECURITY.md) | Public security posture and current v0.1.0 boundary |
 | [Changelog](CHANGELOG.md) | Release history and public-safe notes |
 
 ## License

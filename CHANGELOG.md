@@ -2,18 +2,13 @@
 
 All notable changes to Zeus Agent are recorded here.
 
-## Unreleased
-
-### Added
-
-- Mneme-style README presentation with a Zeus header banner, badges, navigation, architecture map, evidence table, and readiness boundary.
-- Public Hermes comparison document covering Hermes baseline architecture, Zeus target architecture, and the governed runtime differences.
-
-## v1.0.0 - 2026-06-02
+## v0.1.0 - 2026-06-02
 
 ### Added
 
 - First public Zeus Agent release.
+- Mneme-style README presentation with a Zeus header banner, badges, navigation, architecture map, evidence table, and readiness boundary.
+- Public Hermes comparison document covering Hermes baseline architecture, Zeus target architecture, and the governed runtime differences.
 - Governed objective compiler and runtime contract surface.
 - Authority-gated capability broker with evidence records.
 - Local agent work loop, conversation, provider, tool, connector, transport, gateway, workflow, verification, and skill-evolution scaffolds.
