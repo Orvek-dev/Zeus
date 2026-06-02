@@ -2,6 +2,13 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## Unreleased
+
+### Added
+
+- Mneme-style README presentation with a Zeus header banner, badges, navigation, architecture map, evidence table, and readiness boundary.
+- Public Hermes comparison document covering Hermes baseline architecture, Zeus target architecture, and the governed runtime differences.
+
 ## v1.0.0 - 2026-06-02
 
 ### Added
