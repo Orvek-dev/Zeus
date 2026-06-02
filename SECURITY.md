@@ -1,29 +1,22 @@
 # Security Policy
 
-Zeus is local-first and local-only by default.
+Zeus is governed and local-first by default.
 
 ## Defaults
 
-- No remote telemetry.
-- No cloud sync by default.
-- No execution without blueprint approval.
-- No raw secrets in logs, ontology, memory, or artifacts.
-- Local private state is written under `~/.zeus` with restrictive permissions.
+- No remote telemetry is enabled by the package.
+- Local runtime state should stay outside source control.
+- Provider credentials should be referenced by environment variable or external secret manager name, never copied into configs, tests, logs, or evidence.
+- Secret-looking values are redacted in runtime surfaces that handle credential-like text.
+- Tool, connector, transport, gateway, and live provider paths should pass through authority, lease, and evidence boundaries before execution.
+- Dry-run and live-capable paths should remain distinguishable in code and review.
+
+## Current v1.0.0 Boundary
+
+`v1.0.0` is a governed runtime foundation. It includes deterministic local scenarios, provider and tool interfaces, transport state, gateway/workflow scaffolds, and verification surfaces. It is not a hard-isolated remote execution platform by itself.
+
+Before production use, live MCP tools, external AI APIs, browser/terminal automation, cron workers, remote sandboxes, and networked gateways should be wired through explicit authority grants, runtime leases, audit evidence, and rollback behavior.
 
 ## Reporting
 
 Please report security issues privately before public disclosure.
-
-## Current Alpha Boundary
-
-This repository currently implements blueprint, approval, local process sandbox,
-Mneme evidence, Sisyphus progress reporting, skill lifecycle, and registry
-scaffolds.
-
-- The sandbox executor is a local process sandbox. It gates approval, paths,
-  environment, obvious network/destructive commands, and timeout budgets, but it
-  is not hard isolation.
-- External network access is deny-by-default in the first runtime.
-- Provider authentication stores environment variable names only, never key
-  values.
-- GitHub publishing prep never commits, pushes, or creates repositories.
