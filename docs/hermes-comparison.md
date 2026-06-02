@@ -72,7 +72,7 @@ Zeus layers:
 | Model runtime | Provider request/response contracts, local LLM adapter, OpenAI-compatible adapter, fake provider, metadata provider |
 | Tool runtime | Tool schema registry, visibility filtering, dispatch constraints, blocked side effects |
 | Connector runtime | External connector lifecycle and execution contracts |
-| Transport runtime | Runtime manifests, probes, registry gates, and persistent SQLite-backed state |
+| Transport runtime | Runtime manifests, probes, registry gates, and persistent local database-backed state |
 | Workflow runtime | Schedule and job contracts for future recurring work |
 | Gateway runtime | Local gateway drafts and delivery record scaffolds |
 | Verification runtime | Artifact checks, requirement checks, evidence checks, and completion guardrails |
@@ -93,9 +93,9 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v0.1.0` code does not claim all live surfaces are production-active.
-It establishes the contracts and local deterministic runtime checks those
-surfaces should pass through.
+The public `v0.2.0` code does not claim all live surfaces are production-active.
+It establishes the contracts, total architecture dry-run checks, and live
+connection design those surfaces should pass through.
 
 ## What Is Different With Hermes
 
@@ -107,7 +107,7 @@ surfaces should pass through.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.1.0 is a local deterministic foundation; live integrations are future work behind the same governance boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.2.0 is a local deterministic total-architecture foundation; live integrations are designed behind the same governance boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
@@ -140,7 +140,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v0.1.0 Boundary
+## Current v0.2.0 Boundary
 
 Implemented public foundation:
 
@@ -149,9 +149,14 @@ Implemented public foundation:
 - local deterministic agent loop scaffolds;
 - provider, tool, connector, transport, workflow, gateway, verification, and
   skill-evolution contracts;
-- SQLite-backed local state for runtime/transport/product slices;
+- security planning, research graph, ontology candidate, sandbox workflow, and
+  dry-run orchestration contracts;
+- local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 204 public tests and a 9/9 final architecture eval.
+- 244 public tests, a 9/9 final architecture eval, and an 8/8 total
+  architecture eval;
+- live connection architecture for future provider, MCP, web, gateway, browser,
+  terminal, and sandbox adapters.
 
 Not claimed yet:
 
