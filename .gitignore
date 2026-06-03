@@ -27,6 +27,7 @@ venv/
 .codex/
 .omo/
 AGENTS.md
+ETHOS.md
 docs/ai/
 gstack/
 harness/

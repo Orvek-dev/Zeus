@@ -11,8 +11,12 @@ _SECRET_LIKE_MARKERS: Final[tuple[str, ...]] = (
     "api_key",
     "apikey",
     "bearer ",
+    "private-key",
+    "private_key",
+    "private key",
     "secret",
     "password",
+    "-----begin",
 )
 _SECRET_LIKE_PREFIXES: Final[tuple[str, ...]] = (
     "ghp_",
@@ -30,7 +34,15 @@ _SECRET_SPAN_PATTERNS: Final[tuple[tuple[re.Pattern[str], str], ...]] = (
     (re.compile(r"xox[abp]-[A-Za-z0-9-]+"), "[redacted-secret]"),
     (re.compile(r"(?i)bearer\s+[A-Za-z0-9._~+/=-]+"), "[redacted-secret]"),
     (
-        re.compile(r"(?i)(api[_-]?key|token|password|secret)[=:][^\s\"'}]+"),
+        re.compile(
+            r"(?is)-----BEGIN [A-Z ]*PRIVATE KEY-----.*?-----END [A-Z ]*PRIVATE KEY-----",
+        ),
+        "[redacted-secret]",
+    ),
+    (
+        re.compile(
+            r"(?i)(api[ _-]?key|private[ _-]?key|token|password|secret)\s*[=:]\s*[^\s\"'}]+",
+        ),
         "[redacted-secret]",
     ),
 )

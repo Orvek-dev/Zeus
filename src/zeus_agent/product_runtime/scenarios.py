@@ -14,6 +14,7 @@ from zeus_agent.product_runtime.final_helpers import (
     required_artifact_markers,
     work_loop_plan,
 )
+from zeus_agent.product_runtime.domain_language import core_domain_language_summary
 from zeus_agent.product_runtime.models import ProductRuntimeSnapshot
 from zeus_agent.runtime_promotion import LiveTransportPromotionGuard
 from zeus_agent.skill_evolution import (
@@ -55,6 +56,7 @@ def final_core_contracts_payload(
         source_evidence_ids=("final-core-contracts", "final-verification-summary"),
     )
     payload = ProductRuntimeSnapshot(
+        core_domain_language=core_domain_language_summary(),
         objective_compiled=contract.status == "compiled",
         objective_id=contract.objective_id,
         work_loop_plan_created=True,

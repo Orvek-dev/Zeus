@@ -20,6 +20,7 @@ from zeus_agent.cli_wave10 import register_wave10_commands
 from zeus_agent.cli_wave11 import register_wave11_commands
 from zeus_agent.cli_wave12 import register_wave12_commands
 from zeus_agent.cli_wave13 import register_wave13_commands
+from zeus_agent.cli_wave14 import register_wave14_commands
 from zeus_agent.cli_total import register_total_commands
 from zeus_agent.cli_final import register_final_commands
 from zeus_agent.kernel.authority import AuthorityContext, CapabilityGrant, PathGrant
@@ -221,5 +222,6 @@ register_wave10_commands(app)
 register_wave11_commands(app)
 register_wave12_commands(app)
 register_wave13_commands(app)
+register_wave14_commands(app)
 register_total_commands(app)
 register_final_commands(app)

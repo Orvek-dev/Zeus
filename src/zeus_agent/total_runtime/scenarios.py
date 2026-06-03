@@ -6,6 +6,7 @@ import re
 from zeus_agent.capability_runtime.sandbox_workflow import SandboxWorkflowOptimizer
 from zeus_agent.ontology_runtime import OntologyCandidateBuilder, OntologyLearningBatch
 from zeus_agent.orchestration_runtime import ParallelScheduler, ParallelTaskSpec
+from zeus_agent.product_runtime.domain_language import core_domain_language_summary
 from zeus_agent.research_runtime import (
     ResearchEvidenceEdge,
     ResearchEvidenceNode,
@@ -57,6 +58,7 @@ def total_architecture_plan_payload() -> dict[str, object]:
         "source_pins": _source_pins(research_graph.nodes),
         "hermes_absorption_boundary": "governed_dry_run_contracts",
         "no_secret_echo": True,
+        "zeus_core_language": _zeus_core_language_payload(),
     }
     payload["no_secret_echo"] = _no_secret_echo(payload)
     return payload
@@ -108,6 +110,7 @@ def total_architecture_blocks_payload(*, raw_secret: str) -> dict[str, object]:
         "handler_executed": False,
         "network_opened": False,
         "no_secret_echo": True,
+        "zeus_core_language": _zeus_core_language_payload(),
     }
     payload["no_secret_echo"] = _no_secret_echo(payload, raw_secret)
     return payload
@@ -207,6 +210,10 @@ def _unpinned_research_source_present() -> str:
 
 def _label(result: object) -> str:
     return "blocked" if getattr(result, "decision", "") == "blocked" else "allowed"
+
+
+def _zeus_core_language_payload() -> dict[str, object]:
+    return core_domain_language_summary().model_dump(mode="json")
 
 
 def _no_secret_echo(payload: dict[str, object], raw_secret: str | None = None) -> bool:

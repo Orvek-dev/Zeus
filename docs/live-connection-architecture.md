@@ -4,7 +4,7 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v0.2.0` does not claim these live integrations are production-active. It
+`v0.3.0` does not claim these live integrations are production-active. It
 establishes the public design and the dry-run contract slice those integrations
 must pass through before live execution is enabled.
 
@@ -13,6 +13,16 @@ must pass through before live execution is enabled.
 Zeus should be usable as a broad Hermes-like agent platform while keeping its
 own center of gravity: objective contracts, authority, leases, approval,
 sandboxing, evidence, and controlled promotion.
+
+The product-domain layer uses the reduced Zeus core language: Zeus Kernel,
+Athena, Thunderbolt, Aegis, Mercury, Apollo, Hephaestus, Poseidon, Artemis,
+Demeter, Olympus, and Prometheus. The technical runtime identifiers are
+preserved, and product-domain labels do not rename runtime modules. Hermes
+remains upstream/reference only. Mercury is the Zeus internal transport product name
+for transport, connector, MCP, API, and gateway routing. Live connection
+work in this document remains designed/prepared/dry-run/future until a later
+implementation proves active execution through authority, leases, approval,
+sandboxing, evidence, and promotion.
 
 A live connection is allowed only when Zeus can answer these questions:
 
@@ -224,9 +234,9 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v0.2.0 Implementation Boundary
+## v0.3.0 Implementation Boundary
 
-`v0.2.0` includes:
+`v0.3.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
 - security planning for live-capable surfaces;
@@ -235,9 +245,10 @@ Every live connection type should pass these gates:
 - ontology candidate contracts;
 - sandbox workflow optimization hints;
 - dry-run parallel scheduler contracts;
+- stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v0.2.0` does not include:
+`v0.3.0` does not include:
 
 - production live MCP catalog;
 - long-running gateway daemon;

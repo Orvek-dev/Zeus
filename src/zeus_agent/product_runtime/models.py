@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+from zeus_agent.product_runtime.domain_language import (
+    CoreDomainLanguageSummary,
+    core_domain_language_summary,
+)
 
 
 class WorkLoopContractAdapter(BaseModel):
@@ -15,6 +20,9 @@ class WorkLoopContractAdapter(BaseModel):
 class ProductRuntimeSnapshot(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
+    core_domain_language: CoreDomainLanguageSummary = Field(
+        default_factory=core_domain_language_summary,
+    )
     objective_compiled: bool
     objective_id: str
     work_loop_plan_created: bool

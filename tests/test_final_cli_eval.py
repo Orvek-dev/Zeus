@@ -44,6 +44,25 @@ def test_final_core_contracts_payload_links_product_runtime_layers(tmp_path) -> 
     assert raw_secret not in serialized
 
 
+def test_final_core_payload_reports_reduced_domain_language(tmp_path) -> None:
+    raw_secret = "ghp_CORE_LANGUAGE_FIXTURE"
+
+    payload = final_core_contracts_payload(
+        objective="Implement final Zeus architecture with canonical product language.",
+        raw_secret=raw_secret,
+        evidence_root=tmp_path,
+    )
+    core_language = payload["core_domain_language"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert core_language["canonical_count"] == 12
+    assert core_language["transport_product_name"] == "Mercury"
+    assert core_language["technical_runtime_names_preserved"] is True
+    assert core_language["hermes_name_reserved"] is True
+    assert payload["no_secret_echo"] is True
+    assert raw_secret not in serialized
+
+
 def test_final_adversarial_blocks_payload_fails_closed() -> None:
     raw_secret = "sk-final-adversarial-secret"
 
@@ -176,6 +195,8 @@ def test_final_eval_cli_reports_adjacent_surface_compatibility() -> None:
     assert payload["final_product_tests_passed"] is True
     assert payload["adjacent_surface_still_works"] is True
     assert payload["failed"] == 0
+    checks = {check["name"]: check["status"] for check in payload["checks"]}
+    assert checks["core_language_mapping"] == "pass"
 
 
 def test_final_architecture_eval_is_deterministic() -> None:

@@ -15,12 +15,33 @@ from zeus_agent.security.credentials import CredentialScope, CredentialScopeUnsa
 
 from .models import RuntimeLease, _validate_host, _validate_scoped_id
 
-RuntimeKind = Literal["provider", "mcp", "gateway", "cron", "api_tool", "plugin"]
+RuntimeKind = Literal[
+    "provider",
+    "mcp",
+    "web",
+    "github",
+    "gateway",
+    "browser",
+    "terminal",
+    "network",
+    "sandbox",
+    "live_sandbox",
+    "cron",
+    "api_tool",
+    "plugin",
+]
 RuntimeLeaseDecision = Literal["allowed", "blocked"]
 _RUNTIME_CAPABILITY_PREFIX: Final[dict[RuntimeKind, str]] = {
     "provider": "provider.",
     "mcp": "mcp.",
+    "web": "web.",
+    "github": "github.",
     "gateway": "gateway.",
+    "browser": "browser.",
+    "terminal": "terminal.",
+    "network": "network.",
+    "sandbox": "sandbox.",
+    "live_sandbox": "live_sandbox.",
     "cron": "cron.",
     "api_tool": "api.tool.",
     "plugin": "plugin.",

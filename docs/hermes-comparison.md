@@ -78,6 +78,20 @@ Zeus layers:
 | Verification runtime | Artifact checks, requirement checks, evidence checks, and completion guardrails |
 | Skill evolution | Proposed improvement queue with explicit review and promotion blocks |
 
+## Product-Domain Layer
+
+Public Zeus architecture language now separates product-domain names from
+technical runtime identifiers. The reduced Zeus core language has exactly 12
+pillars: Zeus Kernel, Athena, Thunderbolt, Aegis, Mercury, Apollo, Hephaestus,
+Poseidon, Artemis, Demeter, Olympus, and Prometheus. The technical runtime
+identifiers are preserved; product-domain labels do not rename runtime modules.
+
+Hermes remains upstream/reference only. Mercury is the Zeus internal transport product name
+for transport, connector, MCP, API, and gateway routing boundaries.
+The current public boundary remains designed/prepared/dry-run/future for live
+provider, MCP, web, gateway, browser, plugin, and network execution unless later
+evidence proves those integrations are active through Zeus authority gates.
+
 ## What Zeus Shares With Hermes
 
 Zeus should eventually support the same broad platform categories:
@@ -93,7 +107,7 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v0.2.0` code does not claim all live surfaces are production-active.
+The public `v0.3.0` code does not claim all live surfaces are production-active.
 It establishes the contracts, total architecture dry-run checks, and live
 connection design those surfaces should pass through.
 
@@ -107,7 +121,7 @@ connection design those surfaces should pass through.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.2.0 is a local deterministic total-architecture foundation; live integrations are designed behind the same governance boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.3.0 is a local deterministic total-architecture foundation with stabilized Zeus Core Language; live integrations are designed behind the same governance boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
@@ -140,7 +154,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v0.2.0 Boundary
+## Current v0.3.0 Boundary
 
 Implemented public foundation:
 
@@ -151,9 +165,10 @@ Implemented public foundation:
   skill-evolution contracts;
 - security planning, research graph, ontology candidate, sandbox workflow, and
   dry-run orchestration contracts;
+- stabilized Zeus Core Language mapped to technical runtime anchors;
 - local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 244 public tests, a 9/9 final architecture eval, and an 8/8 total
+- 296 public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.

@@ -2,6 +2,28 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.3.0 - 2026-06-03
+
+### Added
+
+- Official Zeus Core Language checkpoint with the reduced 12-name product-domain layer mapped to stable technical runtime anchors.
+- Public documentation alignment for Zeus Kernel, Athena, Thunderbolt, Aegis, Mercury, Apollo, Hephaestus, Poseidon, Artemis, Demeter, Olympus, and Prometheus.
+- Runtime/docs consistency tests that prevent product-domain names from renaming underlying runtime modules.
+- Poseidon gateway-boundary guard so it remains gateway/surface containment language instead of sandbox naming.
+- High-risk release checkpoint routing for next-wave work, including public/private artifact boundaries and explicit Git publication blocker handling.
+
+### Changed
+
+- README, Hermes comparison, and live connection design now describe the current `v0.3.0` source checkpoint.
+- Public evidence language now treats the core-language checkpoint as part of the deterministic local regression surface.
+- Release readiness language more clearly separates Hermes-like platform absorption from active live-provider, MCP, gateway, browser, terminal, plugin, network, or remote-sandbox execution.
+
+### Notes
+
+- `v0.3.0` remains local-first and deterministic by default.
+- Live integrations remain designed/prepared/dry-run/future until real adapters pass Zeus authority grants, runtime leases, approval receipts, sandbox controls, audit evidence, verification, rollback, and release review.
+- Private Codex/ULW artifacts, local evidence, local runtime databases, and machine-local operating state remain excluded from the public release.
+
 ## v0.2.0 - 2026-06-02
 
 ### Added

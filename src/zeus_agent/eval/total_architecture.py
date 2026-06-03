@@ -18,6 +18,7 @@ def run_total_architecture_eval() -> dict[str, object]:
         _check("plan_scheduler_safe", plan["scheduler_decision"] == "planned"),
         _check("blocks_live_surfaces", _blocks_safe(blocks)),
         _check("blocks_no_secret_echo", blocks["no_secret_echo"] is True),
+        _check("core_language_mapping", _core_language_mapping(plan, blocks)),
         _check("no_live_surface_opened", _no_live_surface_opened(plan, blocks)),
     ]
     passed = sum(1 for check in checks if check["status"] == "pass")
@@ -44,6 +45,49 @@ def _blocks_safe(blocks: dict[str, object]) -> bool:
         and blocks["live_mcp_request"] == "blocked"
         and blocks["live_web_request"] == "blocked"
         and blocks["gateway_delivery"] == "blocked"
+    )
+
+
+def _core_language_mapping(
+    plan: dict[str, object],
+    blocks: dict[str, object],
+) -> bool:
+    plan_language = plan["zeus_core_language"]
+    blocks_language = blocks["zeus_core_language"]
+    return (
+        _language_summary_valid(plan_language)
+        and _language_summary_valid(blocks_language)
+        and plan_language == blocks_language
+    )
+
+
+def _language_summary_valid(language: object) -> bool:
+    if not isinstance(language, dict):
+        return False
+    mercury_mapping = next(
+        (
+            item
+            for item in language["mappings"]
+            if item["product_name"] == "Mercury"
+        ),
+        None,
+    )
+    if mercury_mapping is None:
+        return False
+    return (
+        language["canonical_count"] == 12
+        and language["transport_product_name"] == "Mercury"
+        and language["technical_runtime_names_preserved"] is True
+        and language["hermes_name_reserved"] is True
+        and language["internal_transport_aliases"] == []
+        and {"transport_runtime", "connector_runtime"}.issubset(
+            set(mercury_mapping["technical_anchors"]),
+        )
+        and {
+            "Hermes Runtime",
+            "Dionysus Production Mode",
+            "Ares Executor",
+        }.issubset(set(language["forbidden_aliases"]))
     )
 
 

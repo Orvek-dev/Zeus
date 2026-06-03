@@ -11,7 +11,10 @@ LiveSurfaceKind = Literal[
     "provider",
     "mcp",
     "web",
+    "github",
     "gateway",
+    "browser",
+    "terminal",
     "network",
     "plugin",
     "live_sandbox",
@@ -30,16 +33,20 @@ SecurityPlanReason = Literal[
     "unsafe_credential_scope",
     "scope_mismatch",
     "live_transport_not_authorized",
+    "evidence_scope_bypass",
 ]
 
 _SAFE_SURFACES: Final[frozenset[LiveSurfaceKind]] = frozenset(
-    ("local", "research", "ontology", "orchestration", "sandbox"),
+    ("local", "research", "ontology", "orchestration"),
 )
 _ALLOWED_CAPABILITY_PREFIXES: Final[tuple[str, ...]] = (
     "provider.",
     "mcp.",
     "web.",
+    "github.",
     "gateway.",
+    "browser.",
+    "terminal.",
     "network.",
     "plugin.",
     "live_sandbox.",
@@ -53,7 +60,10 @@ _SURFACE_CAPABILITY_PREFIX: Final[dict[LiveSurfaceKind, str]] = {
     "provider": "provider.",
     "mcp": "mcp.",
     "web": "web.",
+    "github": "github.",
     "gateway": "gateway.",
+    "browser": "browser.",
+    "terminal": "terminal.",
     "network": "network.",
     "plugin": "plugin.",
     "live_sandbox": "live_sandbox.",
@@ -145,8 +155,6 @@ class SecurityPlanBuilder:
             )
 
         if runtime_lease is None:
-            if request.dry_run:
-                return _allowed(request, "dry_run", scope_matched=False)
             return _blocked(request, "missing_runtime_lease")
 
         if not isinstance(runtime_lease, RuntimeLease):
@@ -162,6 +170,11 @@ class SecurityPlanBuilder:
             runtime_lease.credential_scopes,
         ):
             return _blocked(request, "scope_mismatch")
+        if (
+            request.evidence_target is not None
+            and request.evidence_target != runtime_lease.evidence_target
+        ):
+            return _blocked(request, "evidence_scope_bypass")
 
         if not request.dry_run and not runtime_lease.live_transport_allowed:
             return _blocked(request, "live_transport_not_authorized")

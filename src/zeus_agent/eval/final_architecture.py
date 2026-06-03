@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from zeus_agent.product_runtime import (
     final_adversarial_blocks_payload,
     final_core_contracts_payload,
@@ -34,6 +36,7 @@ def run_final_architecture_eval() -> dict[str, object]:
             core["skill_evolution_candidate_status"] == "proposed_not_promoted",
         ),
         _check("adversarial_blocks", _adversarial_blocks_pass(adversarial)),
+        _check("core_language_mapping", _core_language_mapping_pass(core)),
         _check("no_secret_echo", core["no_secret_echo"] is True and adversarial["no_secret_echo"] is True),
         _check("product_state_reload_stable", state["product_state_reload_stable"] is True),
         _check("adjacent_surface_still_works", core["adjacent_surface_still_works"] is True),
@@ -66,4 +69,16 @@ def _adversarial_blocks_pass(payload: dict[str, object]) -> bool:
         and payload["unsafe_skill_auto_promotion"] == "blocked"
         and payload["handler_executed"] is False
         and payload["network_opened"] is False
+    )
+
+
+def _core_language_mapping_pass(payload: dict[str, object]) -> bool:
+    core_language = payload.get("core_domain_language")
+    if not isinstance(core_language, Mapping):
+        return False
+    return (
+        core_language.get("canonical_count") == 12
+        and core_language.get("transport_product_name") == "Mercury"
+        and core_language.get("technical_runtime_names_preserved") is True
+        and core_language.get("hermes_name_reserved") is True
     )
