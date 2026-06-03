@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Final, Literal, Protocol, assert_never
+from typing import Final, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -116,7 +116,7 @@ def plan_browser_dispatch(
                 evidence_target=evidence_target,
             )
         case unreachable:
-            assert_never(unreachable)
+            raise TypeError(f"unsupported_browser_dispatch_request:{type(unreachable).__name__}")
     return BrowserDispatchFacade().plan(dispatch_request, runtime_lease=runtime_lease)
 
 

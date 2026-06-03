@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final, Literal, Sequence, assert_never
+from typing import Final, Literal, Sequence
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -147,7 +147,7 @@ def _command_text(command: str | tuple[str, ...]) -> str:
         case tuple():
             return " ".join(command)
         case unreachable:
-            assert_never(unreachable)
+            raise TypeError(f"unsupported_terminal_command:{type(unreachable).__name__}")
 
 
 __all__: Final = (
