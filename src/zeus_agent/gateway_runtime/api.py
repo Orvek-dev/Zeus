@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, assert_never
+from typing import Final
+from typing_extensions import assert_never
 
 from zeus_agent.gateway_runtime.api_support import (
     BLOCKED_GOAL_CONTRACT_ID,

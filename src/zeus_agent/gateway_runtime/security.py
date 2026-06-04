@@ -3,7 +3,8 @@ from __future__ import annotations
 import hmac
 import hashlib
 from dataclasses import dataclass
-from typing import Final, Literal, assert_never
+from typing import Final, Literal
+from typing_extensions import assert_never
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_serializer, field_validator
 

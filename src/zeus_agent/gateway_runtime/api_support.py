@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final, assert_never
+from typing import Final
+from typing_extensions import assert_never
 
 from zeus_agent.gateway_runtime.models import ExcludingAllowedReason, GatewayReason
 from zeus_agent.gateway_runtime.session_store import SQLiteGatewaySessionStore

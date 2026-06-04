@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Final, Literal, assert_never
+from typing import Final, Literal
+from typing_extensions import assert_never
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, ValidationInfo, field_serializer, field_validator, model_validator
 
