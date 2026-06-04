@@ -121,6 +121,27 @@ def test_broker_blocks_file_read_without_matching_path_scope_before_handler() ->
     assert handler_called["count"] == 0
 
 
+def test_broker_blocks_sibling_prefix_path_scope_before_handler() -> None:
+    graph = _graph()
+    authority = _authority(["file.read"], path_prefixes=["/workspace/read-only"])
+    handler_called = {"count": 0}
+
+    def read_handler(payload: dict[str, object]) -> dict[str, object]:
+        handler_called["count"] += 1
+        return {"echo": payload.get("path"), "result": "ok"}
+
+    broker = CapabilityBroker(graph=graph, handlers={"file.read": read_handler})
+    response = broker.dispatch(
+        capability_id="file.read",
+        payload={"path": "/workspace/read-only-evil/file.txt"},
+        context=authority,
+    )
+
+    assert response["decision"] == "blocked"
+    assert response["reason"] == "path_scope_blocked"
+    assert handler_called["count"] == 0
+
+
 def test_broker_ignores_untrusted_payload_criterion_id_for_evidence() -> None:
     graph = _graph()
     authority = _authority(["file.read"], path_prefixes=["/virtual/"])

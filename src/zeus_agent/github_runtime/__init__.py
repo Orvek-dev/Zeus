@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .facade import GitHubResearchFacade
 from .models import (
+    GitHubFreshnessState,
     GitHubResearchDispatch,
     GitHubResearchEnvelope,
     GitHubResearchEvidence,
@@ -10,6 +11,7 @@ from .models import (
 )
 
 __all__ = [
+    "GitHubFreshnessState",
     "GitHubResearchDispatch",
     "GitHubResearchEnvelope",
     "GitHubResearchEvidence",

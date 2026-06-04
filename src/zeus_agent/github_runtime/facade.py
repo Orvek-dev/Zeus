@@ -17,6 +17,7 @@ class GitHubResearchFacade:
             query=source.query,
             query_evidence_id=source.query_evidence_id,
             source_pinned=source.source_pinned,
+            freshness=source.freshness,
             summary=source.summary,
             secret_fields=source.secret_fields,
         )
@@ -37,6 +38,8 @@ def _github_block_reasons(source: GitHubSourcePin) -> tuple[str, ...]:
     reasons: list[str] = []
     if not source.source_pinned:
         reasons.append("github_source_unpinned")
+    if source.freshness == "stale":
+        reasons.append("github_source_stale")
     if source.ref is None:
         reasons.append("github_ref_missing")
     if source.query_evidence_id is None:

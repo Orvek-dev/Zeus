@@ -186,8 +186,59 @@ def test_terminal_run_network_like_command_is_blocked_before_subprocess(
     assert calls == []
 
 
-def test_file_read_path_traversal_is_blocked_by_adapter_policy(tmp_path: Path) -> None:
-    # Given: path authority appears to cover a traversal string but the target resolves outside root.
+def test_file_read_credential_path_is_blocked_by_adapter_policy(tmp_path: Path) -> None:
+    # Given: read authority and a credential-looking file inside the sandbox.
+    root = tmp_path / "sandbox"
+    root.mkdir()
+    (root / ".env").write_text("TOKEN=sk-policy-bypass-fixture\n", encoding="utf-8")
+    broker = _broker(root)
+    authority = _authority(root, ["file.read"])
+
+    # When: file.read targets the credential-looking path.
+    response = broker.dispatch(
+        capability_id="file.read",
+        payload={"path": str(root / ".env")},
+        context=authority,
+        profile=PROFILE,
+        criterion_id=WAVE3_POLICY_REQ,
+    )
+
+    # Then: no credential content is returned.
+    assert response["decision"] == "blocked"
+    assert response["reason"] == "credential_path"
+    assert response["result"] == {
+        "decision": "blocked",
+        "reason": "credential_path",
+        "path": None,
+        "content": None,
+    }
+
+
+def test_text_search_skips_credential_files_under_directory(tmp_path: Path) -> None:
+    # Given: search authority and a credential-looking file under the search root.
+    root = tmp_path / "sandbox"
+    root.mkdir()
+    (root / ".env").write_text("TOKEN=sk-policy-bypass-fixture\n", encoding="utf-8")
+    (root / "notes.txt").write_text("public note\n", encoding="utf-8")
+    broker = _broker(root)
+    authority = _authority(root, ["text.search"])
+
+    # When: text.search scans the sandbox directory for a value only in credentials.
+    response = broker.dispatch(
+        capability_id="text.search",
+        payload={"path": str(root), "query": "sk-policy-bypass-fixture"},
+        context=authority,
+        profile=PROFILE,
+        criterion_id=WAVE3_POLICY_REQ,
+    )
+
+    # Then: the credential file is skipped and no secret snippet is returned.
+    assert response["decision"] == "allowed"
+    assert response["result"] == {"query": "sk-policy-bypass-fixture", "matches": []}
+
+
+def test_file_read_path_traversal_is_blocked_by_authority_before_adapter(tmp_path: Path) -> None:
+    # Given: path authority covers the sandbox root but the request resolves outside it.
     root = tmp_path / "sandbox"
     root.mkdir()
     outside = tmp_path / "outside.txt"
@@ -205,13 +256,24 @@ def test_file_read_path_traversal_is_blocked_by_adapter_policy(tmp_path: Path) -
         criterion_id=WAVE3_POLICY_REQ,
     )
 
-    # Then: the adapter blocks the resolved outside-root target without returning content.
+    # Then: authority blocks before the adapter can return outside-root content.
     assert response["decision"] == "blocked"
-    assert response["reason"] == "path_outside_sandbox"
-    assert response["result"] == {
-        "decision": "blocked",
-        "reason": "path_outside_sandbox",
-        "path": None,
-        "content": None,
-    }
+    assert response["reason"] == "path_scope_blocked"
+    assert response["result"] is None
     assert response["evidence"]["status"] == "blocked"
+
+
+def test_sandbox_policy_resolve_path_blocks_traversal_outside_root(tmp_path: Path) -> None:
+    # Given: an adapter-level sandbox policy and a traversal path that leaves the root.
+    root = tmp_path / "sandbox"
+    root.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("outside secret\n", encoding="utf-8")
+
+    # When: the adapter policy resolves the traversal path directly.
+    decision = SandboxPolicy().resolve_path(root, "../outside.txt")
+
+    # Then: the adapter still blocks the resolved outside-root target.
+    assert decision.decision == "blocked"
+    assert decision.path is None
+    assert decision.reason == "path_outside_sandbox"

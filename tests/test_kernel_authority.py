@@ -132,6 +132,11 @@ def test_authority_context_allows_only_unexpired_scoped_grants() -> None:
         credential_grants=[CredentialGrant(capability_id="tool.exec", credential_scope="vault.prod")],
     )
     assert scoped.allows("tool.exec", path="/workspace/read-only/file.txt", now=now).decision == "allowed"
+    assert scoped.allows(
+        "tool.exec",
+        path="/workspace/read-only-evil/file.txt",
+        now=now,
+    ).decision == "blocked"
     assert scoped.allows("tool.exec", network_host="api.openai.com", now=now).decision == "allowed"
     assert scoped.allows("tool.exec", credential_scope="vault.prod", now=now).decision == "allowed"
 

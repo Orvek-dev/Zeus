@@ -158,6 +158,7 @@ class ProviderRuntimeRequest(BaseModel):
     credential_scope: Optional[str] = None
     network_host: Optional[str] = None
     live_network: bool = False
+    evidence_target: str = "mneme.wave10.provider_runtime"
     metadata: tuple[ProviderMetadataEntry, ...] = ()
 
     @field_validator(
@@ -167,6 +168,7 @@ class ProviderRuntimeRequest(BaseModel):
         "response_format",
         "credential_scope",
         "network_host",
+        "evidence_target",
     )
     @classmethod
     def _validate_optional_text(

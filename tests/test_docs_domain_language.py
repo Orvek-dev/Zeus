@@ -49,12 +49,16 @@ STALE_PUBLIC_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
     "294%20passed",
     "`294` public tests passed",
     "294 public tests",
+    "tests-296",
+    "296%20passed",
+    "`296` public tests passed",
+    "296 public tests",
     "`8/8` checks passed",
     "8/8 total",
 )
 CURRENT_PUBLIC_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
-    "tests-296%20passed",
-    "`296` public tests passed",
+    "tests-484%20passed",
+    "`484` public tests passed",
     "`10/10` checks passed",
     "`9/9` checks passed",
 )
@@ -130,7 +134,7 @@ def test_public_docs_do_not_overmap_runtime_details() -> None:
     assert "Hermes remains upstream/reference only" in public_text
     assert "Mercury is the Zeus internal transport product name" in public_text
 
-    # Then: public docs keep the v0.3.0 no-live boundary explicit.
+    # Then: public docs keep the v0.4.0 no-live boundary explicit.
     for claim in ACTIVE_LIVE_CLAIMS:
         assert claim not in public_text
     assert "designed/prepared/dry-run/future" in public_text

@@ -10,6 +10,7 @@ from zeus_agent.security.credentials import (
     CredentialScopeUnsafeError,
     credential_report,
     redact_secret_like,
+    redact_secret_spans,
 )
 from zeus_agent.workflow_runtime.jobs import (
     CompensationMetadata,
@@ -60,6 +61,7 @@ def test_credential_scope_rejects_secret_like_values_without_echoing_secret() ->
         ("Bearer abcdefghijklmnopqrstuvwxyz", "[redacted-secret]"),
         ("api_key=abcdef", "[redacted-secret]"),
         ("token=secret", "[redacted-secret]"),
+        ("AWS_ACCESS_KEY_ID=AKIAWAVE18FIXTURE", "[redacted-secret]"),
         ("external.openai.readonly", "external.openai.readonly"),
     ],
 )
@@ -68,6 +70,18 @@ def test_redaction_helper_never_returns_raw_secret_like_values(value: str, expec
     # When: the helper redacts secret-like values for logs and dumps.
     # Then: secret-like values are masked while safe labels pass through.
     assert redact_secret_like(value) == expected
+
+
+def test_secret_span_redaction_masks_cloud_provider_credentials() -> None:
+    # Given: a cloud-provider credential line appears in captured output.
+    value = "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+    # When: span redaction is applied before evidence or logs are written.
+    redacted = redact_secret_spans(value)
+
+    # Then: the raw cloud secret value is not echoed.
+    assert redacted == "[redacted-secret]"
+    assert "wJalrXUtn" not in redacted
 
 
 def test_workflow_planner_creates_pending_job_with_principal_and_retry_compensation_metadata() -> None:
