@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .facade import WebResearchFacade
 from .models import (
+    WebFreshnessState,
     WebResearchDispatch,
     WebResearchEnvelope,
     WebResearchEvidence,
@@ -10,6 +11,7 @@ from .models import (
 )
 
 __all__ = [
+    "WebFreshnessState",
     "WebResearchDispatch",
     "WebResearchEnvelope",
     "WebResearchEvidence",

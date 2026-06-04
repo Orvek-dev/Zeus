@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, JsonValue, ValidationInfo, field_val
 from zeus_agent.security.credentials import redact_secret_spans
 
 WebDecision = Literal["planned", "blocked"]
+WebFreshnessState = Literal["fresh", "stale"]
 WebSecretField = Literal["source_id", "source_url", "source_ref", "summary"]
 
 _MODEL_CONFIG: Final = ConfigDict(
@@ -46,6 +47,7 @@ class WebSourcePin(BaseModel):
     source_url: str
     source_ref: Optional[str]
     source_pinned: bool = True
+    freshness: WebFreshnessState = "fresh"
     summary: str
     secret_fields: tuple[WebSecretField, ...] = ()
 
@@ -80,6 +82,13 @@ class WebSourcePin(BaseModel):
             return None
         return _safe_text(value, "source_ref")
 
+    @field_validator("freshness", mode="before")
+    @classmethod
+    def _validate_freshness(cls, value: JsonValue) -> JsonValue:
+        if isinstance(value, str) and value.strip() == "":
+            raise ValueError("freshness must be non-empty")
+        return value
+
     @field_validator("secret_fields", mode="before")
     @classmethod
     def _coerce_secret_fields(
@@ -108,6 +117,7 @@ class WebResearchEvidence(BaseModel):
     source_url: str
     source_ref: Optional[str]
     source_pinned: bool
+    freshness: WebFreshnessState
     summary: str
     secret_fields: tuple[WebSecretField, ...]
     no_secret_echo: bool = True
@@ -129,6 +139,7 @@ class WebResearchEnvelope(BaseModel):
 
 __all__ = [
     "WebDecision",
+    "WebFreshnessState",
     "WebResearchDispatch",
     "WebResearchEnvelope",
     "WebResearchEvidence",

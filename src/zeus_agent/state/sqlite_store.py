@@ -124,6 +124,13 @@ class SQLiteStateStore:
                 (criterion_id, evidence_id, status),
             )
 
+    def add_audit_event(self, event_id: str, summary: str) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                "INSERT INTO audit_log_events(event_id, summary) VALUES (?, ?)",
+                (event_id, summary),
+            )
+
     def counts(self) -> StateCounts:
         return StateCounts(
             sessions=self._count("session_state_sessions"),

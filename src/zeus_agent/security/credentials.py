@@ -10,6 +10,9 @@ _SECRET_LIKE_MARKERS: Final[tuple[str, ...]] = (
     "api-key",
     "api_key",
     "apikey",
+    "aws_access_key_id",
+    "aws_secret_access_key",
+    "aws_session_token",
     "bearer ",
     "private-key",
     "private_key",
@@ -42,6 +45,12 @@ _SECRET_SPAN_PATTERNS: Final[tuple[tuple[re.Pattern[str], str], ...]] = (
     (
         re.compile(
             r"(?i)(api[ _-]?key|private[ _-]?key|token|password|secret)\s*[=:]\s*[^\s\"'}]+",
+        ),
+        "[redacted-secret]",
+    ),
+    (
+        re.compile(
+            r"(?i)(aws_access_key_id|aws_secret_access_key|aws_session_token)\s*[=:]\s*[^\s\"'}]+",
         ),
         "[redacted-secret]",
     ),

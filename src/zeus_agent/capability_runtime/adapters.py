@@ -9,6 +9,7 @@ from zeus_agent.kernel.capabilities import (
     CapabilityRisk,
     SideEffect,
 )
+from zeus_agent.security.credentials import redact_secret_spans
 
 from .sandbox import SandboxPolicy
 
@@ -76,10 +77,12 @@ def build_wave3_handlers(
         decision = sandbox_policy.resolve_path(sandbox_root, raw_path)
         if decision.decision == "blocked" or decision.path is None:
             return _blocked_file_result(decision.reason or "path_blocked")
+        if sandbox_policy.protects_credential_path(sandbox_root, decision.path):
+            return _blocked_file_result("credential_path")
         if not decision.path.is_file():
             return _blocked_file_result("not_a_file")
         try:
-            content = decision.path.read_text(encoding="utf-8")
+            content = _redact_text(decision.path.read_text(encoding="utf-8"))
         except UnicodeDecodeError:
             return _blocked_file_result("file_decode_failed")
         return {
@@ -103,7 +106,12 @@ def build_wave3_handlers(
                 "query": raw_query,
                 "matches": [],
             }
-        return {"query": raw_query, "matches": _search_matches(decision.path, sandbox_root, raw_query)}
+        if sandbox_policy.protects_credential_path(sandbox_root, decision.path):
+            return {"decision": "blocked", "reason": "credential_path", "query": raw_query, "matches": []}
+        return {
+            "query": raw_query,
+            "matches": _search_matches(decision.path, sandbox_root, sandbox_policy, raw_query),
+        }
 
     def terminal_run(payload: dict) -> dict[str, object]:
         raw_command = payload.get("argv", payload.get("cmd"))
@@ -124,13 +132,20 @@ def build_wave3_handlers(
     }
 
 
-def _search_matches(path: Path, root: Path, query: str) -> list[dict[str, object]]:
+def _search_matches(
+    path: Path,
+    root: Path,
+    policy: SandboxPolicy,
+    query: str,
+) -> list[dict[str, object]]:
     files = [path] if path.is_file() else sorted(
         (candidate for candidate in path.rglob("*") if candidate.is_file()),
         key=lambda candidate: _relative_path(candidate, root),
     )
     matches = []
     for file_path in files:
+        if policy.protects_credential_path(root, file_path):
+            continue
         try:
             lines = file_path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:
@@ -141,7 +156,7 @@ def _search_matches(path: Path, root: Path, query: str) -> list[dict[str, object
                     {
                         "path": _relative_path(file_path, root),
                         "line": index,
-                        "snippet": line,
+                        "snippet": _redact_text(line),
                     }
                 )
     return matches
@@ -158,3 +173,9 @@ def _blocked_file_result(reason: str) -> dict[str, object]:
         "path": None,
         "content": None,
     }
+
+
+def _redact_text(value: str) -> str:
+    leading = value[: len(value) - len(value.lstrip())]
+    trailing = value[len(value.rstrip()) :]
+    return "{0}{1}{2}".format(leading, redact_secret_spans(value.strip()), trailing)

@@ -31,6 +31,11 @@ _SECRET_SPAN_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
         re.DOTALL | re.IGNORECASE,
     ),
     re.compile(
+        r"(?i)([\"']?(api[ _-]?key|private[ _-]?key|token|password|secret|"
+        r"aws_access_key_id|aws_secret_access_key|aws_session_token)[\"']?\s*[:=]\s*)"
+        r"[\"']?[^\"'\s,}]+[\"']?",
+    ),
+    re.compile(
         r"(?i)(api[ _-]?key|private[ _-]?key|token|password|secret)\s*[=:]\s*[^\s\"'}]+",
     ),
     re.compile(r"(?i)\bprivate[ _-]?key\s*[=:]\s*[^\s\"'}]+"),

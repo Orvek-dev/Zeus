@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, JsonValue, ValidationInfo, field_val
 from zeus_agent.security.credentials import redact_secret_spans
 
 GitHubDecision = Literal["planned", "blocked"]
+GitHubFreshnessState = Literal["fresh", "stale"]
 GitHubSecretField = Literal[
     "repo",
     "ref",
@@ -55,6 +56,7 @@ class GitHubSourcePin(BaseModel):
     query: str
     query_evidence_id: Optional[str]
     source_pinned: bool = True
+    freshness: GitHubFreshnessState = "fresh"
     summary: str
     secret_fields: tuple[GitHubSecretField, ...] = ()
 
@@ -101,6 +103,13 @@ class GitHubSourcePin(BaseModel):
             return None
         return _safe_text(value, info.field_name)
 
+    @field_validator("freshness", mode="before")
+    @classmethod
+    def _validate_freshness(cls, value: JsonValue) -> JsonValue:
+        if isinstance(value, str) and value.strip() == "":
+            raise ValueError("freshness must be non-empty")
+        return value
+
     @field_validator("secret_fields", mode="before")
     @classmethod
     def _coerce_secret_fields(
@@ -131,6 +140,7 @@ class GitHubResearchEvidence(BaseModel):
     query: str
     query_evidence_id: Optional[str]
     source_pinned: bool
+    freshness: GitHubFreshnessState
     summary: str
     secret_fields: tuple[GitHubSecretField, ...]
     no_secret_echo: bool = True
@@ -152,6 +162,7 @@ class GitHubResearchEnvelope(BaseModel):
 
 __all__ = [
     "GitHubDecision",
+    "GitHubFreshnessState",
     "GitHubResearchDispatch",
     "GitHubResearchEnvelope",
     "GitHubResearchEvidence",

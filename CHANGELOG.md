@@ -2,6 +2,31 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.4.0 - 2026-06-04
+
+### Added
+
+- Hermes-grade live platform absorption master plan covering CLI, API, gateway, MCP, providers, memory, skills, eval, tracing, recovery, and live runtime parity targets.
+- Live agent loop contracts for objective-driven turns, provider/tool coordination, persistence, resilience, and evidence-backed completion.
+- Gateway/API runtime scaffolds with session persistence, security review blockers, HTTP server adapters, and G006 scenario/eval coverage.
+- Live provider HTTP adapter contracts for OpenAI-compatible style providers with fail-closed request/response handling.
+- MCP manager contracts for server registration, tool-surface filtering, provenance checks, and managed runtime decisions.
+- Tool sandbox execution contracts for local command mediation, policy checks, path/network controls, and blocked side-effect evidence.
+- Research provider and observability gate surfaces for source-backed synthesis, runtime telemetry, evidence logs, and release-quality checks.
+- Public master design coverage for MemoryGraph, LLM Wiki, verification-taught learning, ontology-backed knowledge, and adaptive workflow intelligence.
+
+### Changed
+
+- README, Hermes comparison, and live connection architecture now describe the `v0.4.0` public source checkpoint and expanded live-platform absorption scope.
+- Public tests now cover Wave 15 through Wave 20 and G006 runtime slices while keeping private Codex harness artifacts out of the repository.
+- Version metadata is aligned to `zeus-agent==0.4.0`.
+
+### Notes
+
+- `v0.4.0` remains local-first and deterministic by default.
+- The release substantially widens the public implementation surface, but production live execution is still gated behind Zeus authority grants, runtime leases, approvals, sandbox controls, audit evidence, verification, rollback, and release review.
+- Private Codex/ULW artifacts, local evidence, local runtime databases, and machine-local operating state remain excluded from the public release.
+
 ## v0.3.0 - 2026-06-03
 
 ### Added

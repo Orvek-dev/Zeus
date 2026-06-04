@@ -16,6 +16,7 @@ class WebResearchFacade:
             source_url=source.source_url,
             source_ref=source.source_ref,
             source_pinned=source.source_pinned,
+            freshness=source.freshness,
             summary=source.summary,
             secret_fields=source.secret_fields,
         )
@@ -35,6 +36,8 @@ def _web_block_reasons(source: WebSourcePin) -> tuple[str, ...]:
     reasons: list[str] = []
     if not source.source_pinned:
         reasons.append("web_source_unpinned")
+    if source.freshness == "stale":
+        reasons.append("web_source_stale")
     if source.source_ref is None:
         reasons.append("web_source_ref_missing")
     if "summary" in source.secret_fields:

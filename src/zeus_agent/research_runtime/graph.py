@@ -4,6 +4,7 @@ from typing import Iterable, Optional
 
 from zeus_agent.research_runtime.models import (
     _contains_secret_like,
+    _contains_secret_like_identifier,
     ResearchEvidenceEdge,
     ResearchEvidenceGraph,
     ResearchEvidenceNode,
@@ -21,11 +22,12 @@ class ResearchGraphBuilder:
         edge_list = list(edges or [])
         node_ids = [node.node_id for node in node_list]
 
+        _reject_secret_like_fields(node_ids)
         if len(node_ids) != len(set(node_ids)):
             raise ValueError("duplicate_node_id")
 
         for node in node_list:
-            if node.source_pin is None and node.source_kind in {"hermes_source_pin", "openclaw_source_pin", "task_evidence_node"}:
+            if node.source_pin is None and node.source_kind != "local_doc":
                 raise ValueError("external_claims_must_be_pinned")
             if node.source_pin is None:
                 if node.source_kind == "local_doc":
@@ -34,6 +36,8 @@ class ResearchGraphBuilder:
             if node.source_pin.source_type != node.source_kind:
                 raise ValueError("source_kind_mismatch")
             pin = node.source_pin
+            if pin.freshness == "stale":
+                raise ValueError("stale_source_blocked")
             if _contains_secret_like(pin.summary) or _contains_secret_like(pin.provenance_id):
                 raise ValueError("secret_like_claim_fields")
             if pin.source_url is not None and _contains_secret_like(pin.source_url):
@@ -45,6 +49,7 @@ class ResearchGraphBuilder:
 
         valid_ids = set(node_ids)
         for edge in edge_list:
+            _reject_secret_like_fields((edge.source_node_id, edge.target_node_id, edge.relation))
             if edge.source_node_id not in valid_ids or edge.target_node_id not in valid_ids:
                 raise ValueError("edge_references_missing_node")
 
@@ -54,3 +59,8 @@ class ResearchGraphBuilder:
             network_opened=False,
             handler_executed=False,
         )
+
+
+def _reject_secret_like_fields(values: Iterable[str]) -> None:
+    if any(_contains_secret_like_identifier(value) for value in values):
+        raise ValueError("secret_like_graph_field")

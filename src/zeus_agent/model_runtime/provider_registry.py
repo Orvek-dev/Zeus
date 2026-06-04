@@ -211,7 +211,7 @@ class ProviderRegistry:
                 network_host=_network_host_for_intake(request),
                 live_network=request.live_network,
                 budget_required=budget_required,
-                evidence_target=getattr(request, "evidence_target", EVIDENCE_TARGET),
+                evidence_target=request.evidence_target,
             )
         except ValidationError:
             return RuntimeLeaseIntakeResult(

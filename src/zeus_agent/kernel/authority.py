@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, Literal, Optional, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -144,7 +145,7 @@ class AuthorityContext(BaseModel):
                     reason="path_scope_missing",
                     capability_id=capability,
                 )
-            if not any(path.startswith(rule.path_prefix) for rule in path_rules):
+            if not any(_path_in_scope(path, rule.path_prefix) for rule in path_rules):
                 return AuthorityDecision(
                     decision="blocked",
                     reason="path_scope_blocked",
@@ -228,6 +229,9 @@ class ApprovalReceipt(BaseModel):
     run_id: str
     goal_contract_id: str
     approved_capabilities: List[str]
+    request_fingerprint: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    nonce: Optional[str] = None
 
     @field_validator("principal_id", "run_id", "goal_contract_id")
     @classmethod
@@ -238,6 +242,20 @@ class ApprovalReceipt(BaseModel):
     @classmethod
     def _validate_approved_capabilities(cls, values: List[str]) -> List[str]:
         return [_require_non_empty(value, "approved_capabilities") for value in values]
+
+    @field_validator("request_fingerprint", "nonce")
+    @classmethod
+    def _validate_optional_text(cls, value: Optional[str], info: object) -> Optional[str]:
+        if value is None:
+            return None
+        return _require_non_empty(value, info.field_name)
+
+    @field_validator("expires_at")
+    @classmethod
+    def _validate_expires_at(cls, value: Optional[datetime]) -> Optional[datetime]:
+        if value is None:
+            return None
+        return _to_utc(value)
 
     def assert_within_authority(self, authority: AuthorityContext) -> None:
         if authority.run_id != self.run_id:
@@ -252,3 +270,18 @@ class ApprovalReceipt(BaseModel):
                 raise ValueError(
                     "approved capability outside authority scope: {0}".format(capability)
                 )
+
+
+def _path_in_scope(path: str, path_prefix: str) -> bool:
+    normalized_path = _normalize_scope_path(path)
+    normalized_prefix = _normalize_scope_path(path_prefix)
+    if normalized_path == normalized_prefix:
+        return True
+    return normalized_path.startswith("{0}/".format(normalized_prefix.rstrip("/")))
+
+
+def _normalize_scope_path(value: str) -> str:
+    text = _require_non_empty(value, "path")
+    if text.startswith("/"):
+        return Path(text).resolve().as_posix()
+    return text.rstrip("/")
