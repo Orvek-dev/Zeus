@@ -24,7 +24,7 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v0.6.0 boundary is designed/prepared/dry-run/future for live-capable
+The public v0.7.0 boundary is designed/prepared/dry-run/future for live-capable
 surfaces unless a specific surface has separate production evidence and release
 approval.
 
@@ -191,16 +191,16 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v0.6.0 release tree:
+Measured in the public v0.7.0 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |
-| Public source/test/docs/config files | 321 |
-| `src` Python source lines | 26,792 |
-| `tests` Python source lines | 14,503 |
-| `docs` Markdown lines | 2,635 |
-| Python tests | 92 |
-| Source CLI files | 22 |
+| Public source/test/docs/config files | 1,019 |
+| `src` Python source lines | 72,966 |
+| `tests` Python source lines | 38,360 |
+| `docs` Markdown lines | 2,824 |
+| Python test files | 284 |
+| CLI/product commands | 220 |
 
 Current Zeus already has many runtime anchors:
 
@@ -240,11 +240,11 @@ The target should be expressed as useful platform mass, not empty line padding.
 
 | Metric | Current Zeus | Hermes reference signal | Zeus parity target |
 | --- | ---: | ---: | ---: |
-| Runtime Python LOC | 26.8k | Hermes is materially larger and live | 180k-280k useful runtime LOC |
-| Test LOC | 15.9k | broad tests across agent/gateway/tools/providers | 120k+ test LOC |
-| Runtime files | about 120 Python modules in `src/zeus_agent` | broad multi-surface runtime | 700-1,000 useful runtime files |
-| Test files | 94 | broad unit/integration/e2e coverage | 700+ test files |
-| Product docs | 12.1k docs/plans lines | large public docs and references | 80k+ practical docs lines |
+| Runtime Python LOC | 72.9k source / 63.6k non-comment | Hermes is materially larger and live | 180k-280k useful runtime LOC |
+| Test LOC | 38.4k source / 31.2k non-comment | broad tests across agent/gateway/tools/providers | 120k+ test LOC |
+| Runtime files | 721 Python modules in `src/zeus_agent` | broad multi-surface runtime | 700-1,000 useful runtime files |
+| Test files | 284 | broad unit/integration/e2e coverage | 700+ test files |
+| Product docs | 2.8k public docs lines | large public docs and references | 80k+ practical docs lines |
 | Entry surfaces | CLI/eval/scaffolded API/gateway | CLI, gateway, ACP, batch, API, library | 8 production/beta surfaces |
 | Providers | fake/local/OpenAI-compatible scaffolds | many provider paths and fallbacks | 15+ provider profiles |
 | Native tools | scaffolded | 70+ tools | 80+ Zeus tools |
@@ -901,7 +901,7 @@ These are feasible now because current Zeus already has compatible anchors:
 | Task DAG integration | `ParallelTaskSpec`, `ParallelScheduler`, `WorkLoopPlan` | Compile pattern plans into existing parallel task specs and lane plans. |
 | Write-scope safety | `ParallelScheduler` owned-path conflict detection | Reuse path conflict checks before fan-out. |
 | Lease boundary | `runtime_lease` and live connection orchestra | Require lease metadata for live or external workflow steps. |
-| Evidence checkpoint | `harness/evidence/evidence.jsonl`, verification gates | Add workflow decisions as evidence records before completion. |
+| Evidence checkpoint | `src/zeus_agent/verification_runtime/` evidence records and verification gates | Add workflow decisions as public runtime evidence records before completion. Private `harness/evidence` ledgers remain Codex/project-mode artifacts, not public release anchors. |
 | Skill improvement candidate | `skill_evolution` candidate/review models | Convert repeated workflow improvements into Prometheus candidates, not active rules. |
 | No-secret behavior | existing redaction and no-secret checks | Redact workflow telemetry and block raw secrets in workflow memory. |
 

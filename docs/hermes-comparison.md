@@ -107,9 +107,9 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v0.6.0` code does not claim all live surfaces are production-active.
-It establishes the contracts, total architecture dry-run checks, and live
-connection design those surfaces should pass through.
+The public `v0.7.0` code does not claim all live surfaces are production-active.
+It establishes the contracts, total architecture dry-run checks, Tool Limbs
+boundary, and live connection design those surfaces should pass through.
 
 ## What Is Different With Hermes
 
@@ -121,7 +121,7 @@ connection design those surfaces should pass through.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.6.0 is a local deterministic live-spine checkpoint with release-gated provider/MCP loopback readiness and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.7.0 is a local deterministic Tool Limbs checkpoint with native tool catalog reporting, MCP discovery and API connector dry-run contracts, release-gated provider/MCP loopback readiness, and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
@@ -154,7 +154,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v0.6.0 Boundary
+## Current v0.7.0 Boundary
 
 Implemented public foundation:
 
@@ -163,14 +163,17 @@ Implemented public foundation:
 - local deterministic agent loop scaffolds;
 - provider, tool, connector, transport, workflow, gateway, verification, and
   skill-evolution contracts;
+- governed Tool Limbs reporting for native tools, MCP discovery, and API
+  connector dry-run contracts;
 - security planning, research graph, ontology candidate, sandbox workflow, and
   dry-run orchestration contracts;
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 1238 public tests, a 10/10 final architecture eval, and a 9/9 total
+- 1243 public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc program;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc program with v0.7.0
+  Tool Limbs checkpoint reporting;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.
 

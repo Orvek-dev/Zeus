@@ -65,6 +65,14 @@ class ReleaseGatedUlwStatus(BaseModel):
     independent_review_required: bool = True
     manual_qa_required: bool = True
     raw_secret_marker_detected: bool = False
+    tool_limbs_contract_available: bool = False
+    native_tool_catalog_contract_available: bool = False
+    mcp_tool_discovery_contract_available: bool = False
+    api_connector_contract_available: bool = False
+    tool_include_exclude_required: bool = False
+    tool_approval_lease_required: bool = False
+    tool_security_gate_required: bool = False
+    tool_limbs_ready: bool = False
     credential_material_accessed: bool = False
     network_opened: bool = False
     external_delivery_opened: bool = False
@@ -95,6 +103,7 @@ def build_release_gated_ulw_status(
         raw_secret_marker_detected=secret_marker_detected,
     )
     live_spine_contract_available = normalized_version == "v0.6.0" and "unknown_target_version" not in blocked_reasons
+    tool_limbs_contract_available = normalized_version == "v0.7.0" and "unknown_target_version" not in blocked_reasons
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
         target_version=normalized_version,
@@ -130,6 +139,14 @@ def build_release_gated_ulw_status(
         independent_review_required=True,
         manual_qa_required=True,
         raw_secret_marker_detected=secret_marker_detected,
+        tool_limbs_contract_available=tool_limbs_contract_available,
+        native_tool_catalog_contract_available=tool_limbs_contract_available,
+        mcp_tool_discovery_contract_available=tool_limbs_contract_available,
+        api_connector_contract_available=tool_limbs_contract_available,
+        tool_include_exclude_required=tool_limbs_contract_available,
+        tool_approval_lease_required=tool_limbs_contract_available,
+        tool_security_gate_required=tool_limbs_contract_available,
+        tool_limbs_ready=False,
         credential_material_accessed=False,
         network_opened=False,
         external_delivery_opened=False,
@@ -149,7 +166,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
     reasons = []
     if target_version not in _PROGRAM_ORDER:
         reasons.append("unknown_target_version")
-    elif target_version != "v0.6.0":
+    elif target_version not in {"v0.6.0", "v0.7.0"}:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
         reasons.append("raw_secret_marker_detected")

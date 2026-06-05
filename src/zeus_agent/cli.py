@@ -159,6 +159,7 @@ from zeus_agent.runtime_lease import RuntimeLease
 from zeus_agent.session_runtime import SessionStore
 from zeus_agent.setup_runtime import setup_apply, setup_plan
 from zeus_agent.tool_runtime import native_tool_catalog_payload
+from zeus_agent.tool_limbs_runtime import build_tool_limbs_contract
 from zeus_agent.trajectory_runtime import export_trajectory
 from zeus_agent.verification_runtime import ReviewBindingRequest, bind_review
 from zeus_agent.wiki_runtime import render_wiki_page
@@ -224,6 +225,15 @@ def release_gated_ulw(
         target_version=target_version,
         raw_secret_marker_detected=raw_secret_marker_detected,
     ).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("tool-limbs")
+def tool_limbs(
+    tool_id: Optional[str] = typer.Option(None, "--tool-id"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_tool_limbs_contract(tool_id=tool_id).to_payload()
     _print_payload(payload, as_json=as_json)
 
 

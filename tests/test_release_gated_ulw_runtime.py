@@ -48,12 +48,32 @@ def test_release_gated_ulw_blocks_unknown_target_version() -> None:
 
 
 def test_release_gated_ulw_blocks_future_release_until_current_checkpoint_closes() -> None:
-    result = build_release_gated_ulw_status(target_version="v0.7.0")
+    result = build_release_gated_ulw_status(target_version="v0.8.0")
 
     assert result.decision == "blocked"
-    assert result.release_stage == "tool_limbs"
+    assert result.release_stage == "platform_surface"
     assert result.release_gate_ready is False
     assert "prior_release_checkpoint_required" in result.blocked_reasons
+
+
+def test_v070_tool_limbs_reports_governed_tool_contract() -> None:
+    result = build_release_gated_ulw_status(target_version="v0.7.0")
+    payload = result.to_payload()
+
+    assert payload["decision"] == "report"
+    assert payload["target_version"] == "v0.7.0"
+    assert payload["release_stage"] == "tool_limbs"
+    assert payload["tool_limbs_contract_available"] is True
+    assert payload["native_tool_catalog_contract_available"] is True
+    assert payload["mcp_tool_discovery_contract_available"] is True
+    assert payload["api_connector_contract_available"] is True
+    assert payload["tool_include_exclude_required"] is True
+    assert payload["tool_approval_lease_required"] is True
+    assert payload["tool_security_gate_required"] is True
+    assert payload["tool_limbs_ready"] is False
+    assert payload["release_gate_ready"] is False
+    assert payload["next_version"] == "v0.8.0"
+    assert payload["no_secret_echo"] is True
 
 
 def test_release_gated_ulw_cli_json_surface() -> None:

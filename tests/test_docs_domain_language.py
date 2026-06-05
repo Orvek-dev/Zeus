@@ -11,6 +11,10 @@ PUBLIC_DOCS: Final[tuple[Path, ...]] = (
     PROJECT_ROOT / "docs/hermes-comparison.md",
     PROJECT_ROOT / "docs/live-connection-architecture.md",
 )
+PUBLIC_MASTER_PLAN_DOCS: Final[tuple[Path, ...]] = (
+    PROJECT_ROOT / "docs/hermes-grade-platform-master-design.md",
+    PROJECT_ROOT / "docs/hermes-live-platform-absorption-master-plan.md",
+)
 APPROVED_CORE_NAMES: Final[tuple[str, ...]] = (
     "Zeus Kernel",
     "Athena",
@@ -70,12 +74,18 @@ STALE_PUBLIC_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
     "tests-1237%20passed",
     "`1237` public tests passed",
     "1237 public tests",
+    "tests-1238%20passed",
+    "`1238` public tests passed",
+    "1238 public tests",
+    "tests-1242%20passed",
+    "`1242` public tests passed",
+    "1242 public tests",
     "`8/8` checks passed",
     "8/8 total",
 )
 CURRENT_PUBLIC_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
-    "tests-1238%20passed",
-    "`1238` public tests passed",
+    "tests-1243%20passed",
+    "`1243` public tests passed",
     "`10/10` checks passed",
     "`9/9` checks passed",
 )
@@ -197,3 +207,9 @@ def test_core_language_docs_match_runtime_anchor_contract() -> None:
     )
     assert "gateway_runtime" in poseidon_doc
     assert "Sandbox, environment, and volatile" not in poseidon_doc
+
+
+def test_public_master_plans_do_not_name_private_harness_as_existing_public_anchor() -> None:
+    for path in PUBLIC_MASTER_PLAN_DOCS:
+        text = _read(path)
+        assert "| Evidence checkpoint | `harness/evidence/evidence.jsonl`" not in text

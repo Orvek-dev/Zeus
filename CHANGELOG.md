@@ -2,6 +2,32 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.7.0 - 2026-06-05
+
+### Added
+
+- Tool Limbs runtime and CLI surface for governed native tool, MCP discovery,
+  and API connector boundary reporting.
+- Release-gated `v0.7.0` checkpoint fields for Tool Limbs readiness,
+  include/exclude policy, approval lease, security gate, and evidence capture.
+- Secret-safe Tool Limbs adversarial handling that blocks unknown or
+  credential-like tool identifiers without echoing raw secret-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==0.7.0`.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Tool Limbs checkpoint instead of only the `v0.6.0`
+  live-spine checkpoint.
+
+### Notes
+
+- `v0.7.0` is still local-first and deterministic by default.
+- Tool visibility is not execution authorization. Real external provider, MCP,
+  gateway, browser, terminal, sandbox, and API production execution remains
+  gated behind explicit authority, lease, approval, sandbox, evidence, rollback,
+  and release review.
+
 ## v0.6.0 - 2026-06-05
 
 ### Added

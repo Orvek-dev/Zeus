@@ -4,8 +4,8 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v0.6.0` does not claim these live integrations are production-active. It
-establishes the public live-spine release gate and the dry-run contract slice
+`v0.7.0` does not claim these live integrations are production-active. It
+establishes the public Tool Limbs release gate and the dry-run contract slice
 those integrations must pass through before live execution is enabled.
 
 ## Design Goal
@@ -73,8 +73,8 @@ policy before dispatching a handler.
 | `runtime_lease` | Binds live capability, credential scope, network host, budget, TTL, and evidence target | `src/zeus_agent/runtime_lease/` |
 | `security_runtime` | Decides allowed/blocked/dry-run before handler execution | `src/zeus_agent/security/planning.py` |
 | `provider_runtime` | Resolves local LLM, fake, OpenAI-compatible, Anthropic-style, and future provider adapters | `src/zeus_agent/model_runtime/` |
-| `mcp_runtime` | Registers trusted MCP servers, tools, schemas, resources, and credential scopes | future module, backed by `tool_runtime` and `connector_runtime` |
-| `tool_runtime` | Filters visible tools, validates schema, blocks side effects without authority | `src/zeus_agent/tool_runtime/` |
+| `mcp_runtime` | Registers trusted MCP servers, tools, schemas, resources, and credential scopes | future live module, dry-run surfaced through `src/zeus_agent/tool_limbs_runtime/` |
+| `tool_runtime` | Filters visible tools, validates schema, blocks side effects without authority | `src/zeus_agent/tool_runtime/` and `src/zeus_agent/tool_limbs_runtime/` |
 | `gateway_runtime` | Drafts and delivers external messages only through scoped targets and audit records | `src/zeus_agent/gateway_runtime/` |
 | `research_runtime` | Builds source-pinned research evidence from web, GitHub, docs, and local sources | `src/zeus_agent/research_runtime/` |
 | `sandbox_runtime` | Contains terminal, browser, file, remote, and network side effects | `src/zeus_agent/capability_runtime/` |
@@ -234,13 +234,17 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v0.6.0 Implementation Boundary
+## v0.7.0 Implementation Boundary
 
-`v0.6.0` includes:
+`v0.7.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
 - release-gated ULW status for the v0.6.0 -> v1.0.0-rc program;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
+- Tool Limbs reporting for native tool catalog visibility, MCP discovery
+  contract availability, API connector contract availability, include/exclude
+  policy, approval lease, security gate, evidence capture, and no-secret-echo
+  checks;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -250,7 +254,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v0.6.0` does not include:
+`v0.7.0` does not include:
 
 - production live MCP catalog;
 - long-running gateway daemon;
