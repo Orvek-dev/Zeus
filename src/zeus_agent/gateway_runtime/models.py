@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Final, Literal
-from typing_extensions import assert_never
+from typing import Final, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, ValidationInfo, field_serializer, field_validator, model_validator
 
@@ -38,7 +37,7 @@ def _require_non_empty(value: str, field_name: str) -> str:
     return normalized
 
 
-def _redact_optional(value: str | None) -> str | None:
+def _redact_optional(value: Optional[str]) -> Optional[str]:
     if value is None:
         return None
     return redact_secret_spans(value)
@@ -103,9 +102,9 @@ class GatewayApiResponse(_GatewayModel):
     decision: GatewayDecision
     reason: GatewayReason
     status_code: int = Field(ge=100, le=599)
-    session_id: str | None = None
-    run_id: str | None = None
-    goal_contract_id: str | None = None
+    session_id: Optional[str] = None
+    run_id: Optional[str] = None
+    goal_contract_id: Optional[str] = None
     session_persisted: bool = False
     resume_succeeded: bool = False
     loopback_http_opened: bool = False
@@ -132,9 +131,9 @@ class GatewayApiResponse(_GatewayModel):
         cls,
         *,
         reason: Literal["allowed"] = "allowed",
-        session_id: str | None = None,
-        run_id: str | None = None,
-        goal_contract_id: str | None = None,
+        session_id: Optional[str] = None,
+        run_id: Optional[str] = None,
+        goal_contract_id: Optional[str] = None,
         session_persisted: bool = False,
         resume_succeeded: bool = False,
         loopback_http_opened: bool = False,
@@ -198,7 +197,7 @@ class GatewayApiResponse(_GatewayModel):
 
     @field_validator("session_id", "run_id", "goal_contract_id")
     @classmethod
-    def _validate_optional_text(cls, value: str | None, info: ValidationInfo) -> str | None:
+    def _validate_optional_text(cls, value: Optional[str], info: ValidationInfo) -> Optional[str]:
         if value is None:
             return None
         return _require_non_empty(value, info.field_name)
@@ -211,41 +210,40 @@ class GatewayApiResponse(_GatewayModel):
         return value
 
     @field_serializer("session_id", "run_id", "goal_contract_id")
-    def _serialize_optional_identity(self, value: str | None) -> str | None:
+    def _serialize_optional_identity(self, value: Optional[str]) -> Optional[str]:
         return _redact_optional(value)
 
     @model_validator(mode="after")
     def _validate_decision_status(self) -> GatewayApiResponse:
-        match self.decision:
-            case "allowed":
-                if not 200 <= self.status_code <= 299:
-                    raise ValueError("allowed_status_must_be_2xx")
-            case "blocked":
-                if not 400 <= self.status_code <= 499:
-                    raise ValueError("blocked_status_must_be_4xx")
-                if self.handler_executed:
-                    raise ValueError("blocked_handler_executed")
-                if self.side_effect_count != 0:
-                    raise ValueError("blocked_side_effect_count")
-                if any(
-                    (
-                        self.session_persisted,
-                        self.resume_succeeded,
-                        self.loopback_http_opened,
-                        self.idempotency_replay_stable,
-                        self.idempotent_replay,
-                        self.network_opened,
-                        self.external_delivery_attempted,
-                        self.external_delivery_opened,
-                        self.webhook_registered,
-                        self.standing_order_created,
-                        self.credential_material_accessed,
-                    ),
-                ):
-                    raise ValueError("blocked_side_effect_flag")
-            case unreachable:
-                assert_never(unreachable)
-        return self
+        if self.decision == "allowed":
+            if not 200 <= self.status_code <= 299:
+                raise ValueError("allowed_status_must_be_2xx")
+            return self
+        if self.decision == "blocked":
+            if not 400 <= self.status_code <= 499:
+                raise ValueError("blocked_status_must_be_4xx")
+            if self.handler_executed:
+                raise ValueError("blocked_handler_executed")
+            if self.side_effect_count != 0:
+                raise ValueError("blocked_side_effect_count")
+            if any(
+                (
+                    self.session_persisted,
+                    self.resume_succeeded,
+                    self.loopback_http_opened,
+                    self.idempotency_replay_stable,
+                    self.idempotent_replay,
+                    self.network_opened,
+                    self.external_delivery_attempted,
+                    self.external_delivery_opened,
+                    self.webhook_registered,
+                    self.standing_order_created,
+                    self.credential_material_accessed,
+                ),
+            ):
+                raise ValueError("blocked_side_effect_flag")
+            return self
+        raise AssertionError(self.decision)
 
 
 ExcludingAllowedReason = Literal[

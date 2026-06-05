@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from zeus_agent.state.idempotency import IdempotencyConflictError
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class GatewaySession:
     session_id: str
     run_id: str
@@ -17,7 +17,7 @@ class GatewaySession:
     side_effects: bool = False
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class GatewaySessionStoreCounts:
     sessions: int
     idempotency_records: int
@@ -27,7 +27,7 @@ class GatewaySessionStoreCounts:
     side_effects: bool
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class GatewayAuditSummary:
     sessions: int
     idempotency_records: int
@@ -37,7 +37,7 @@ class GatewayAuditSummary:
     side_effects: bool
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class GatewaySessionFieldError(RuntimeError):
     field_name: str
 

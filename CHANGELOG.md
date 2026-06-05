@@ -2,6 +2,27 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.5.0 - 2026-06-05
+
+### Added
+
+- Public sync of the expanded Zeus live-platform runtime surface through the W205-W212 local RC closeout package.
+- RC closeout runtime for macro coverage audit, deterministic smoke/eval aggregation, source metrics, Hermes live opt-in mapping, public/private security boundary, package/release boundary, and hard-close reporting.
+- Public boundary documents for Hermes live opt-in, public/private artifact separation, RC release handling, and W205-W212 hard-close handoff.
+- Additional deterministic public tests for live provider/API/MCP/gateway/research/workflow/ontology/skill/security/release boundaries.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==0.5.0`.
+- README, Hermes comparison, live connection architecture, and platform master docs now describe the `v0.5.0` public source checkpoint.
+- Public RC tests no longer depend on private `docs/ai`, `plans`, `harness`, or `evidence` artifacts.
+
+### Notes
+
+- `v0.5.0` is still local-first and deterministic by default.
+- Production live execution, real external provider/MCP/gateway/browser/terminal/sandbox operation, tag publication, and GitHub release claims remain gated behind explicit authority, lease, approval, sandbox, evidence, rollback, and release review.
+- Private Codex/ULW artifacts, local evidence, local runtime databases, and machine-local operating state remain excluded from the public release.
+
 ## v0.4.0 - 2026-06-04
 
 ### Added

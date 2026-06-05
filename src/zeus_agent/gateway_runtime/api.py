@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
-from typing_extensions import assert_never
+from typing import Final, Optional
 
 from zeus_agent.gateway_runtime.api_support import (
     BLOCKED_GOAL_CONTRACT_ID,
@@ -33,16 +32,16 @@ from zeus_agent.gateway_runtime.session_store import (
 )
 
 
-@dataclass(frozen=True, slots=True, init=False)
+@dataclass(frozen=True, init=False)
 class GatewayApiRuntime:
     store: SQLiteGatewaySessionStore
     security_policy: GatewaySecurityPolicy
 
     def __init__(
         self,
-        db_path: Path | None = None,
+        db_path: Optional[Path] = None,
         *,
-        store: SQLiteGatewaySessionStore | None = None,
+        store: Optional[SQLiteGatewaySessionStore] = None,
     ) -> None:
         object.__setattr__(self, "store", select_store(db_path, store))
         object.__setattr__(self, "security_policy", GatewaySecurityPolicy())
@@ -54,19 +53,16 @@ class GatewayApiRuntime:
         idempotency_key: str,
     ) -> GatewayApiResponse:
         authorized = self.security_policy.authorize_loopback(security)
-        match authorized.decision:
-            case "blocked":
-                return self._record_blocked(
-                    authorized,
-                    session_id=request.session_id,
-                    run_id=request.run_id,
-                    goal_contract_id=request.goal_contract_id,
-                    message=request.message,
-                )
-            case "allowed":
-                pass
-            case unreachable:
-                assert_never(unreachable)
+        if authorized.decision == "blocked":
+            return self._record_blocked(
+                authorized,
+                session_id=request.session_id,
+                run_id=request.run_id,
+                goal_contract_id=request.goal_contract_id,
+                message=request.message,
+            )
+        if authorized.decision != "allowed":
+            raise AssertionError(authorized.decision)
         try:
             session = self.store.create_or_replay_session(
                 session_id=request.session_id,
@@ -95,19 +91,16 @@ class GatewayApiRuntime:
         security: GatewaySecurityRequestContext,
     ) -> GatewayApiResponse:
         authorized = self.security_policy.authorize_loopback(security)
-        match authorized.decision:
-            case "blocked":
-                return self._record_blocked(
-                    authorized,
-                    session_id=session_id,
-                    run_id=BLOCKED_RUN_ID,
-                    goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
-                    message=request.message,
-                )
-            case "allowed":
-                pass
-            case unreachable:
-                assert_never(unreachable)
+        if authorized.decision == "blocked":
+            return self._record_blocked(
+                authorized,
+                session_id=session_id,
+                run_id=BLOCKED_RUN_ID,
+                goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
+                message=request.message,
+            )
+        if authorized.decision != "allowed":
+            raise AssertionError(authorized.decision)
         session = self.store.resume_session(
             session_id,
             request.resume_token,
@@ -125,39 +118,35 @@ class GatewayApiRuntime:
 
     def audit_summary(self, security: GatewaySecurityRequestContext) -> GatewayApiResponse:
         authorized = self.security_policy.authorize_loopback(security)
-        match authorized.decision:
-            case "blocked":
-                return self._record_blocked(
-                    authorized,
-                    session_id=BLOCKED_SESSION_ID,
-                    run_id=BLOCKED_RUN_ID,
-                    goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
-                    message=security.path,
-                )
-            case "allowed":
-                counts = self.store.counts()
-                return GatewayApiResponse.allowed(
-                    audit_records=counts.audit_records,
-                    gateway_session_count=counts.sessions,
-                )
-            case unreachable:
-                assert_never(unreachable)
+        if authorized.decision == "blocked":
+            return self._record_blocked(
+                authorized,
+                session_id=BLOCKED_SESSION_ID,
+                run_id=BLOCKED_RUN_ID,
+                goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
+                message=security.path,
+            )
+        if authorized.decision != "allowed":
+            raise AssertionError(authorized.decision)
+        counts = self.store.counts()
+        return GatewayApiResponse.allowed(
+            audit_records=counts.audit_records,
+            gateway_session_count=counts.sessions,
+        )
 
-    def preflight_block(self, security: GatewaySecurityRequestContext) -> GatewayApiResponse | None:
+    def preflight_block(self, security: GatewaySecurityRequestContext) -> Optional[GatewayApiResponse]:
         authorized = self.security_policy.authorize_loopback(security)
-        match authorized.decision:
-            case "blocked":
-                return self._record_blocked(
-                    authorized,
-                    session_id=BLOCKED_SESSION_ID,
-                    run_id=BLOCKED_RUN_ID,
-                    goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
-                    message=security.path,
-                )
-            case "allowed":
-                return None
-            case unreachable:
-                assert_never(unreachable)
+        if authorized.decision == "blocked":
+            return self._record_blocked(
+                authorized,
+                session_id=BLOCKED_SESSION_ID,
+                run_id=BLOCKED_RUN_ID,
+                goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
+                message=security.path,
+            )
+        if authorized.decision == "allowed":
+            return None
+        raise AssertionError(authorized.decision)
 
     def malformed_request(
         self,
@@ -179,29 +168,27 @@ class GatewayApiRuntime:
 
     def blocked_surface(self, security: GatewaySecurityRequestContext) -> GatewayApiResponse:
         authorized = self.security_policy.authorize_loopback(security)
-        match authorized.decision:
-            case "blocked":
-                return self._record_blocked(
-                    authorized,
-                    session_id=BLOCKED_SESSION_ID,
-                    run_id=BLOCKED_RUN_ID,
-                    goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
-                    message=security.path,
-                )
-            case "allowed":
-                denied = GatewayApiResponse.blocked(
-                    reason="malformed_request",
-                    status_code=400,
-                )
-                return self._record_blocked(
-                    denied,
-                    session_id=BLOCKED_SESSION_ID,
-                    run_id=BLOCKED_RUN_ID,
-                    goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
-                    message=security.path,
-                )
-            case unreachable:
-                assert_never(unreachable)
+        if authorized.decision == "blocked":
+            return self._record_blocked(
+                authorized,
+                session_id=BLOCKED_SESSION_ID,
+                run_id=BLOCKED_RUN_ID,
+                goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
+                message=security.path,
+            )
+        if authorized.decision != "allowed":
+            raise AssertionError(authorized.decision)
+        denied = GatewayApiResponse.blocked(
+            reason="malformed_request",
+            status_code=400,
+        )
+        return self._record_blocked(
+            denied,
+            session_id=BLOCKED_SESSION_ID,
+            run_id=BLOCKED_RUN_ID,
+            goal_contract_id=BLOCKED_GOAL_CONTRACT_ID,
+            message=security.path,
+        )
 
     def _record_blocked(
         self,

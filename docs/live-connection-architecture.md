@@ -4,7 +4,7 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v0.4.0` does not claim these live integrations are production-active. It
+`v0.5.0` does not claim these live integrations are production-active. It
 establishes the public design and the dry-run contract slice those integrations
 must pass through before live execution is enabled.
 
@@ -234,9 +234,9 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v0.4.0 Implementation Boundary
+## v0.5.0 Implementation Boundary
 
-`v0.4.0` includes:
+`v0.5.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
 - security planning for live-capable surfaces;
@@ -248,7 +248,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v0.4.0` does not include:
+`v0.5.0` does not include:
 
 - production live MCP catalog;
 - long-running gateway daemon;

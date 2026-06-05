@@ -55,6 +55,8 @@ def test_chat_command_reports_fake_local_allowed_search_completion(tmp_path: Pat
             "chat",
             "--message",
             "find needle but hide sk-chat-secret",
+            "--scenario",
+            "fake-search",
             "--home",
             str(tmp_path),
             "--json",

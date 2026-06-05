@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+from .catalog import (
+    McpCatalogEntry,
+    curated_mcp_catalog_payload,
+    default_mcp_catalog_entries,
+    mcp_catalog_server_specs,
+)
+from .discovery import (
+    McpDiscoverySnapshot,
+    McpToolDescriptor,
+    normalize_tools_list_result,
+    tool_entry_from_mcp_tool,
+)
 from .facade import McpFacade
 from .manager import (
     McpDiscoveryClient,
@@ -19,8 +31,10 @@ from .models import (
 )
 
 __all__ = [
+    "McpCatalogEntry",
     "McpDispatchEnvelope",
     "McpDiscoveryClient",
+    "McpDiscoverySnapshot",
     "McpEvidenceEnvelope",
     "McpFacade",
     "McpFacadeEnvelope",
@@ -30,6 +44,12 @@ __all__ = [
     "McpRuntimeServerSpec",
     "McpServerManifest",
     "McpToolManifest",
+    "McpToolDescriptor",
     "McpTransportKind",
     "McpTrustLevel",
+    "curated_mcp_catalog_payload",
+    "default_mcp_catalog_entries",
+    "mcp_catalog_server_specs",
+    "normalize_tools_list_result",
+    "tool_entry_from_mcp_tool",
 ]

@@ -31,7 +31,7 @@ _LOOPBACK_BINDS: Final = frozenset(("127.0.0.1", "localhost", "::1"))
 _MAX_BODY_BYTES: Final = 64 * 1024
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class GatewayLoopbackServerBindError(RuntimeError):
     bind: str
     reason: str = "non_loopback_bind_blocked"
@@ -44,7 +44,7 @@ class _IPv6ThreadingHTTPServer(ThreadingHTTPServer):
     address_family = socket.AF_INET6
 
 
-@dataclass(slots=True)
+@dataclass
 class _GatewayLoopbackState:
     runtime: GatewayApiRuntime
     expected_token: str

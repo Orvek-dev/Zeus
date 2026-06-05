@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Final, Literal, Protocol
+from typing import Final, Literal, Optional, Protocol, Union
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -22,7 +22,7 @@ class EvidenceObligation(BaseModel):
     model_config = _STRICT_MODEL
 
     required: bool
-    target: str | None = None
+    target: Optional[str] = None
     reason: str
 
 
@@ -40,10 +40,10 @@ class BrowserDispatchRequest(BaseModel):
     target_url: str
     dry_run: bool = True
     capability_id: str = "browser.navigate.plan"
-    network_host: str | None = None
-    approval_receipt_id: str | None = None
-    evidence_target: str | None = None
-    lease_id: str | None = None
+    network_host: Optional[str] = None
+    approval_receipt_id: Optional[str] = None
+    evidence_target: Optional[str] = None
+    lease_id: Optional[str] = None
 
     @field_validator(
         "request_id",
@@ -55,7 +55,7 @@ class BrowserDispatchRequest(BaseModel):
         "lease_id",
     )
     @classmethod
-    def _validate_text(cls, value: str | None) -> str | None:
+    def _validate_text(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return None
         redacted = redact_secret_spans(value.strip())
@@ -85,7 +85,7 @@ class BrowserDispatchFacade:
     def plan(
         self,
         request: BrowserDispatchRequest,
-        runtime_lease: RuntimeLeaseLike | None = None,
+        runtime_lease: Optional[RuntimeLeaseLike] = None,
     ) -> BrowserDispatchResult:
         if request.dry_run:
             return _result(request, decision="planned", reasons=("dry_run_plan_only",))
@@ -98,31 +98,30 @@ BrowserFacade = BrowserDispatchFacade
 
 
 def plan_browser_dispatch(
-    request: BrowserDispatchRequest | str,
+    request: Union[BrowserDispatchRequest, str],
     *,
     dry_run: bool = True,
-    runtime_lease: RuntimeLeaseLike | None = None,
-    approval_receipt_id: str | None = None,
-    evidence_target: str | None = None,
+    runtime_lease: Optional[RuntimeLeaseLike] = None,
+    approval_receipt_id: Optional[str] = None,
+    evidence_target: Optional[str] = None,
 ) -> BrowserDispatchResult:
-    match request:
-        case BrowserDispatchRequest():
-            dispatch_request = request
-        case str():
-            dispatch_request = BrowserDispatchRequest(
-                target_url=request,
-                dry_run=dry_run,
-                approval_receipt_id=approval_receipt_id,
-                evidence_target=evidence_target,
-            )
-        case unreachable:
-            raise TypeError(f"unsupported_browser_dispatch_request:{type(unreachable).__name__}")
+    if isinstance(request, BrowserDispatchRequest):
+        dispatch_request = request
+    elif isinstance(request, str):
+        dispatch_request = BrowserDispatchRequest(
+            target_url=request,
+            dry_run=dry_run,
+            approval_receipt_id=approval_receipt_id,
+            evidence_target=evidence_target,
+        )
+    else:
+        raise TypeError(f"unsupported_browser_dispatch_request:{type(request).__name__}")
     return BrowserDispatchFacade().plan(dispatch_request, runtime_lease=runtime_lease)
 
 
 def _live_block_reasons(
     request: BrowserDispatchRequest,
-    runtime_lease: RuntimeLeaseLike | None,
+    runtime_lease: Optional[RuntimeLeaseLike],
 ) -> tuple[str, ...]:
     reasons: list[str] = []
     if runtime_lease is None:

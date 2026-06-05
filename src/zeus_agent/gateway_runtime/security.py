@@ -3,8 +3,7 @@ from __future__ import annotations
 import hmac
 import hashlib
 from dataclasses import dataclass
-from typing import Final, Literal
-from typing_extensions import assert_never
+from typing import Final, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_serializer, field_validator
 
@@ -36,7 +35,7 @@ class GatewaySecurityRequestContext(BaseModel):
     path: str
     host: str
     client_host: str
-    authorization_header: str | None = Field(default=None, repr=False)
+    authorization_header: Optional[str] = Field(default=None, repr=False)
     expected_token: str = Field(repr=False)
 
     @field_validator("method")
@@ -59,7 +58,7 @@ class GatewaySecurityRequestContext(BaseModel):
 
     @field_validator("authorization_header")
     @classmethod
-    def _validate_authorization_header(cls, value: str | None) -> str | None:
+    def _validate_authorization_header(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return None
         normalized = value.strip()
@@ -68,13 +67,13 @@ class GatewaySecurityRequestContext(BaseModel):
         return normalized
 
     @field_serializer("authorization_header", "expected_token")
-    def _serialize_secret(self, value: str | None) -> str | None:
+    def _serialize_secret(self, value: Optional[str]) -> Optional[str]:
         if value is None:
             return None
         return _REDACTED_SECRET
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class GatewaySecurityPolicy:
     def authorize_loopback(self, context: GatewaySecurityRequestContext) -> GatewayApiResponse:
         if not _is_loopback(context.host) or not _is_loopback(context.client_host):
@@ -85,31 +84,29 @@ class GatewaySecurityPolicy:
         if not _is_authenticated(context.authorization_header, context.expected_token):
             return GatewayApiResponse.blocked(reason="unauthenticated", status_code=401)
         surface = _surface_for_path(context.path)
-        match surface:
-            case "session":
-                if context.method != "POST":
-                    return GatewayApiResponse.blocked(reason="malformed_request", status_code=400)
-                return GatewayApiResponse.allowed(reason="allowed")
-            case "audit":
-                if context.method != "GET":
-                    return GatewayApiResponse.blocked(reason="malformed_request", status_code=400)
-                return GatewayApiResponse.allowed(reason="allowed")
-            case "webhook":
-                return GatewayApiResponse.blocked(reason="webhook_blocked", status_code=403)
-            case "external_delivery":
-                return GatewayApiResponse.blocked(
-                    reason="external_delivery_blocked",
-                    status_code=403,
-                )
-            case "standing_order":
-                return GatewayApiResponse.blocked(
-                    reason="standing_order_blocked",
-                    status_code=403,
-                )
-            case "unknown":
+        if surface == "session":
+            if context.method != "POST":
                 return GatewayApiResponse.blocked(reason="malformed_request", status_code=400)
-            case unreachable:
-                assert_never(unreachable)
+            return GatewayApiResponse.allowed(reason="allowed")
+        if surface == "audit":
+            if context.method != "GET":
+                return GatewayApiResponse.blocked(reason="malformed_request", status_code=400)
+            return GatewayApiResponse.allowed(reason="allowed")
+        if surface == "webhook":
+            return GatewayApiResponse.blocked(reason="webhook_blocked", status_code=403)
+        if surface == "external_delivery":
+            return GatewayApiResponse.blocked(
+                reason="external_delivery_blocked",
+                status_code=403,
+            )
+        if surface == "standing_order":
+            return GatewayApiResponse.blocked(
+                reason="standing_order_blocked",
+                status_code=403,
+            )
+        if surface == "unknown":
+            return GatewayApiResponse.blocked(reason="malformed_request", status_code=400)
+        raise AssertionError(surface)
 
 
 def _require_non_empty(value: str, field_name: str) -> str:
@@ -125,14 +122,14 @@ def gateway_authority_fingerprint(context: GatewaySecurityRequestContext) -> str
     return _AUTHORITY_HASH_PREFIX + hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
-def _is_authenticated(authorization_header: str | None, expected_token: str) -> bool:
+def _is_authenticated(authorization_header: Optional[str], expected_token: str) -> bool:
     token = _bearer_token(authorization_header)
     if token is None:
         return False
     return hmac.compare_digest(token, expected_token)
 
 
-def _bearer_token(authorization_header: str | None) -> str | None:
+def _bearer_token(authorization_header: Optional[str]) -> Optional[str]:
     if authorization_header is None:
         return None
     prefix, separator, token = authorization_header.strip().partition(" ")

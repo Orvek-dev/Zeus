@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 from zeus_agent.cli import app
@@ -35,7 +34,7 @@ def test_python3_can_import_zeus_agent_cli_without_g006_syntax_error() -> None:
     env["PYTHONPATH"] = "src"
     result = subprocess.run(
         [
-            sys.executable,
+            "/usr/bin/python3",
             "-c",
             (
                 "import sys; "

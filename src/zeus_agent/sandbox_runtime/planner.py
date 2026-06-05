@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final
+from typing import Final, Optional, Union
 
 from zeus_agent.capability_runtime.sandbox import SandboxPolicy
 from zeus_agent.security.credentials import redact_secret_spans
@@ -20,7 +20,7 @@ from .models import (
 
 
 class SandboxDispatchFacade:
-    def __init__(self, policy: SandboxPolicy | None = None) -> None:
+    def __init__(self, policy: Optional[SandboxPolicy] = None) -> None:
         self._policy = policy or SandboxPolicy()
 
     def plan(self, request: SandboxDispatchRequest) -> SandboxDispatchResult:
@@ -58,36 +58,33 @@ SandboxFacade = SandboxDispatchFacade
 
 
 def plan_sandbox_dispatch(
-    request: SandboxDispatchRequest | tuple[str, ...],
+    request: Union[SandboxDispatchRequest, tuple[str, ...]],
     *,
-    root: Path | None = None,
-    evidence_target: str | None = None,
+    root: Optional[Path] = None,
+    evidence_target: Optional[str] = None,
 ) -> SandboxDispatchResult:
-    match request:
-        case SandboxDispatchRequest():
-            dispatch_request = request
-        case tuple():
-            dispatch_request = SandboxDispatchRequest(
-                root=root,
-                commands=request,
-                evidence_target=evidence_target,
-            )
-        case _:
-            raise ValueError("malformed_sandbox_dispatch")
+    if isinstance(request, SandboxDispatchRequest):
+        dispatch_request = request
+    elif isinstance(request, tuple):
+        dispatch_request = SandboxDispatchRequest(
+            root=root,
+            commands=request,
+            evidence_target=evidence_target,
+        )
+    else:
+        raise ValueError("malformed_sandbox_dispatch")
     return SandboxDispatchFacade().plan(dispatch_request)
 
 
 def _backend_requirement(backend: str) -> SandboxRequirement:
-    match backend:
-        case "local":
-            return SandboxRequirement(name="backend", value=backend, decision="planned")
-        case _:
-            return SandboxRequirement(
-                name="backend",
-                value=backend,
-                decision="blocked",
-                reason="backend_not_supported",
-            )
+    if backend == "local":
+        return SandboxRequirement(name="backend", value=backend, decision="planned")
+    return SandboxRequirement(
+        name="backend",
+        value=backend,
+        decision="blocked",
+        reason="backend_not_supported",
+    )
 
 
 def _mount_requirement(policy: SandboxPolicy, root: Path, mount: str) -> SandboxMountRequirement:
@@ -106,37 +103,33 @@ def _mount_requirement(policy: SandboxPolicy, root: Path, mount: str) -> Sandbox
 
 
 def _egress_requirement(egress_policy: str) -> SandboxRequirement:
-    match egress_policy:
-        case "none" | "denied":
-            return SandboxRequirement(
-                name="egress_policy",
-                value=egress_policy,
-                decision="planned",
-                reason="network_egress_denied",
-            )
-        case _:
-            return SandboxRequirement(
-                name="egress_policy",
-                value=egress_policy,
-                decision="blocked",
-                reason="network_egress_blocked",
-            )
+    if egress_policy in {"none", "denied"}:
+        return SandboxRequirement(
+            name="egress_policy",
+            value=egress_policy,
+            decision="planned",
+            reason="network_egress_denied",
+        )
+    return SandboxRequirement(
+        name="egress_policy",
+        value=egress_policy,
+        decision="blocked",
+        reason="network_egress_blocked",
+    )
 
 
 def _resource_requirement(resource_profile: str) -> SandboxRequirement:
-    match resource_profile:
-        case "bounded":
-            return SandboxRequirement(name="resource_profile", value=resource_profile, decision="planned")
-        case _:
-            return SandboxRequirement(
-                name="resource_profile",
-                value=resource_profile,
-                decision="blocked",
-                reason="resource_profile_unbounded",
-            )
+    if resource_profile == "bounded":
+        return SandboxRequirement(name="resource_profile", value=resource_profile, decision="planned")
+    return SandboxRequirement(
+        name="resource_profile",
+        value=resource_profile,
+        decision="blocked",
+        reason="resource_profile_unbounded",
+    )
 
 
-def _cleanup_obligation(cleanup_required: bool, cleanup_plan: str | None) -> CleanupObligation:
+def _cleanup_obligation(cleanup_required: bool, cleanup_plan: Optional[str]) -> CleanupObligation:
     if not cleanup_required:
         return CleanupObligation(required=False, decision="planned", reason="cleanup_not_required")
     if cleanup_plan is None:
@@ -182,7 +175,7 @@ def _blocked_reasons(
     return tuple(reasons)
 
 
-def _append_reason(reasons: list[str], reason: str | None) -> None:
+def _append_reason(reasons: list[str], reason: Optional[str]) -> None:
     if reason is not None and reason not in reasons:
         reasons.append(reason)
 

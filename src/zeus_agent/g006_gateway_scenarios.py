@@ -5,7 +5,7 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Final
+from typing import Final, Union
 
 from zeus_agent.gateway_runtime.api import GatewayApiRuntime
 from zeus_agent.gateway_runtime.models import (
@@ -15,7 +15,7 @@ from zeus_agent.gateway_runtime.models import (
 )
 from zeus_agent.gateway_runtime.security import GatewaySecurityRequestContext
 
-G006ScenarioValue = bool | int | str
+G006ScenarioValue = Union[bool, int, str]
 G006Payload = dict[str, G006ScenarioValue]
 
 _AUTH_TOKEN: Final = "g006-secret-auth-token"

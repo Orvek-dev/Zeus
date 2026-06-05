@@ -39,6 +39,17 @@ from .provider_registry import (
     ProviderAdapter,
     ProviderRegistry,
 )
+from .provider_catalog import (
+    ProviderProfile,
+    get_provider_profile,
+    provider_catalog,
+    provider_catalog_payload,
+)
+from .fallback import (
+    ProviderFallbackDecision,
+    evaluate_provider_fallback,
+    provider_budget_payload,
+)
 
 __all__ = [
     "FakeModelRuntime",
@@ -55,8 +66,15 @@ __all__ = [
     "ProviderBoundaryRequest",
     "ProviderBoundaryResult",
     "ProviderRegistry",
+    "ProviderProfile",
+    "ProviderFallbackDecision",
     "ProviderRawToolCall",
+    "evaluate_provider_fallback",
+    "get_provider_profile",
     "EVIDENCE_TARGET",
+    "provider_catalog",
+    "provider_catalog_payload",
+    "provider_budget_payload",
     "ProviderJsonScalar",
     "ProviderJsonValue",
     "ProviderMessage",

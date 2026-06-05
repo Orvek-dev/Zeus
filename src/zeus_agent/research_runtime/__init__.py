@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .graph import ResearchEvidenceGraph, ResearchGraphBuilder
+from .brief import build_research_brief
 from .models import ResearchEvidenceEdge, ResearchEvidenceNode, ResearchSourcePin
 from .providers import (
     FakeGitHubResearchProvider,
@@ -20,4 +21,5 @@ __all__ = [
     "ResearchProviderQuery",
     "ResearchProviderResponse",
     "ResearchSourcePin",
+    "build_research_brief",
 ]

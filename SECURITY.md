@@ -11,9 +11,9 @@ Zeus is governed and local-first by default.
 - Tool, connector, transport, gateway, and live provider paths should pass through authority, lease, and evidence boundaries before execution.
 - Dry-run and live-capable paths should remain distinguishable in code and review.
 
-## Current v0.2.0 Boundary
+## Current v0.5.0 Boundary
 
-`v0.2.0` is a governed total-architecture foundation. It includes deterministic local scenarios, provider and tool interfaces, transport state, gateway/workflow scaffolds, verification surfaces, security planning, runtime lease scope checks, research evidence graph contracts, ontology candidate controls, sandbox workflow hints, and dry-run orchestration contracts. It is not a hard-isolated remote execution platform by itself.
+`v0.5.0` is a governed live-platform source checkpoint. It includes deterministic local scenarios, provider and tool interfaces, transport state, gateway/workflow scaffolds, verification surfaces, security planning, runtime lease scope checks, research evidence graph contracts, ontology candidate controls, sandbox workflow hints, live opt-in boundaries, public/private release boundaries, and RC hard-close reporting. It is not a hard-isolated remote execution platform by itself.
 
 Before production use, live MCP tools, external AI APIs, browser/terminal automation, cron workers, remote sandboxes, and networked gateways should be wired through explicit authority grants, runtime leases, credential-scope binding, human approval when needed, sandbox egress policy, audit evidence, and rollback behavior.
 

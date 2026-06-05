@@ -13,6 +13,11 @@ from .models import (
     UntrustedToolCall,
 )
 from .registry import ToolRuntimeRegistry
+from .catalog import (
+    native_tool_catalog,
+    native_tool_catalog_payload,
+    register_native_tool_catalog,
+)
 
 __all__ = [
     "JsonObject",
@@ -26,4 +31,7 @@ __all__ = [
     "ToolsetDefinition",
     "UntrustedMcpDiscovery",
     "UntrustedToolCall",
+    "native_tool_catalog",
+    "native_tool_catalog_payload",
+    "register_native_tool_catalog",
 ]

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
+from typing import Union
 
 from zeus_agent.g006_gateway_scenarios import (
     G006Payload,
@@ -11,7 +12,7 @@ from zeus_agent.g006_gateway_scenarios import (
     g006_gateway_loopback_payload,
 )
 
-G006EvalValue = bool | int | str | list[dict[str, str]]
+G006EvalValue = Union[bool, int, str, list[dict[str, str]]]
 G006EvalPayload = dict[str, G006EvalValue]
 
 

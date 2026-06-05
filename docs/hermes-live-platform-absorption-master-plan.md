@@ -24,13 +24,16 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
+The public v0.5.0 boundary is designed/prepared/dry-run/future for live-capable
+surfaces unless a specific surface has separate production evidence and release
+approval.
+
+Hermes remains upstream/reference only. Mercury is the Zeus internal transport product name for transport, connector, MCP, API, and gateway routing.
 
 ## Canonical Terms
 
 | Term | Meaning | Rejected aliases |
 | --- | --- | --- |
-| Hermes live platform | The practical breadth of Hermes Agent: CLI, gateway, providers, tools, MCP, sessions, memory, skills, cron, API, ACP, batch, and library surfaces. | simple chatbot, coding-only agent |
-| Zeus live platform | Hermes-grade live breadth routed through Zeus objective authority, leases, security, evidence, and verification. | Hermes clone, generic agent wrapper |
 | Zeus Kernel | The authority, objective, evidence, and verification center that prevents the agent loop from granting itself power. | all-powerful agent loop, global YOLO |
 | Athena | Objective reasoning and contract compilation layer. | prompt prefix, task title |
 | Thunderbolt | Runtime lease and capability grant boundary. | permission flag, allow all |
@@ -43,6 +46,8 @@ production-ready according to the implementation evidence produced later.
 | Demeter | Durable memory, MemoryGraph, ontology, LLM Wiki, retention, and local knowledge growth. | unscoped memory dump |
 | Olympus | Parallel orchestration, ULW loop, task DAG, write scopes, recovery, and worker evidence. | more agents without ownership |
 | Prometheus | Skill evolution, reviewed self-improvement, eval, and controlled promotion. | auto-promoted skill |
+| Hermes live platform | The practical breadth of Hermes Agent: CLI, gateway, providers, tools, MCP, sessions, memory, skills, cron, API, ACP, batch, and library surfaces. | simple chatbot, coding-only agent |
+| Zeus live platform | Hermes-grade live breadth routed through Zeus objective authority, leases, security, evidence, and verification. | Hermes clone, generic agent wrapper |
 | MemoryGraph | Evidence-grounded schema/fact/passage graph used by Demeter. | vector-only memory, raw chat log |
 | LLM Wiki | Human-readable curation view over MemoryGraph. | source of truth, unchecked generated docs |
 | Adaptive Workflow Intelligence | Zeus's ability to choose, compose, critique, and revise work patterns while staying inside authority, budget, evidence, and security boundaries. | uncontrolled self-optimization |
@@ -186,7 +191,7 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v0.4.0 release tree:
+Measured in the public v0.5.0 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |

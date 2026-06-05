@@ -5,7 +5,7 @@ import json
 import sqlite3
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Final
+from typing import Final, Union
 from urllib.parse import urlsplit
 
 import pytest
@@ -14,7 +14,7 @@ from zeus_agent.gateway_runtime.server import GatewayLoopbackServer
 
 AUTH_A: Final = "g006-http-auth-token-a"
 RESUME_TOKEN: Final = "g006-http-resume-token"
-JsonPayload = dict[str, str | int | bool | None]
+JsonPayload = dict[str, Union[str, int, bool, None]]
 
 
 @pytest.fixture

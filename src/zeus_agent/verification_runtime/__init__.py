@@ -5,9 +5,17 @@ from .engine import (
     VerificationObligation,
     VerificationSummary,
 )
+from .review import (
+    ReviewBindingRequest,
+    ReviewBindingResult,
+    bind_review,
+)
 
 __all__ = [
+    "ReviewBindingRequest",
+    "ReviewBindingResult",
     "VerificationEngine",
     "VerificationObligation",
     "VerificationSummary",
+    "bind_review",
 ]

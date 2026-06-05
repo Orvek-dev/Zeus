@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final, Literal, Sequence
+from typing import Final, Literal, Optional, Sequence, Union
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -17,7 +17,7 @@ class EvidenceObligation(BaseModel):
     model_config = _STRICT_MODEL
 
     required: bool
-    target: str | None = None
+    target: Optional[str] = None
     reason: str
 
 
@@ -32,26 +32,27 @@ class TerminalDispatchRequest(BaseModel):
     model_config = _STRICT_MODEL
 
     request_id: str = "terminal.dispatch"
-    command: str | tuple[str, ...]
-    root: Path | None = None
-    evidence_target: str | None = None
+    command: Union[str, tuple[str, ...]]
+    root: Optional[Path] = None
+    evidence_target: Optional[str] = None
 
     @field_validator("command", mode="before")
     @classmethod
-    def _normalize_command(cls, value: str | list[str] | tuple[str, ...]) -> str | tuple[str, ...]:
-        match value:
-            case str():
-                return redact_secret_spans(value.strip())
-            case list():
-                return tuple(_redacted_text(item) for item in value)
-            case tuple():
-                return tuple(_redacted_text(item) for item in value)
-            case _:
-                raise ValueError("malformed_command")
+    def _normalize_command(
+        cls,
+        value: Union[str, list[str], tuple[str, ...]],
+    ) -> Union[str, tuple[str, ...]]:
+        if isinstance(value, str):
+            return redact_secret_spans(value.strip())
+        if isinstance(value, list):
+            return tuple(_redacted_text(item) for item in value)
+        if isinstance(value, tuple):
+            return tuple(_redacted_text(item) for item in value)
+        raise ValueError("malformed_command")
 
     @field_validator("request_id", "evidence_target")
     @classmethod
-    def _validate_text(cls, value: str | None) -> str | None:
+    def _validate_text(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return None
         redacted = redact_secret_spans(value.strip())
@@ -76,7 +77,7 @@ class TerminalDispatchResult(BaseModel):
 
 
 class TerminalDispatchFacade:
-    def __init__(self, policy: SandboxPolicy | None = None) -> None:
+    def __init__(self, policy: Optional[SandboxPolicy] = None) -> None:
         self._policy = policy or SandboxPolicy()
 
     def plan(self, request: TerminalDispatchRequest) -> TerminalDispatchResult:
@@ -111,26 +112,25 @@ TerminalFacade = TerminalDispatchFacade
 
 
 def plan_terminal_dispatch(
-    request: TerminalDispatchRequest | str | Sequence[str],
+    request: Union[TerminalDispatchRequest, str, Sequence[str]],
     *,
-    root: Path | None = None,
-    evidence_target: str | None = None,
+    root: Optional[Path] = None,
+    evidence_target: Optional[str] = None,
 ) -> TerminalDispatchResult:
-    match request:
-        case TerminalDispatchRequest():
-            dispatch_request = request
-        case str():
-            dispatch_request = TerminalDispatchRequest(
-                command=request,
-                root=root,
-                evidence_target=evidence_target,
-            )
-        case _:
-            dispatch_request = TerminalDispatchRequest(
-                command=tuple(request),
-                root=root,
-                evidence_target=evidence_target,
-            )
+    if isinstance(request, TerminalDispatchRequest):
+        dispatch_request = request
+    elif isinstance(request, str):
+        dispatch_request = TerminalDispatchRequest(
+            command=request,
+            root=root,
+            evidence_target=evidence_target,
+        )
+    else:
+        dispatch_request = TerminalDispatchRequest(
+            command=tuple(request),
+            root=root,
+            evidence_target=evidence_target,
+        )
     return TerminalDispatchFacade().plan(dispatch_request)
 
 
@@ -140,14 +140,12 @@ def _redacted_text(value: str) -> str:
     return redact_secret_spans(value.strip())
 
 
-def _command_text(command: str | tuple[str, ...]) -> str:
-    match command:
-        case str():
-            return command
-        case tuple():
-            return " ".join(command)
-        case unreachable:
-            raise TypeError(f"unsupported_terminal_command:{type(unreachable).__name__}")
+def _command_text(command: Union[str, tuple[str, ...]]) -> str:
+    if isinstance(command, str):
+        return command
+    if isinstance(command, tuple):
+        return " ".join(command)
+    raise TypeError(f"unsupported_terminal_command:{type(command).__name__}")
 
 
 __all__: Final = (

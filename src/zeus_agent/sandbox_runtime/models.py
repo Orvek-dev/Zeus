@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final, Literal
+from typing import Final, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -17,7 +17,7 @@ class EvidenceObligation(BaseModel):
     model_config = _STRICT_MODEL
 
     required: bool
-    target: str | None = None
+    target: Optional[str] = None
     reason: str
 
 
@@ -27,7 +27,7 @@ class CleanupObligation(BaseModel):
     required: bool
     decision: RequirementDecision
     reason: str
-    plan: str | None = None
+    plan: Optional[str] = None
 
 
 class SandboxRequirement(BaseModel):
@@ -36,7 +36,7 @@ class SandboxRequirement(BaseModel):
     name: str
     value: str
     decision: RequirementDecision
-    reason: str | None = None
+    reason: Optional[str] = None
 
 
 class SandboxMountRequirement(BaseModel):
@@ -44,8 +44,8 @@ class SandboxMountRequirement(BaseModel):
 
     path: str
     decision: RequirementDecision
-    resolved_path: str | None = None
-    reason: str | None = None
+    resolved_path: Optional[str] = None
+    reason: Optional[str] = None
 
 
 class SandboxCommandPlan(BaseModel):
@@ -54,7 +54,7 @@ class SandboxCommandPlan(BaseModel):
     command: str
     argv: tuple[str, ...]
     decision: Literal["allowed", "blocked"]
-    reason: str | None = None
+    reason: Optional[str] = None
 
 
 class SandboxDispatchRequest(BaseModel):
@@ -62,27 +62,25 @@ class SandboxDispatchRequest(BaseModel):
 
     request_id: str = "sandbox.dispatch"
     backend: str = "local"
-    root: Path | None = None
+    root: Optional[Path] = None
     mounts: tuple[str, ...] = ()
     commands: tuple[str, ...] = ()
     egress_policy: str = "none"
     resource_profile: str = "bounded"
     cleanup_required: bool = True
-    cleanup_plan: str | None = None
-    evidence_target: str | None = None
+    cleanup_plan: Optional[str] = None
+    evidence_target: Optional[str] = None
 
     @field_validator("mounts", "commands", mode="before")
     @classmethod
-    def _normalize_text_tuple(cls, value: str | list[str] | tuple[str, ...]) -> tuple[str, ...]:
-        match value:
-            case str():
-                return (redact_secret_spans(value),)
-            case list():
-                return tuple(_redacted_text(item) for item in value)
-            case tuple():
-                return tuple(_redacted_text(item) for item in value)
-            case _:
-                raise ValueError("malformed_text_tuple")
+    def _normalize_text_tuple(cls, value: Union[str, list[str], tuple[str, ...]]) -> tuple[str, ...]:
+        if isinstance(value, str):
+            return (redact_secret_spans(value),)
+        if isinstance(value, list):
+            return tuple(_redacted_text(item) for item in value)
+        if isinstance(value, tuple):
+            return tuple(_redacted_text(item) for item in value)
+        raise ValueError("malformed_text_tuple")
 
     @field_validator(
         "request_id",
@@ -93,7 +91,7 @@ class SandboxDispatchRequest(BaseModel):
         "evidence_target",
     )
     @classmethod
-    def _validate_text(cls, value: str | None) -> str | None:
+    def _validate_text(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return None
         redacted = redact_secret_spans(value.strip())
