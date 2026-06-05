@@ -2,6 +2,40 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.4 - 2026-06-06
+
+### Added
+
+- Gateway Live Delivery runtime and CLI command for governed gateway status
+  reporting, configured target allowlist, pairing proof, delivery envelope,
+  delivery body, loopback transport, loopback HTTP delivery, audit, response
+  redaction, and cleanup evidence.
+- Release-gated `v1.0.0-rc.4` checkpoint fields for gateway settings,
+  pairing, delivery envelope, delivery body, loopback transport, loopback HTTP,
+  external delivery blocked posture, webhook blocked posture, and gateway live
+  delivery readiness.
+- Python library facade method for `gateway_live_delivery(...)` so library
+  callers can inspect the same gateway live-delivery contract as the CLI.
+- Secret-safe gateway live handling that blocks missing credential material and
+  unallowlisted targets before loopback network access.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc4` for Python packaging
+  and `v1.0.0-rc.4` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Gateway Live Delivery checkpoint on top of the MCP Live
+  Server boundary.
+
+### Notes
+
+- `v1.0.0-rc.4` is still local-first and deterministic by default.
+- The Gateway Live Delivery loopback smoke can open a session-local loopback
+  HTTP server and execute the governed gateway delivery path when the operator
+  supplies a scoped environment secret reference. It does not claim external
+  gateway delivery, webhook production execution, hosted SaaS readiness,
+  unattended execution, or hard-isolated remote runtime operation.
+
 ## v1.0.0-rc.3 - 2026-06-06
 
 ### Added

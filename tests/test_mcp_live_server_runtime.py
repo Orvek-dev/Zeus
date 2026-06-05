@@ -25,7 +25,7 @@ def test_v100rc3_release_gate_reports_mcp_live_server_checkpoint() -> None:
     assert payload["mcp_remote_server_available"] is False
     assert payload["mcp_live_server_ready"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.4"
     assert "mcp_live_server_loopback_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

@@ -34,6 +34,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.0.0-rc.1",
     "v1.0.0-rc.2",
     "v1.0.0-rc.3",
+    "v1.0.0-rc.4",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -45,6 +46,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.0.0-rc.1": "production_foundation",
     "v1.0.0-rc.2": "provider_live_api",
     "v1.0.0-rc.3": "mcp_live_server",
+    "v1.0.0-rc.4": "gateway_live_delivery",
 }
 
 
@@ -134,6 +136,16 @@ class ReleaseGatedUlwStatus(BaseModel):
     mcp_resources_enabled: bool = False
     mcp_prompts_enabled: bool = False
     mcp_live_server_ready: bool = False
+    gateway_live_delivery_contract_available: bool = False
+    gateway_settings_available: bool = False
+    gateway_pairing_available: bool = False
+    gateway_delivery_envelope_available: bool = False
+    gateway_delivery_body_available: bool = False
+    gateway_loopback_transport_available: bool = False
+    gateway_loopback_http_available: bool = False
+    gateway_external_delivery_available: bool = False
+    gateway_webhook_available: bool = False
+    gateway_live_delivery_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -185,6 +197,9 @@ def build_release_gated_ulw_status(
     )
     mcp_live_server_contract_available = (
         normalized_version == "v1.0.0-rc.3" and "unknown_target_version" not in blocked_reasons
+    )
+    gateway_live_delivery_contract_available = (
+        normalized_version == "v1.0.0-rc.4" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -276,6 +291,16 @@ def build_release_gated_ulw_status(
         mcp_resources_enabled=False,
         mcp_prompts_enabled=False,
         mcp_live_server_ready=False,
+        gateway_live_delivery_contract_available=gateway_live_delivery_contract_available,
+        gateway_settings_available=gateway_live_delivery_contract_available,
+        gateway_pairing_available=gateway_live_delivery_contract_available,
+        gateway_delivery_envelope_available=gateway_live_delivery_contract_available,
+        gateway_delivery_body_available=gateway_live_delivery_contract_available,
+        gateway_loopback_transport_available=gateway_live_delivery_contract_available,
+        gateway_loopback_http_available=gateway_live_delivery_contract_available,
+        gateway_external_delivery_available=False,
+        gateway_webhook_available=False,
+        gateway_live_delivery_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -313,6 +338,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.0.0-rc.1",
         "v1.0.0-rc.2",
         "v1.0.0-rc.3",
+        "v1.0.0-rc.4",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -332,6 +358,18 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.0.0-rc.4":
+        return (
+            "gateway_live_delivery_release_gate_manual_qa",
+            "gateway_live_delivery_loopback_manual_qa",
+            "gateway_live_delivery_missing_secret_manual_qa",
+            "gateway_live_delivery_blocked_target_manual_qa",
+            "gateway_live_delivery_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0-rc.3":
         return (
             "mcp_live_server_release_gate_manual_qa",

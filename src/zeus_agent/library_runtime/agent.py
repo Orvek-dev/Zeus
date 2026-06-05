@@ -11,6 +11,7 @@ from zeus_agent.approval_receipt_runtime import ApprovalReceiptRuntime
 from zeus_agent.credential_readiness_runtime import CredentialReadinessRuntime
 from zeus_agent.entry_runtime import ZeusChatRuntime, default_zeus_home
 from zeus_agent.gateway_cockpit_runtime import GatewayCockpitRuntime
+from zeus_agent.gateway_live_delivery_runtime import build_gateway_live_delivery_contract
 from zeus_agent.gateway_pairing_runtime import GatewayPairingRuntime
 from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
@@ -1368,6 +1369,22 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             scenario=scenario,
             secret_ref=secret_ref,
             query=query,
+        ).to_payload()
+
+    def gateway_live_delivery(
+        self,
+        *,
+        scenario: str = "status",
+        secret_ref: str = "env://ZEUS_RC4_GATEWAY_TOKEN",
+        target: str = "slack://ops",
+        message: str = "Zeus gateway live delivery checkpoint",
+    ) -> dict[str, Any]:
+        return build_gateway_live_delivery_contract(
+            scenario=scenario,
+            secret_ref=secret_ref,
+            target=target,
+            message=message,
+            home=self.home,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:

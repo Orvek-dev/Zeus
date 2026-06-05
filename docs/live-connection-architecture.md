@@ -4,10 +4,10 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.0.0-rc.3` does not claim these live integrations are production-active. It
-establishes the public MCP Live Server release gate and the dry-run/live beta
-contract slices those integrations must pass through before production live
-execution or promotion is enabled.
+`v1.0.0-rc.4` does not claim these live integrations are production-active. It
+establishes the public Gateway Live Delivery release gate and the dry-run/live
+beta contract slices those integrations must pass through before production
+live execution or promotion is enabled.
 
 ## Design Goal
 
@@ -237,12 +237,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.0.0-rc.3 Implementation Boundary
+## v1.0.0-rc.4 Implementation Boundary
 
-`v1.0.0-rc.3` includes:
+`v1.0.0-rc.4` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.3 program;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.4 program;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -274,6 +274,11 @@ Every live connection type should pass these gates:
   scanning, credential binding, secret material proof, execution authorization,
   transport audit, response redaction, resources/prompts disabled posture,
   remote-server blocked posture, and cleanup;
+- Gateway Live Delivery reporting for status-only readiness, configured target
+  allowlist, pairing proof, delivery envelope, delivery body, loopback
+  transport, loopback HTTP delivery, credential binding, secret material proof,
+  execution authorization, transport audit, response redaction, external
+  delivery blocked posture, webhook blocked posture, and cleanup;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -283,12 +288,13 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.0.0-rc.3` does not include:
+`v1.0.0-rc.4` does not include:
 
 - production live MCP catalog;
 - external non-loopback provider production execution;
 - remote MCP server production execution;
 - MCP resources/prompts activation;
+- external gateway or webhook production execution;
 - long-running gateway daemon;
 - hosted API server;
 - unattended browser or terminal execution;
