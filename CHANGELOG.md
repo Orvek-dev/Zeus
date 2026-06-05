@@ -2,6 +2,39 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.9 - 2026-06-06
+
+### Added
+
+- MCP Owned Client Live runtime and CLI command for governed remote MCP tool
+  execution through explicit operator opt-in, endpoint allowlisting, scoped
+  secret reference checks, credential handoff, remote transport policy, remote
+  executor preflight, owned client receipt validation, audit, redaction,
+  cleanup, resources/prompts disabled posture, and no-production-claim
+  reporting.
+- Release-gated `v1.0.0-rc.9` checkpoint fields for MCP owned client live
+  contract availability, owned client transport availability, owned client
+  adapter availability, and MCP owned client live readiness.
+- Python library facade method for `mcp_owned_client_live(...)` so library
+  callers can inspect the same owned-client MCP contract as the CLI.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc9` for Python packaging
+  and `v1.0.0-rc.9` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe MCP Owned Client Live on top of Provider Owned Client Live.
+- Release-gated ULW now advances `v1.0.0-rc.8` to `v1.0.0-rc.9`.
+
+### Notes
+
+- `v1.0.0-rc.9` is still governed and deterministic by default.
+- MCP Owned Client Live validates the owned-client adapter path with policy,
+  credential handoff, preflight, audit, redaction, cleanup, and
+  resources/prompts disabled. It does not claim production remote MCP catalog
+  readiness, unrestricted remote MCP execution, hosted SaaS readiness, or
+  unattended live operation.
+
 ## v1.0.0-rc.8 - 2026-06-06
 
 ### Added

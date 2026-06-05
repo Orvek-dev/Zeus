@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.0.0-rc.8"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--rc.8-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.0.0-rc.9"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--rc.9-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1314%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1320%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,19 +35,20 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v1.0.0-rc.8` source checkpoint adds
-Provider Owned Client Live on top of Provider Live Opt-in, Memory Privacy Live,
-Sandbox Terminal Live, Provider Live API, MCP Live Server, and Gateway Live
-Delivery: an owned provider client adapter path bound to explicit operator
-opt-in, endpoint allowlisting, scoped secret references, remote transport
-policy, remote executor preflight, credential handoff, audit, redaction,
-cleanup, and no-production-claim reporting. The previous memory and
+an unconstrained chat loop. The public `v1.0.0-rc.9` source checkpoint adds MCP
+Owned Client Live on top of Provider Owned Client Live, Provider Live Opt-in,
+Memory Privacy Live, Sandbox Terminal Live, Provider Live API, MCP Live Server,
+and Gateway Live Delivery: a governed remote MCP tool call path bound to
+explicit operator opt-in, endpoint allowlisting, scoped secret references,
+remote transport policy, remote executor preflight, credential handoff, owned
+client receipt validation, audit, redaction, cleanup, resources/prompts
+disabled posture, and no-production-claim reporting. Provider, memory, and
 sandbox/terminal smoke paths remain governed by quarantine, retention,
 cross-session search default-deny, lease, approval, broker dispatch, safe
-environment, evidence capture, cleanup, and network/Docker/SSH blocks.
-Hosted gateways and production external AI APIs should still be connected
-through the same authority, lease, approval, sandbox, evidence, retention, and
-promotion boundaries.
+environment, evidence capture, cleanup, and network/Docker/SSH blocks. Hosted
+gateways, production external AI APIs, and production remote MCP catalogs
+should still be connected through the same authority, lease, approval, sandbox,
+evidence, retention, and promotion boundaries.
 
 ## Quickstart
 
@@ -72,7 +73,7 @@ zeus final-eval --json
 zeus total-plan --json
 zeus total-blocks --secret-like ghp_TEST_FIXTURE --json
 zeus total-eval --json
-zeus release-gated-ulw --target-version v1.0.0-rc.8 --json
+zeus release-gated-ulw --target-version v1.0.0-rc.9 --json
 zeus tool-limbs --tool-id files.read --json
 zeus platform-surface --surface gateway --json
 zeus memory-ontology --subject Zeus --json
@@ -103,6 +104,9 @@ ZEUS_RC7_PROVIDER_KEY=provider-rc7-material-value zeus provider-live-optin --sce
 zeus provider-owned-client-live --scenario status --json
 zeus provider-owned-client-live --scenario blocked-missing-opt-in --json
 ZEUS_RC8_PROVIDER_KEY=provider-rc8-material-value zeus provider-owned-client-live --scenario owned-client-smoke --json
+zeus mcp-owned-client-live --scenario status --json
+zeus mcp-owned-client-live --scenario blocked-missing-opt-in --json
+ZEUS_RC9_MCP_TOKEN=mcp-rc9-material-value zeus mcp-owned-client-live --scenario owned-client-smoke --json
 ```
 
 Status commands do not require live provider keys. The loopback smoke commands
@@ -203,7 +207,7 @@ gravity is different.
 | --- | --- | --- |
 | Primary product shape | General-purpose self-improving agent that lives across CLI, gateway, ACP, batch, API, and library surfaces | Goal-oriented governed runtime that turns objectives into contracts and evidence obligations |
 | Core loop | `AIAgent` builds prompts, resolves providers, dispatches tools, persists sessions, and continues conversation | Objective compiler -> authority gate -> work-loop plan -> runtime dispatch -> evidence -> promotion decision |
-| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.0.0-rc.8 Provider Owned Client Live checkpoint with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, loopback provider HTTP smoke, loopback MCP HTTP smoke, MCP prompt-injection scan, loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, Provider Live Opt-in external receipt validation, Provider Owned Client Live adapter execution, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
+| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.0.0-rc.9 MCP Owned Client Live checkpoint with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, loopback provider HTTP smoke, loopback MCP HTTP smoke, MCP prompt-injection scan, loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, Provider Live Opt-in external receipt validation, Provider Owned Client Live adapter execution, MCP Owned Client Live remote tool execution, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
 | Safety center | Approval, profile isolation, tool availability, command checks, gateway authorization, and platform controls | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo checks, and promotion blocks |
 | Self-improvement | Built-in learning loop and skill creation from experience | Validation-gated skill-evolution queue; proposed skills cannot self-promote, widen authority, enable live transport, or bypass evidence |
 | Completion model | Conversational progress and tool-visible execution | Evidence-backed completion; "done" is blocked when objective, artifact, verification, or promotion evidence is missing |
@@ -219,13 +223,14 @@ Read the longer comparison in [docs/hermes-comparison.md](docs/hermes-comparison
 
 ## Live Connection Design
 
-`v1.0.0-rc.8` includes the public Provider Owned Client Live checkpoint for
-governed owned-client provider execution. It proves explicit operator opt-in,
-endpoint allowlisting, scoped secret reference checks, remote transport policy,
-credential handoff, remote executor preflight, owned provider client receipt
-validation, audit, redaction, cleanup, and no production-ready claim. Provider
-Live Opt-in still proves external receipt validation, and Memory Privacy Live
-still proves local SQLite
+`v1.0.0-rc.9` includes the public MCP Owned Client Live checkpoint for governed
+remote MCP tool execution through an owned client adapter. It proves explicit
+operator opt-in, endpoint allowlisting, scoped secret reference checks, remote
+transport policy, credential handoff, remote executor preflight, owned MCP
+client receipt validation, audit, redaction, cleanup, resources/prompts disabled
+posture, and no production-ready claim. Provider Owned Client Live still proves
+the owned provider adapter path, Provider Live Opt-in still proves external
+receipt validation, and Memory Privacy Live still proves local SQLite
 MemoryGraph schema readiness, explicit local fact smoke, secret quarantine,
 retention deletion, cross-session search default-deny, no active rule writes,
 no ontology/learned-rule auto-promotion, and no ordinary network access.
@@ -261,11 +266,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, core language, release version, public docs hygiene, and total architecture surfaces | `1314` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, core language, release version, public docs hygiene, and total architecture surfaces | `1320` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.0.0rc8` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.0.0rc9` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | pending remote CI after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -275,14 +280,14 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v1.0.0-rc.8 Readiness
+## v1.0.0-rc.9 Readiness
 
-`v1.0.0-rc.8` is a governed Provider Owned Client Live source checkpoint. The
+`v1.0.0-rc.9` is a governed MCP Owned Client Live source checkpoint. The
 supported public surface is:
 
 - local deterministic CLI scenarios through `zeus`;
-- `release-gated-ulw --target-version v1.0.0-rc.8 --json` for the sequential
-  v0.6.0 -> v1.0.0-rc.8 release-gate program contract;
+- `release-gated-ulw --target-version v1.0.0-rc.9 --json` for the sequential
+  v0.6.0 -> v1.0.0-rc.9 release-gate program contract;
 - `tool-limbs --tool-id files.read --json` for governed native tool, MCP
   discovery, and API connector boundary reporting;
 - `platform-surface --surface gateway --json` for governed CLI, API, gateway,
@@ -317,6 +322,12 @@ supported public surface is:
   policy, credential handoff, preflight, owned client receipt, audit, redaction,
   cleanup, and no-secret-echo checks, but still does not claim production
   provider readiness;
+- `mcp-owned-client-live --scenario owned-client-smoke --secret-ref env://ZEUS_RC9_MCP_TOKEN --json`
+  for controlled remote MCP tool execution through an owned client adapter when
+  the operator intentionally supplies a scoped environment secret reference.
+  This scenario binds remote MCP policy, credential handoff, preflight, owned
+  client receipt, audit, redaction, cleanup, resources/prompts disabled posture,
+  and no-secret-echo checks, but still does not claim production MCP readiness;
 - `adaptive-zeus --objective "..." --task-count N --json` for objective
   sensitive workflow selection across lean ULW, classify-and-act, parallel
   fan-out synthesis, and adversarial verification. This status surface does not
@@ -404,7 +415,7 @@ zeus wave13-eval --json
 zeus total-plan --json
 zeus total-blocks --secret-like ghp_TEST_FIXTURE --json
 zeus total-eval --json
-zeus release-gated-ulw --target-version v1.0.0-rc.8 --json
+zeus release-gated-ulw --target-version v1.0.0-rc.9 --json
 zeus tool-limbs --tool-id files.read --json
 zeus platform-surface --surface gateway --json
 zeus memory-ontology --subject Zeus --json
@@ -432,6 +443,8 @@ zeus provider-live-optin --scenario blocked-unallowlisted --json
 ZEUS_RC7_PROVIDER_KEY=provider-rc7-material-value zeus provider-live-optin --scenario external-receipt-smoke --json
 zeus provider-owned-client-live --scenario status --json
 ZEUS_RC8_PROVIDER_KEY=provider-rc8-material-value zeus provider-owned-client-live --scenario owned-client-smoke --json
+zeus mcp-owned-client-live --scenario status --json
+ZEUS_RC9_MCP_TOKEN=mcp-rc9-material-value zeus mcp-owned-client-live --scenario owned-client-smoke --json
 
 # Product-level checks
 zeus final-core --objective "Build a governed coding agent" --json
@@ -490,7 +503,7 @@ docs/                     public architecture and Hermes comparison notes
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus should keep a governed kernel/runtime split |
 | [Hermes-grade platform master design](docs/hermes-grade-platform-master-design.md) | Target product, UX, architecture, security, and roadmap contract for reaching at least Hermes-half live platform breadth |
 | [Live connection architecture](docs/live-connection-architecture.md) | Target design for real AI API, MCP, tool, gateway, web, browser, terminal, and sandbox connections |
-| [Security policy](SECURITY.md) | Public security posture and current v1.0.0-rc.8 boundary |
+| [Security policy](SECURITY.md) | Public security posture and current v1.0.0-rc.9 boundary |
 | [Changelog](CHANGELOG.md) | Release history and public-safe notes |
 
 ## License

@@ -22,7 +22,7 @@ def test_v100rc8_release_gate_reports_provider_owned_client_live_checkpoint() ->
     assert payload["owned_client_adapter_available"] is True
     assert payload["provider_owned_client_live_ready"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.9"
     assert "provider_owned_client_live_smoke_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

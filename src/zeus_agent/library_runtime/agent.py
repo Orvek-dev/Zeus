@@ -158,6 +158,7 @@ from zeus_agent.mcp_settings_runtime import McpSettingsRuntime
 from zeus_agent.memory_cockpit_runtime import MemoryCockpitRuntime
 from zeus_agent.memory_entry_runtime import MemoryEntryRuntime
 from zeus_agent.memory_privacy_live_runtime import build_memory_privacy_live_contract
+from zeus_agent.mcp_owned_client_live_runtime import build_mcp_owned_client_live_contract
 from zeus_agent.model_cockpit_runtime import ModelCockpitRuntime
 from zeus_agent.model_runtime import provider_catalog_payload
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
@@ -1451,6 +1452,27 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             secret_ref=secret_ref,
             model_id=model_id,
             message=message,
+        ).to_payload()
+
+    def mcp_owned_client_live(
+        self,
+        *,
+        scenario: str = "status",
+        endpoint: str = "https://mcp.github.local/rpc",
+        allowed_host: str = "mcp.github.local",
+        secret_ref: str = "env://ZEUS_RC9_MCP_TOKEN",
+        server_id: str = "mcp.github",
+        tool_name: str = "repo.search",
+        query: str = "Zeus MCP owned client live checkpoint",
+    ) -> dict[str, Any]:
+        return build_mcp_owned_client_live_contract(
+            scenario=scenario,
+            endpoint=endpoint,
+            allowed_host=allowed_host,
+            secret_ref=secret_ref,
+            server_id=server_id,
+            tool_name=tool_name,
+            query=query,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
