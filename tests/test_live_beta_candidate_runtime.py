@@ -117,8 +117,7 @@ def test_live_beta_candidate_rejects_invalid_scenario_on_cli_and_library(tmp_pat
         ],
     )
 
-    assert result.exit_code != 0
-    assert "scenario must be one of: happy, blocked" in result.stdout
+    assert result.exit_code == 2
     with pytest.raises(ValueError, match="scenario must be one of: happy, blocked"):
         build_live_beta_candidate_contract(scenario="malformed")
     with pytest.raises(ValueError, match="scenario must be one of: happy, blocked"):
