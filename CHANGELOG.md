@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.10.0 - 2026-06-05
+
+### Added
+
+- Adaptive Zeus runtime and CLI command for objective-sensitive ULW workflow
+  selection across lean ULW, classify-and-act, parallel fan-out synthesis, and
+  adversarial verification.
+- Release-gated `v0.10.0` checkpoint fields for Adaptive Zeus readiness,
+  dynamic workflow contracts, pattern routing, critique checkpoints, workflow
+  learning visibility, trajectory/eval visibility, and dry-run evidence.
+- Python library facade method for `adaptive_zeus_status(...)` so library
+  callers can inspect the same adaptive workflow contract as the CLI.
+- Secret-safe objective handling that blocks credential-like workflow requests
+  without echoing raw secret-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==0.10.0`.
+- README, Hermes comparison, live connection architecture, master design, and
+  security policy now describe the Adaptive Zeus checkpoint instead of only the
+  `v0.9.0` Memory/Ontology checkpoint.
+
+### Notes
+
+- `v0.10.0` is still local-first and deterministic by default.
+- Adaptive workflow selection does not execute handlers, open network access,
+  self-modify workflows, auto-write memory, promote learned rules, or widen
+  authority.
+
 ## v0.9.0 - 2026-06-05
 
 ### Added

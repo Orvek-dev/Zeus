@@ -12,6 +12,7 @@ from pydantic import ValidationError
 
 from zeus_agent.agent_runtime import run_wave2_loop
 from zeus_agent.acp_runtime import handle_acp_message
+from zeus_agent.adaptive_zeus_runtime import build_adaptive_zeus_contract
 from zeus_agent.api_runtime import run_api_server
 from zeus_agent.batch_runtime import run_objective_batch
 from zeus_agent.cli_wave3 import register_wave3_commands
@@ -259,6 +260,27 @@ def memory_ontology(
         home=home or default_zeus_home(),
         subject=subject,
         candidate_id=candidate_id,
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("adaptive-zeus")
+def adaptive_zeus(
+    objective: str = typer.Option(..., "--objective"),
+    task_count: int = typer.Option(1, "--task-count"),
+    requires_code: bool = typer.Option(False, "--requires-code"),
+    requires_research: bool = typer.Option(False, "--requires-research"),
+    risk_level: str = typer.Option("normal", "--risk-level"),
+    evidence_target: str = typer.Option("v010.adaptive_zeus", "--evidence-target"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_adaptive_zeus_contract(
+        objective=objective,
+        task_count=task_count,
+        requires_code=requires_code,
+        requires_research=requires_research,
+        risk_level=risk_level,
+        evidence_target=evidence_target,
     ).to_payload()
     _print_payload(payload, as_json=as_json)
 

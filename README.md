@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v0.9.0"><img alt="Version" src="https://img.shields.io/badge/version-0.9.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v0.10.0"><img alt="Version" src="https://img.shields.io/badge/version-0.10.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1251%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1256%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,14 +35,14 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v0.9.0` source checkpoint advances the
-platform into Memory/Ontology: local MemoryGraph storage, LLM Wiki views,
-ontology review queues, and skill-learning memory bridges are represented as a
-governed surface with retention policy, no-secret-echo checks, no auto-promotion,
-manual QA, review, and GitHub publication checkpoints. Live external AI APIs,
-MCP servers, gateway delivery, browser control, terminal execution, and remote
-runtimes should still be connected through the same authority, lease, approval,
-sandbox, evidence, retention, and promotion boundaries.
+an unconstrained chat loop. The public `v0.10.0` source checkpoint adds
+Adaptive Zeus: a dry-run workflow intelligence surface that reads an objective,
+chooses between lean ULW, parallel fan-out synthesis, classify-and-act, or
+adversarial verification, and reports the chosen pattern with critique,
+evidence, review, and safety boundaries. Live external AI APIs, MCP servers,
+gateway delivery, browser control, terminal execution, and remote runtimes
+should still be connected through the same authority, lease, approval, sandbox,
+evidence, retention, and promotion boundaries.
 
 ## Quickstart
 
@@ -67,10 +67,11 @@ zeus final-eval --json
 zeus total-plan --json
 zeus total-blocks --secret-like ghp_TEST_FIXTURE --json
 zeus total-eval --json
-zeus release-gated-ulw --target-version v0.9.0 --json
+zeus release-gated-ulw --target-version v0.10.0 --json
 zeus tool-limbs --tool-id files.read --json
 zeus platform-surface --surface gateway --json
 zeus memory-ontology --subject Zeus --json
+zeus adaptive-zeus --objective "Implement provider, MCP catalog, cron, and review slices" --task-count 5 --requires-code --requires-research --json
 ```
 
 These commands do not require live provider keys. They exercise the public
@@ -94,6 +95,7 @@ promotion boundaries before external systems are wired in.
 | `ontology_runtime` | Provenance-backed ontology candidates that remain proposed or blocked until reviewed | `zeus memory-ontology --json` |
 | `memory_ontology_surface` | Local MemoryGraph, LLM Wiki, ontology review queue, retention, and no auto-promotion reporting | `zeus memory-ontology --subject Zeus --json` |
 | `orchestration_runtime` | Dry-run parallel scheduler with dependency, evidence, depth, live-surface, and write-scope checks | `zeus total-plan --json` |
+| `adaptive_zeus_runtime` | Objective-sensitive workflow selection with critique checkpoints, ULW pattern choice, and no live execution | `zeus adaptive-zeus --objective "Ship a governed feature" --task-count 5 --requires-code --json` |
 | `skill_evolution` | Proposed improvements that cannot self-promote, widen authority, or bypass evidence gates | [Hermes comparison](docs/hermes-comparison.md) |
 
 ## Zeus Core Language
@@ -159,7 +161,7 @@ gravity is different.
 | --- | --- | --- |
 | Primary product shape | General-purpose self-improving agent that lives across CLI, gateway, ACP, batch, API, and library surfaces | Goal-oriented governed runtime that turns objectives into contracts and evidence obligations |
 | Core loop | `AIAgent` builds prompts, resolves providers, dispatches tools, persists sessions, and continues conversation | Objective compiler -> authority gate -> work-loop plan -> runtime dispatch -> evidence -> promotion decision |
-| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v0.9.0 Memory/Ontology checkpoint with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, provider/MCP loopback readiness, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
+| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v0.10.0 Adaptive Zeus checkpoint with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, provider/MCP loopback readiness, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
 | Safety center | Approval, profile isolation, tool availability, command checks, gateway authorization, and platform controls | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo checks, and promotion blocks |
 | Self-improvement | Built-in learning loop and skill creation from experience | Validation-gated skill-evolution queue; proposed skills cannot self-promote, widen authority, enable live transport, or bypass evidence |
 | Completion model | Conversational progress and tool-visible execution | Evidence-backed completion; "done" is blocked when objective, artifact, verification, or promotion evidence is missing |
@@ -175,10 +177,11 @@ Read the longer comparison in [docs/hermes-comparison.md](docs/hermes-comparison
 
 ## Live Connection Design
 
-`v0.9.0` includes the public Memory/Ontology checkpoint for attaching real
+`v0.10.0` includes the public Adaptive Zeus checkpoint for attaching real
 external AI APIs, MCP servers, native tools, gateway delivery, web research,
 browser or terminal automation, and remote sandboxes through entrypoint
-contracts and retention/promotion boundaries before live execution is enabled.
+contracts, adaptive workflow selection, and retention/promotion boundaries
+before live execution is enabled.
 
 The intended live path is:
 
@@ -203,11 +206,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, core language, release version, public docs hygiene, and total architecture surfaces | `1251` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, core language, release version, public docs hygiene, and total architecture surfaces | `1256` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==0.9.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==0.10.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | pending remote CI after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -217,13 +220,13 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v0.9.0 Readiness
+## v0.10.0 Readiness
 
-`v0.9.0` is a governed Memory/Ontology source checkpoint. The supported public
+`v0.10.0` is a governed Adaptive Zeus source checkpoint. The supported public
 surface is:
 
 - local deterministic CLI scenarios through `zeus`;
-- `release-gated-ulw --target-version v0.9.0 --json` for the sequential
+- `release-gated-ulw --target-version v0.10.0 --json` for the sequential
   v0.6.0 -> v1.0.0-rc release-gate program contract;
 - `tool-limbs --tool-id files.read --json` for governed native tool, MCP
   discovery, and API connector boundary reporting;
@@ -235,6 +238,11 @@ surface is:
   local SQLite MemoryGraph schema under the selected Zeus home, but it does not
   open network access, run handlers, promote ontology terms, or write active
   rules;
+- `adaptive-zeus --objective "..." --task-count N --json` for objective
+  sensitive workflow selection across lean ULW, classify-and-act, parallel
+  fan-out synthesis, and adversarial verification. This status surface does not
+  self-modify workflows, auto-write memory, promote learned rules, open
+  network access, or execute handlers;
 - objective compilation and governed runtime contract models;
 - authority-gated capability broker behavior;
 - provider, tool, connector, transport, workflow, gateway, verification, and
@@ -274,10 +282,11 @@ zeus wave13-eval --json
 zeus total-plan --json
 zeus total-blocks --secret-like ghp_TEST_FIXTURE --json
 zeus total-eval --json
-zeus release-gated-ulw --target-version v0.9.0 --json
+zeus release-gated-ulw --target-version v0.10.0 --json
 zeus tool-limbs --tool-id files.read --json
 zeus platform-surface --surface gateway --json
 zeus memory-ontology --subject Zeus --json
+zeus adaptive-zeus --objective "Implement provider, MCP catalog, cron, and review slices" --task-count 5 --requires-code --requires-research --json
 
 # Product-level checks
 zeus final-core --objective "Build a governed coding agent" --json
@@ -304,6 +313,7 @@ src/zeus_agent/
   research_runtime/       source-pinned research evidence graph contracts
   memory_ontology_surface_runtime/
                            local MemoryGraph, LLM Wiki, ontology review surface
+  adaptive_zeus_runtime/   adaptive ULW pattern selection and critique contracts
   ontology_runtime/       proposed ontology terms with provenance controls
   capability_runtime/     sandbox policy and workflow optimization hints
   orchestration_runtime/  dry-run parallel scheduling with write-scope checks
@@ -321,7 +331,7 @@ docs/                     public architecture and Hermes comparison notes
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus should keep a governed kernel/runtime split |
 | [Hermes-grade platform master design](docs/hermes-grade-platform-master-design.md) | Target product, UX, architecture, security, and roadmap contract for reaching at least Hermes-half live platform breadth |
 | [Live connection architecture](docs/live-connection-architecture.md) | Target design for real AI API, MCP, tool, gateway, web, browser, terminal, and sandbox connections |
-| [Security policy](SECURITY.md) | Public security posture and current v0.9.0 boundary |
+| [Security policy](SECURITY.md) | Public security posture and current v0.10.0 boundary |
 | [Changelog](CHANGELOG.md) | Release history and public-safe notes |
 
 ## License

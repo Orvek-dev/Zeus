@@ -152,7 +152,7 @@ def _task(
 
 
 def _review_required(pattern: WorkflowPattern, request: WorkflowCompileRequest) -> bool:
-    return pattern == "adversarial_verification" or request.risk_level == "high"
+    return pattern in {"adversarial_verification", "fan_out_and_synthesize"} or request.risk_level == "high"
 
 
 def _why_not_decision(pattern: WorkflowPattern, request: WorkflowCompileRequest) -> WhyNotDecision:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any, Optional
 
+from zeus_agent.adaptive_zeus_runtime import build_adaptive_zeus_contract
 from zeus_agent.ontology_cockpit_runtime import OntologyCockpitRuntime
 from zeus_agent.memory_ontology_surface_runtime import build_memory_ontology_surface_contract
 from zeus_agent.orchestration_runtime import WorkflowCompileRequest
@@ -77,6 +78,25 @@ class GrowthFacadeMixin:
             home=self.home,
             subject=subject,
             candidate_id=candidate_id,
+        ).to_payload()
+
+    def adaptive_zeus_status(
+        self,
+        *,
+        objective: str,
+        task_count: int = 1,
+        requires_code: bool = False,
+        requires_research: bool = False,
+        risk_level: str = "normal",
+        evidence_target: str = "v010.adaptive_zeus",
+    ) -> dict[str, Any]:
+        return build_adaptive_zeus_contract(
+            objective=objective,
+            task_count=task_count,
+            requires_code=requires_code,
+            requires_research=requires_research,
+            risk_level=risk_level,
+            evidence_target=evidence_target,
         ).to_payload()
 
     def platform_status(self, *, surface_id: Optional[str] = None) -> dict[str, Any]:

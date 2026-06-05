@@ -88,10 +88,20 @@ class ReleaseGatedUlwStatus(BaseModel):
     skill_learning_memory_contract_available: bool = False
     retention_policy_contract_available: bool = False
     memory_ontology_ready: bool = False
+    adaptive_zeus_contract_available: bool = False
+    dynamic_workflow_contract_available: bool = False
+    pattern_router_contract_available: bool = False
+    critique_checkpoint_contract_available: bool = False
+    workflow_learning_contract_available: bool = False
+    trajectory_eval_contract_available: bool = False
+    adaptive_zeus_ready: bool = False
+    workflow_self_modification: bool = False
+    workflow_memory_auto_write: bool = False
     memory_auto_promotion: bool = False
     ontology_auto_promotion: bool = False
     wiki_page_update_written: bool = False
     active_rule_written: bool = False
+    authority_widened: bool = False
     credential_material_accessed: bool = False
     network_opened: bool = False
     external_delivery_opened: bool = False
@@ -125,6 +135,7 @@ def build_release_gated_ulw_status(
     tool_limbs_contract_available = normalized_version == "v0.7.0" and "unknown_target_version" not in blocked_reasons
     platform_surface_contract_available = normalized_version == "v0.8.0" and "unknown_target_version" not in blocked_reasons
     memory_ontology_contract_available = normalized_version == "v0.9.0" and "unknown_target_version" not in blocked_reasons
+    adaptive_zeus_contract_available = normalized_version == "v0.10.0" and "unknown_target_version" not in blocked_reasons
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
         target_version=normalized_version,
@@ -175,10 +186,20 @@ def build_release_gated_ulw_status(
         skill_learning_memory_contract_available=memory_ontology_contract_available,
         retention_policy_contract_available=memory_ontology_contract_available,
         memory_ontology_ready=False,
+        adaptive_zeus_contract_available=adaptive_zeus_contract_available,
+        dynamic_workflow_contract_available=adaptive_zeus_contract_available,
+        pattern_router_contract_available=adaptive_zeus_contract_available,
+        critique_checkpoint_contract_available=adaptive_zeus_contract_available,
+        workflow_learning_contract_available=adaptive_zeus_contract_available,
+        trajectory_eval_contract_available=adaptive_zeus_contract_available,
+        adaptive_zeus_ready=False,
+        workflow_self_modification=False,
+        workflow_memory_auto_write=False,
         memory_auto_promotion=False,
         ontology_auto_promotion=False,
         wiki_page_update_written=False,
         active_rule_written=False,
+        authority_widened=False,
         credential_material_accessed=False,
         network_opened=False,
         external_delivery_opened=False,
@@ -198,7 +219,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
     reasons = []
     if target_version not in _PROGRAM_ORDER:
         reasons.append("unknown_target_version")
-    elif target_version not in {"v0.6.0", "v0.7.0", "v0.8.0", "v0.9.0"}:
+    elif target_version not in {"v0.6.0", "v0.7.0", "v0.8.0", "v0.9.0", "v0.10.0"}:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
         reasons.append("raw_secret_marker_detected")
@@ -217,6 +238,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v0.10.0":
+        return (
+            "adaptive_zeus_release_gate_manual_qa",
+            "adaptive_zeus_pattern_selection_manual_qa",
+            "adaptive_zeus_secret_boundary_manual_qa",
+            "adaptive_zeus_adjacent_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v0.9.0":
         return (
             "memory_ontology_release_gate_manual_qa",

@@ -10,7 +10,7 @@ waves should satisfy before Zeus can claim Hermes-scale breadth.
 ## Scope
 
 This document governs the target design for Hermes-grade platform absorption.
-It does not replace the current v0.9.0 implementation boundary. It defines the
+It does not replace the current v0.10.0 implementation boundary. It defines the
 future product and architecture standard for entry surfaces, persona, objective
 control, provider runtime, MCP, tools, gateway, memory, skills, security,
 observability, and release readiness.
@@ -90,12 +90,12 @@ Hermes remains upstream/reference only. Mercury is the Zeus internal transport p
 Current Zeus is no longer a single-layer local agent. The local source tree has
 these concrete anchors:
 
-- `src/zeus_agent`: 725 Python files, 73,443 source lines, 63,990 non-comment
+- `src/zeus_agent`: 727 Python files, 73,762 source lines, 64,282 non-comment
   Python LOC.
-- `tests`: 286 Python test files, 38,599 source lines, 31,416 non-comment
+- `tests`: 287 Python test files, 38,754 source lines, 31,552 non-comment
   Python LOC.
-- `docs`: 8 public documents, 2,838 lines.
-- Source CLI registration: 222 deterministic commands when run from the source
+- `docs`: 8 public documents, 2,846 lines.
+- Source CLI registration: 223 deterministic commands when run from the source
   checkout with `PYTHONPATH=src`.
 - Current deterministic architecture checks: `total-eval` 9/9 and
   `final-eval` 10/10.
@@ -607,11 +607,11 @@ The target is "at least half Hermes-grade" in useful platform mass.
 
 | Metric | Current Zeus | Hermes core reference | Zeus Hermes-half target |
 | --- | ---: | ---: | ---: |
-| Runtime files | 725 | 1,499 | 700+ useful runtime files |
-| Python LOC | 63,990 | 324,243 | 120k-170k useful runtime LOC |
-| Test files | 286 | 1,410 | 500+ test/integration files |
-| Docs lines | 2,838 | 436k+ full docs/reference | 30k+ practical product/developer docs |
-| CLI/product commands | 222 deterministic commands | broad `hermes` CLI/gateway/API/library | 100+ user/product commands |
+| Runtime files | 727 | 1,499 | 700+ useful runtime files |
+| Python LOC | 64,282 | 324,243 | 120k-170k useful runtime LOC |
+| Test files | 287 | 1,410 | 500+ test/integration files |
+| Docs lines | 2,846 | 436k+ full docs/reference | 30k+ practical product/developer docs |
+| CLI/product commands | 223 deterministic commands | broad `hermes` CLI/gateway/API/library | 100+ user/product commands |
 | Native tools | scaffolded | 70+ tools | 40+ tools |
 | Toolsets | scaffolded | ~28 toolsets | 15+ toolsets |
 | Gateway adapters | loopback/API scaffold | 20 platform adapters | 5+ adapters |
