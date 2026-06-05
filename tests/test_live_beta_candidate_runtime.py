@@ -29,7 +29,7 @@ def test_v100rc_release_gate_reports_live_beta_candidate_checkpoint() -> None:
     assert payload["production_ready"] is False
     assert "live_beta_candidate_release_gate_manual_qa" in payload["required_checkpoint_evidence"]
     assert "live_beta_candidate_secret_boundary_manual_qa" in payload["required_checkpoint_evidence"]
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.1"
     assert payload["network_opened"] is False
     assert payload["handler_executed"] is False
     assert payload["live_production_claimed"] is False

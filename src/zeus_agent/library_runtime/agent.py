@@ -15,6 +15,7 @@ from zeus_agent.gateway_pairing_runtime import GatewayPairingRuntime
 from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
+from zeus_agent.production_foundation_runtime import build_production_foundation_contract
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionResult
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionRuntime
 from zeus_agent.live_dry_run_runtime import LiveDryRunRuntime
@@ -1326,6 +1327,18 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
         return build_live_beta_candidate_contract(
             include_smoke=include_smoke,
             scenario=scenario,
+            operator_note=operator_note,
+        ).to_payload()
+
+    def production_foundation(
+        self,
+        *,
+        include_credentials: bool = False,
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_production_foundation_contract(
+            home=self.home,
+            include_credentials=include_credentials,
             operator_note=operator_note,
         ).to_payload()
 

@@ -31,6 +31,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v0.9.0",
     "v0.10.0",
     "v1.0.0-rc",
+    "v1.0.0-rc.1",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -39,6 +40,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.9.0": "memory_ontology",
     "v0.10.0": "adaptive_zeus",
     "v1.0.0-rc": "live_beta_candidate",
+    "v1.0.0-rc.1": "production_foundation",
 }
 
 
@@ -102,6 +104,15 @@ class ReleaseGatedUlwStatus(BaseModel):
     live_beta_activation_contract_available: bool = False
     rc_closeout_contract_available: bool = False
     live_beta_candidate_ready: bool = False
+    production_foundation_contract_available: bool = False
+    identity_runtime_available: bool = False
+    auth_runtime_available: bool = False
+    approval_runtime_available: bool = False
+    credential_binding_runtime_available: bool = False
+    secret_resolver_runtime_available: bool = False
+    audit_runtime_available: bool = False
+    sandbox_policy_available: bool = False
+    production_foundation_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -145,6 +156,9 @@ def build_release_gated_ulw_status(
     memory_ontology_contract_available = normalized_version == "v0.9.0" and "unknown_target_version" not in blocked_reasons
     adaptive_zeus_contract_available = normalized_version == "v0.10.0" and "unknown_target_version" not in blocked_reasons
     live_beta_candidate_contract_available = normalized_version == "v1.0.0-rc" and "unknown_target_version" not in blocked_reasons
+    production_foundation_contract_available = (
+        normalized_version == "v1.0.0-rc.1" and "unknown_target_version" not in blocked_reasons
+    )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
         target_version=normalized_version,
@@ -209,6 +223,15 @@ def build_release_gated_ulw_status(
         live_beta_activation_contract_available=live_beta_candidate_contract_available,
         rc_closeout_contract_available=live_beta_candidate_contract_available,
         live_beta_candidate_ready=False,
+        production_foundation_contract_available=production_foundation_contract_available,
+        identity_runtime_available=production_foundation_contract_available,
+        auth_runtime_available=production_foundation_contract_available,
+        approval_runtime_available=production_foundation_contract_available,
+        credential_binding_runtime_available=production_foundation_contract_available,
+        secret_resolver_runtime_available=production_foundation_contract_available,
+        audit_runtime_available=production_foundation_contract_available,
+        sandbox_policy_available=production_foundation_contract_available,
+        production_foundation_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -236,7 +259,15 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
     reasons = []
     if target_version not in _PROGRAM_ORDER:
         reasons.append("unknown_target_version")
-    elif target_version not in {"v0.6.0", "v0.7.0", "v0.8.0", "v0.9.0", "v0.10.0", "v1.0.0-rc"}:
+    elif target_version not in {
+        "v0.6.0",
+        "v0.7.0",
+        "v0.8.0",
+        "v0.9.0",
+        "v0.10.0",
+        "v1.0.0-rc",
+        "v1.0.0-rc.1",
+    }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
         reasons.append("raw_secret_marker_detected")
@@ -255,6 +286,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.0.0-rc.1":
+        return (
+            "production_foundation_release_gate_manual_qa",
+            "production_foundation_security_control_manual_qa",
+            "production_foundation_secret_boundary_manual_qa",
+            "production_foundation_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0-rc":
         return (
             "live_beta_candidate_release_gate_manual_qa",

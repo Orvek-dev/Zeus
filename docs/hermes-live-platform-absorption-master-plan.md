@@ -24,10 +24,12 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v1.0.0-rc boundary remains designed/prepared/dry-run/future for
-production live-capable surfaces, while adding a live-beta-candidate contract
-for local smoke and readiness evidence unless a specific surface has separate
-production evidence and release approval.
+The public v1.0.0-rc.1 boundary remains designed/prepared/dry-run/future for
+production live-capable surfaces, while adding live-beta-candidate and
+production-foundation contracts for local smoke, readiness, identity/auth,
+approval, lease, credential, secret, audit, sandbox, rollback, and review
+evidence unless a specific surface has separate production evidence and release
+approval.
 
 Hermes remains upstream/reference only. Mercury is the Zeus internal transport product name for transport, connector, MCP, API, and gateway routing.
 
@@ -192,7 +194,7 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v1.0.0-rc release tree:
+Measured in the public v1.0.0-rc.1 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |

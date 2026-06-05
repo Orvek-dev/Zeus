@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.1 - 2026-06-06
+
+### Added
+
+- Production Foundation runtime and CLI command for identity/auth, approval,
+  runtime lease, credential binding, secret resolver, audit, sandbox, rollback,
+  and independent-review boundary reporting.
+- Release-gated `v1.0.0-rc.1` checkpoint fields for the production foundation
+  contract and required ULW manual QA evidence.
+- Python library facade method for `production_foundation(...)` so library
+  callers can inspect the same production foundation contract as the CLI.
+- Secret-safe production foundation operator-note handling that blocks
+  credential-like notes without echoing raw secret-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc1` for Python packaging
+  and `v1.0.0-rc.1` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Production Foundation checkpoint on top of the earlier Live
+  Beta Candidate boundary.
+
+### Notes
+
+- `v1.0.0-rc.1` is still local-first and deterministic by default.
+- The Production Foundation can report that required safety/control runtimes are
+  present, but it does not claim production live readiness, hosted SaaS
+  readiness, unattended execution, or hard-isolated remote runtime operation.
+
 ## v1.0.0-rc - 2026-06-05
 
 ### Added

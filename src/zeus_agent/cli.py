@@ -129,6 +129,7 @@ from zeus_agent.cli_wave156 import register_wave156_commands
 from zeus_agent.cli_wave157 import register_wave157_commands
 from zeus_agent.cli_wave158 import register_wave158_commands
 from zeus_agent.cli_wave160 import register_wave160_commands
+from zeus_agent.cli_wave300 import register_wave300_commands
 from zeus_agent.cli_live_research_workflow import register_live_research_workflow_commands
 from zeus_agent.cli_g006 import register_g006_commands
 from zeus_agent.cli_total import register_total_commands
@@ -961,6 +962,7 @@ register_wave156_commands(app)
 register_wave157_commands(app)
 register_wave158_commands(app)
 register_wave160_commands(app)
+register_wave300_commands(app)
 register_live_research_workflow_commands(app)
 register_g006_commands(app)
 register_total_commands(app)
