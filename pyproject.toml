@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zeus-agent"
-version = "1.0.0rc7"
+version = "1.0.0rc8"
 description = "Governed objective-oriented AI agent runtime."
 readme = "README.md"
 requires-python = ">=3.10"

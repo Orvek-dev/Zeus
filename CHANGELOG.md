@@ -2,6 +2,38 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.8 - 2026-06-06
+
+### Added
+
+- Provider Owned Client Live runtime and CLI command for governed owned provider
+  client execution through explicit operator opt-in, endpoint allowlisting,
+  scoped secret reference checks, credential handoff, remote transport policy,
+  remote executor preflight, owned client receipt validation, audit, redaction,
+  cleanup, and no-production-claim reporting.
+- Release-gated `v1.0.0-rc.8` checkpoint fields for provider owned client live
+  contract availability, owned client transport availability, owned client
+  adapter availability, and provider owned client live readiness.
+- Python library facade method for `provider_owned_client_live(...)` so library
+  callers can inspect the same owned-client live contract as the CLI.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc8` for Python packaging
+  and `v1.0.0-rc.8` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Provider Owned Client Live checkpoint on top of Provider
+  Live Opt-in.
+- Release-gated ULW now advances `v1.0.0-rc.7` to `v1.0.0-rc.8`.
+
+### Notes
+
+- `v1.0.0-rc.8` is still governed and deterministic by default.
+- Provider Owned Client Live validates the owned-client adapter path with
+  policy, credential handoff, preflight, audit, redaction, and cleanup. It does
+  not claim unrestricted production provider execution, hosted SaaS readiness,
+  or unattended live operation.
+
 ## v1.0.0-rc.7 - 2026-06-06
 
 ### Added

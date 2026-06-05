@@ -24,7 +24,7 @@ def test_v100rc7_release_gate_reports_provider_live_optin_checkpoint() -> None:
     assert payload["remote_executor_preflight_available"] is True
     assert payload["provider_live_optin_ready"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.8"
     assert "provider_live_optin_external_receipt_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

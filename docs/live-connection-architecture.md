@@ -4,8 +4,8 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.0.0-rc.7` does not claim these live integrations are production-active. It
-establishes the public Provider Live Opt-in release gate and the dry-run/live
+`v1.0.0-rc.8` does not claim these live integrations are production-active. It
+establishes the public Provider Owned Client Live release gate and the dry-run/live
 beta contract slices those integrations must pass through before production
 live execution or promotion is enabled.
 
@@ -237,12 +237,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.0.0-rc.7 Implementation Boundary
+## v1.0.0-rc.8 Implementation Boundary
 
-`v1.0.0-rc.7` includes:
+`v1.0.0-rc.8` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.7 program;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.8 program;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -291,6 +291,10 @@ Every live connection type should pass these gates:
   opt-in enforcement, endpoint allowlisting, scoped secret reference checks,
   remote transport policy, remote executor preflight, external provider receipt
   validation, audit, redaction, and no production-ready claim;
+- Provider Owned Client Live reporting for status-only readiness, owned client
+  adapter execution, scoped secret proof, credential handoff, remote transport
+  policy, remote executor preflight, owned client receipt validation, audit,
+  redaction, cleanup, and no production-ready claim;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -300,7 +304,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.0.0-rc.7` does not include:
+`v1.0.0-rc.8` does not include:
 
 - production live MCP catalog;
 - unrestricted or production external provider execution;

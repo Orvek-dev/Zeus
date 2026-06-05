@@ -38,6 +38,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.0.0-rc.5",
     "v1.0.0-rc.6",
     "v1.0.0-rc.7",
+    "v1.0.0-rc.8",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -53,6 +54,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.0.0-rc.5": "sandbox_terminal_live",
     "v1.0.0-rc.6": "memory_privacy_live",
     "v1.0.0-rc.7": "provider_live_optin",
+    "v1.0.0-rc.8": "provider_owned_client_live",
 }
 
 
@@ -176,6 +178,10 @@ class ReleaseGatedUlwStatus(BaseModel):
     remote_transport_policy_available: bool = False
     remote_executor_preflight_available: bool = False
     provider_live_optin_ready: bool = False
+    provider_owned_client_live_contract_available: bool = False
+    provider_owned_client_transport_available: bool = False
+    owned_client_adapter_available: bool = False
+    provider_owned_client_live_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -239,6 +245,9 @@ def build_release_gated_ulw_status(
     )
     provider_live_optin_contract_available = (
         normalized_version == "v1.0.0-rc.7" and "unknown_target_version" not in blocked_reasons
+    )
+    provider_owned_client_live_contract_available = (
+        normalized_version == "v1.0.0-rc.8" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -317,7 +326,7 @@ def build_release_gated_ulw_status(
         provider_loopback_http_available=provider_live_api_contract_available,
         provider_credentialed_http_available=provider_live_api_contract_available,
         provider_external_transport_available=provider_live_optin_contract_available,
-        provider_owned_client_available=provider_live_api_contract_available,
+        provider_owned_client_available=provider_live_api_contract_available or provider_owned_client_live_contract_available,
         provider_direct_adapter_available=provider_live_api_contract_available,
         provider_live_api_ready=False,
         mcp_live_server_contract_available=mcp_live_server_contract_available,
@@ -361,9 +370,13 @@ def build_release_gated_ulw_status(
         local_privacy_ready=False,
         provider_live_optin_contract_available=provider_live_optin_contract_available,
         provider_external_receipt_available=provider_live_optin_contract_available,
-        remote_transport_policy_available=provider_live_optin_contract_available,
-        remote_executor_preflight_available=provider_live_optin_contract_available,
+        remote_transport_policy_available=provider_live_optin_contract_available or provider_owned_client_live_contract_available,
+        remote_executor_preflight_available=provider_live_optin_contract_available or provider_owned_client_live_contract_available,
         provider_live_optin_ready=False,
+        provider_owned_client_live_contract_available=provider_owned_client_live_contract_available,
+        provider_owned_client_transport_available=provider_owned_client_live_contract_available,
+        owned_client_adapter_available=provider_owned_client_live_contract_available,
+        provider_owned_client_live_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -405,6 +418,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.0.0-rc.5",
         "v1.0.0-rc.6",
         "v1.0.0-rc.7",
+        "v1.0.0-rc.8",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -424,6 +438,18 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.0.0-rc.8":
+        return (
+            "provider_owned_client_live_release_gate_manual_qa",
+            "provider_owned_client_live_missing_optin_manual_qa",
+            "provider_owned_client_live_missing_secret_manual_qa",
+            "provider_owned_client_live_smoke_manual_qa",
+            "provider_owned_client_live_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0-rc.7":
         return (
             "provider_live_optin_release_gate_manual_qa",

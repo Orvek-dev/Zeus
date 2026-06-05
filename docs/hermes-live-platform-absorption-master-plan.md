@@ -24,7 +24,7 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v1.0.0-rc.7 boundary remains designed/prepared/dry-run/future for
+The public v1.0.0-rc.8 boundary remains designed/prepared/dry-run/future for
 production live-capable surfaces, while adding live-beta-candidate and
 production-foundation contracts for local smoke, readiness, identity/auth,
 approval, lease, credential, secret, audit, sandbox, rollback, and review
@@ -36,7 +36,8 @@ loopback smoke, target allowlist, pairing proof, delivery envelope/body, audit,
 redaction, cleanup evidence, external delivery blocked posture, webhook blocked
 posture, and Sandbox Terminal Live local sandbox command smoke, browser guard,
 network/Docker/SSH blocked posture, evidence, cleanup, Memory Privacy Live,
-Provider Live Opt-in external receipt validation,
+Provider Live Opt-in external receipt validation, Provider Owned Client Live
+adapter execution,
 local SQLite MemoryGraph privacy, secret quarantine, retention deletion,
 cross-session search default-deny, and no-auto-promotion evidence unless a
 specific surface has separate production evidence and release approval.
@@ -204,16 +205,16 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v1.0.0-rc.7 release tree:
+Measured in the public v1.0.0-rc.8 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |
-| Public source/test/docs/config files | 1,063 |
-| `src` Python source lines | 77,429 |
-| `tests` Python source lines | 39,981 |
-| `docs` Markdown lines | 2,940 |
-| Python test files | 295 |
-| CLI/product commands | 359 |
+| Public source/test/docs/config files | 1,072 |
+| `src` Python source lines | 78,075 |
+| `tests` Python source lines | 40,112 |
+| `docs` Markdown lines | 2,949 |
+| Python test files | 296 |
+| CLI/product commands | 360 |
 
 Current Zeus already has many runtime anchors:
 
