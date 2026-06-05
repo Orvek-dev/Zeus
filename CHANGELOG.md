@@ -2,6 +2,40 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.3 - 2026-06-06
+
+### Added
+
+- MCP Live Server runtime and CLI command for governed MCP status reporting,
+  loopback MCP HTTP smoke execution, and prompt-injection surface scanning.
+- Release-gated `v1.0.0-rc.3` checkpoint fields for MCP catalog availability,
+  activation policy, request envelope, loopback HTTP, credentialed HTTP,
+  remote-server blocked posture, resources/prompts disabled posture, and
+  MCP live-server readiness.
+- Python library facade method for `mcp_live_server(...)` so library callers can
+  inspect the same MCP live-server contract as the CLI.
+- Secret-safe MCP live-server handling that blocks missing credential material
+  before loopback network access and blocks unsafe prompt-injection markers
+  without opening network access.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc3` for Python packaging
+  and `v1.0.0-rc.3` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the MCP Live Server checkpoint on top of the Provider Live API
+  boundary.
+
+### Notes
+
+- `v1.0.0-rc.3` is still local-first and deterministic by default.
+- The MCP Live Server loopback smoke can open a session-local loopback HTTP
+  server and execute the governed MCP transport path when the operator supplies
+  a scoped environment secret reference. It does not claim remote MCP server
+  execution, resources/prompts activation, production live readiness, hosted
+  SaaS readiness, unattended execution, or hard-isolated remote runtime
+  operation.
+
 ## v1.0.0-rc.2 - 2026-06-06
 
 ### Added

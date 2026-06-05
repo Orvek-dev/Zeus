@@ -4,8 +4,8 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.0.0-rc.2` does not claim these live integrations are production-active. It
-establishes the public Provider Live API release gate and the dry-run/live beta
+`v1.0.0-rc.3` does not claim these live integrations are production-active. It
+establishes the public MCP Live Server release gate and the dry-run/live beta
 contract slices those integrations must pass through before production live
 execution or promotion is enabled.
 
@@ -75,7 +75,8 @@ policy before dispatching a handler.
 | `security_runtime` | Decides allowed/blocked/dry-run before handler execution | `src/zeus_agent/security/planning.py` |
 | `provider_runtime` | Resolves local LLM, fake, OpenAI-compatible, Anthropic-style, and future provider adapters | `src/zeus_agent/model_runtime/` |
 | `provider_live_api_runtime` | Proves the governed provider live API path through loopback smoke, secret binding, authorization, audit, redaction, and cleanup | `src/zeus_agent/provider_live_api_runtime/` |
-| `mcp_runtime` | Registers trusted MCP servers, tools, schemas, resources, and credential scopes | future live module, dry-run surfaced through `src/zeus_agent/tool_limbs_runtime/` |
+| `mcp_runtime` | Registers trusted MCP servers, tools, schemas, resources, and credential scopes | `src/zeus_agent/mcp_runtime/` |
+| `mcp_live_server_runtime` | Proves governed MCP live-server status, loopback HTTP smoke, prompt-injection scanning, audit, redaction, and cleanup | `src/zeus_agent/mcp_live_server_runtime/` |
 | `tool_runtime` | Filters visible tools, validates schema, blocks side effects without authority | `src/zeus_agent/tool_runtime/` and `src/zeus_agent/tool_limbs_runtime/` |
 | `gateway_runtime` | Drafts and delivers external messages only through scoped targets and audit records | `src/zeus_agent/gateway_runtime/` |
 | `research_runtime` | Builds source-pinned research evidence from web, GitHub, docs, and local sources | `src/zeus_agent/research_runtime/` |
@@ -236,12 +237,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.0.0-rc.2 Implementation Boundary
+## v1.0.0-rc.3 Implementation Boundary
 
-`v1.0.0-rc.2` includes:
+`v1.0.0-rc.3` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.2 program;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.3 program;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -268,6 +269,11 @@ Every live connection type should pass these gates:
   smoke, provider readiness, runtime lease, credential binding, secret material
   proof, execution authorization, transport audit, response redaction, and
   cleanup;
+- MCP Live Server reporting for status-only readiness, catalog provenance,
+  activation policy, request envelope, loopback HTTP smoke, prompt-injection
+  scanning, credential binding, secret material proof, execution authorization,
+  transport audit, response redaction, resources/prompts disabled posture,
+  remote-server blocked posture, and cleanup;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -277,10 +283,12 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.0.0-rc.2` does not include:
+`v1.0.0-rc.3` does not include:
 
 - production live MCP catalog;
 - external non-loopback provider production execution;
+- remote MCP server production execution;
+- MCP resources/prompts activation;
 - long-running gateway daemon;
 - hosted API server;
 - unattended browser or terminal execution;
