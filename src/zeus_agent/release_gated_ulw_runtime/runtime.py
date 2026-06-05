@@ -32,6 +32,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v0.10.0",
     "v1.0.0-rc",
     "v1.0.0-rc.1",
+    "v1.0.0-rc.2",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -41,6 +42,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.10.0": "adaptive_zeus",
     "v1.0.0-rc": "live_beta_candidate",
     "v1.0.0-rc.1": "production_foundation",
+    "v1.0.0-rc.2": "provider_live_api",
 }
 
 
@@ -113,6 +115,13 @@ class ReleaseGatedUlwStatus(BaseModel):
     audit_runtime_available: bool = False
     sandbox_policy_available: bool = False
     production_foundation_ready: bool = False
+    provider_live_api_contract_available: bool = False
+    provider_loopback_http_available: bool = False
+    provider_credentialed_http_available: bool = False
+    provider_external_transport_available: bool = False
+    provider_owned_client_available: bool = False
+    provider_direct_adapter_available: bool = False
+    provider_live_api_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -158,6 +167,9 @@ def build_release_gated_ulw_status(
     live_beta_candidate_contract_available = normalized_version == "v1.0.0-rc" and "unknown_target_version" not in blocked_reasons
     production_foundation_contract_available = (
         normalized_version == "v1.0.0-rc.1" and "unknown_target_version" not in blocked_reasons
+    )
+    provider_live_api_contract_available = (
+        normalized_version == "v1.0.0-rc.2" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -232,6 +244,13 @@ def build_release_gated_ulw_status(
         audit_runtime_available=production_foundation_contract_available,
         sandbox_policy_available=production_foundation_contract_available,
         production_foundation_ready=False,
+        provider_live_api_contract_available=provider_live_api_contract_available,
+        provider_loopback_http_available=provider_live_api_contract_available,
+        provider_credentialed_http_available=provider_live_api_contract_available,
+        provider_external_transport_available=False,
+        provider_owned_client_available=provider_live_api_contract_available,
+        provider_direct_adapter_available=provider_live_api_contract_available,
+        provider_live_api_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -267,6 +286,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v0.10.0",
         "v1.0.0-rc",
         "v1.0.0-rc.1",
+        "v1.0.0-rc.2",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -286,6 +306,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.0.0-rc.2":
+        return (
+            "provider_live_api_release_gate_manual_qa",
+            "provider_live_api_loopback_manual_qa",
+            "provider_live_api_missing_secret_manual_qa",
+            "provider_live_api_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0-rc.1":
         return (
             "production_foundation_release_gate_manual_qa",

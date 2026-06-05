@@ -10,7 +10,7 @@ waves should satisfy before Zeus can claim Hermes-scale breadth.
 ## Scope
 
 This document governs the target design for Hermes-grade platform absorption.
-It does not replace the current v1.0.0-rc.1 implementation boundary. It defines the
+It does not replace the current v1.0.0-rc.2 implementation boundary. It defines the
 future product and architecture standard for entry surfaces, persona, objective
 control, provider runtime, MCP, tools, gateway, memory, skills, security,
 observability, and release readiness.

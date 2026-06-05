@@ -2,6 +2,38 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.2 - 2026-06-06
+
+### Added
+
+- Provider Live API runtime and CLI command for governed provider live API
+  status reporting and loopback provider smoke execution.
+- Release-gated `v1.0.0-rc.2` checkpoint fields for provider live API
+  readiness, loopback-only network opening, credential binding, secret material
+  proof, execution authorization, audit, response redaction, and no external
+  production-readiness claim.
+- Python library facade method for `provider_live_api(...)` so library callers
+  can inspect the same provider live API contract as the CLI.
+- Secret-safe provider live handling that blocks missing or credential-like
+  material without echoing raw secret-like values.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc2` for Python packaging
+  and `v1.0.0-rc.2` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Provider Live API checkpoint on top of the earlier
+  Production Foundation boundary.
+
+### Notes
+
+- `v1.0.0-rc.2` is still local-first and deterministic by default.
+- The Provider Live API loopback smoke can open a session-local loopback server
+  and execute the governed provider transport path when the operator supplies a
+  scoped environment secret reference. It does not claim external non-loopback
+  provider execution, production live readiness, hosted SaaS readiness,
+  unattended execution, or hard-isolated remote runtime operation.
+
 ## v1.0.0-rc.1 - 2026-06-06
 
 ### Added

@@ -16,6 +16,7 @@ from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.production_foundation_runtime import build_production_foundation_contract
+from zeus_agent.provider_live_api_runtime import build_provider_live_api_contract
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionResult
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionRuntime
 from zeus_agent.live_dry_run_runtime import LiveDryRunRuntime
@@ -1340,6 +1341,19 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             home=self.home,
             include_credentials=include_credentials,
             operator_note=operator_note,
+        ).to_payload()
+
+    def provider_live_api(
+        self,
+        *,
+        scenario: str = "status",
+        secret_ref: str = "env://ZEUS_RC2_PROVIDER_KEY",
+        message: str = "summarize provider live api checkpoint",
+    ) -> dict[str, Any]:
+        return build_provider_live_api_contract(
+            scenario=scenario,
+            secret_ref=secret_ref,
+            message=message,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
