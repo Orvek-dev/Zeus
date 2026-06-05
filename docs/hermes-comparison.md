@@ -107,13 +107,14 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v1.0.0-rc.6` code does not claim all live surfaces are production-active.
+The public `v1.0.0-rc.7` code does not claim all live surfaces are production-active.
 It establishes the contracts, total architecture dry-run checks, Tool Limbs,
 Platform Surface boundary, Memory/Ontology boundary, Adaptive Zeus workflow
 selection boundary, Live Beta Candidate boundary, Production Foundation
 boundary, Provider Live API boundary, MCP Live Server boundary, Gateway Live
 Delivery boundary, Sandbox Terminal Live boundary, Memory Privacy Live boundary,
-and live connection design those surfaces should pass through.
+Provider Live Opt-in boundary, and live connection design those surfaces should
+pass through.
 
 ## What Is Different With Hermes
 
@@ -125,7 +126,7 @@ and live connection design those surfaces should pass through.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v1.0.0-rc.6 is a local deterministic Memory Privacy Live checkpoint with CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog reporting, MCP discovery and API connector dry-run contracts, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, release-gated provider/MCP/gateway loopback readiness, controlled loopback provider HTTP smoke, controlled loopback MCP HTTP smoke, MCP prompt-injection scan, controlled loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v1.0.0-rc.7 is a governed Provider Live Opt-in checkpoint with CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog reporting, MCP discovery and API connector dry-run contracts, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, release-gated provider/MCP/gateway loopback readiness, controlled loopback provider HTTP smoke, controlled loopback MCP HTTP smoke, MCP prompt-injection scan, controlled loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, Provider Live Opt-in external receipt validation, and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
@@ -158,7 +159,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v1.0.0-rc.6 Boundary
+## Current v1.0.0-rc.7 Boundary
 
 Implemented public foundation:
 
@@ -208,15 +209,19 @@ Implemented public foundation:
   MemoryGraph schema readiness, explicit local fact smoke, secret quarantine,
   retention deletion, cross-session search default-deny, no active-rule writes,
   no ontology/learned-rule auto-promotion, and no network or credential access;
+- governed Provider Live Opt-in reporting for status-only readiness, explicit
+  operator opt-in enforcement, endpoint allowlisting, scoped secret references,
+  remote transport policy, remote executor preflight, external provider receipt
+  validation, audit, redaction, and no production-ready claim;
 - security planning, research graph, ontology candidate, sandbox workflow, and
   dry-run orchestration contracts;
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 1301 public tests, a 10/10 final architecture eval, and a 9/9 total
+- 1308 public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.6 program with
-  v1.0.0-rc.6 Memory Privacy Live checkpoint reporting;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.7 program with
+  v1.0.0-rc.7 Provider Live Opt-in checkpoint reporting;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.
 

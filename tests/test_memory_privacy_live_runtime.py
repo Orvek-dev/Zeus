@@ -31,7 +31,7 @@ def test_v100rc6_release_gate_reports_memory_privacy_live_checkpoint() -> None:
     assert payload["wiki_page_update_written"] is False
     assert payload["active_rule_written"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.7"
     assert "memory_privacy_live_secret_quarantine_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

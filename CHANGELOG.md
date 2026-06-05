@@ -2,6 +2,41 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.7 - 2026-06-06
+
+### Added
+
+- Provider Live Opt-in runtime and CLI command for explicit operator opt-in,
+  endpoint allowlisting, scoped secret reference checks, remote transport
+  policy, remote executor preflight, external provider receipt validation,
+  audit, redaction, and no-production-claim reporting.
+- Release-gated `v1.0.0-rc.7` checkpoint fields for provider live opt-in
+  contract availability, external provider receipt availability, remote
+  transport policy availability, remote executor preflight availability, and
+  provider live opt-in readiness.
+- Python library facade method for `provider_live_optin(...)` so library callers
+  can inspect the same Provider Live Opt-in contract as the CLI.
+- Secret-safe external receipt smoke coverage that proves missing opt-in,
+  unallowlisted endpoints, and missing secrets fail closed before opening the
+  external provider receipt path.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc7` for Python packaging
+  and `v1.0.0-rc.7` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Provider Live Opt-in checkpoint on top of Memory Privacy
+  Live.
+- Release-gated ULW now advances `v1.0.0-rc.6` to `v1.0.0-rc.7`.
+
+### Notes
+
+- `v1.0.0-rc.7` is still governed and deterministic by default.
+- Provider Live Opt-in `external-receipt-smoke` validates a controlled external
+  receipt with operator opt-in, allowlist, preflight, audit, and redaction. It
+  does not claim unrestricted production provider execution, hosted SaaS
+  readiness, or unattended live operation.
+
 ## v1.0.0-rc.6 - 2026-06-06
 
 ### Added

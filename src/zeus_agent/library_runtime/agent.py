@@ -163,6 +163,7 @@ from zeus_agent.model_runtime import provider_catalog_payload
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
 from zeus_agent.objective_runtime import ObjectiveCompiler
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
+from zeus_agent.provider_live_optin_runtime import build_provider_live_optin_contract
 from zeus_agent.research_runtime import build_research_brief
 from zeus_agent.runtime_lease import RuntimeLease
 from zeus_agent.runtime_cockpit import RuntimeCockpitRuntime
@@ -1411,6 +1412,25 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
         return build_memory_privacy_live_contract(
             scenario=scenario,
             home=home or self.home,
+        ).to_payload()
+
+    def provider_live_optin(
+        self,
+        *,
+        scenario: str = "status",
+        endpoint: str = "https://api.openai.local/v1/chat/completions",
+        allowed_host: str = "api.openai.local",
+        secret_ref: str = "env://ZEUS_RC7_PROVIDER_KEY",
+        model_id: str = "gpt-rc7-external",
+        message: str = "summarize provider live opt-in checkpoint",
+    ) -> dict[str, Any]:
+        return build_provider_live_optin_contract(
+            scenario=scenario,
+            endpoint=endpoint,
+            allowed_host=allowed_host,
+            secret_ref=secret_ref,
+            model_id=model_id,
+            message=message,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
