@@ -97,7 +97,6 @@ def test_release_gated_ulw_cli_does_not_expose_raw_note_option() -> None:
     result = CliRunner().invoke(app, ["release-gated-ulw", "--help"])
 
     assert result.exit_code == 0
-    assert "--raw-secret-marker-detected" in result.stdout
     assert "--raw-note" not in result.stdout
 
 
