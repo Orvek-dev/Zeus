@@ -2,6 +2,41 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.6 - 2026-06-06
+
+### Added
+
+- Memory Privacy Live runtime and CLI command for governed local MemoryGraph
+  privacy checks, SQLite-backed schema readiness, secret quarantine, retention
+  deletion, cross-session search default-deny posture, and no auto-promotion
+  reporting.
+- Release-gated `v1.0.0-rc.6` checkpoint fields for local memory store
+  availability, SQLite backend availability, retention delete readiness, secret
+  quarantine readiness, PII redaction readiness, cross-session search default
+  deny, and local privacy readiness.
+- Python library facade method for `memory_privacy_live(...)` so library callers
+  can inspect the same local privacy contract as the CLI.
+- Secret-safe contract output scrubber for memory privacy surfaces so redacted
+  store values do not leave residual secret-like markers in public evidence.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc6` for Python packaging
+  and `v1.0.0-rc.6` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Memory Privacy Live checkpoint on top of Sandbox Terminal
+  Live.
+- Release-gated ULW now advances `v1.0.0-rc.5` to `v1.0.0-rc.6`.
+
+### Notes
+
+- `v1.0.0-rc.6` is still local-first and deterministic by default.
+- Memory Privacy Live can create local SQLite MemoryGraph state under the
+  selected Zeus home for explicit smoke scenarios. It does not claim automatic
+  memory writes from ordinary agent turns, cross-session search exposure,
+  ontology promotion, learned-rule promotion, active rule writes, external
+  network access, or production live readiness.
+
 ## v1.0.0-rc.5 - 2026-06-06
 
 ### Added

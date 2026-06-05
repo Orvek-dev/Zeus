@@ -36,6 +36,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.0.0-rc.3",
     "v1.0.0-rc.4",
     "v1.0.0-rc.5",
+    "v1.0.0-rc.6",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -49,6 +50,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.0.0-rc.3": "mcp_live_server",
     "v1.0.0-rc.4": "gateway_live_delivery",
     "v1.0.0-rc.5": "sandbox_terminal_live",
+    "v1.0.0-rc.6": "memory_privacy_live",
 }
 
 
@@ -159,6 +161,14 @@ class ReleaseGatedUlwStatus(BaseModel):
     docker_backend_available: bool = False
     ssh_backend_available: bool = False
     browser_live_navigation_available: bool = False
+    memory_privacy_live_contract_available: bool = False
+    local_memory_store_available: bool = False
+    sqlite_backend_available: bool = False
+    retention_delete_available: bool = False
+    secret_quarantine_available: bool = False
+    pii_redaction_available: bool = False
+    cross_session_search_default_denied: bool = False
+    local_privacy_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -216,6 +226,9 @@ def build_release_gated_ulw_status(
     )
     sandbox_terminal_live_contract_available = (
         normalized_version == "v1.0.0-rc.5" and "unknown_target_version" not in blocked_reasons
+    )
+    memory_privacy_live_contract_available = (
+        normalized_version == "v1.0.0-rc.6" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -328,6 +341,14 @@ def build_release_gated_ulw_status(
         docker_backend_available=False,
         ssh_backend_available=False,
         browser_live_navigation_available=False,
+        memory_privacy_live_contract_available=memory_privacy_live_contract_available,
+        local_memory_store_available=memory_privacy_live_contract_available,
+        sqlite_backend_available=memory_privacy_live_contract_available,
+        retention_delete_available=memory_privacy_live_contract_available,
+        secret_quarantine_available=memory_privacy_live_contract_available,
+        pii_redaction_available=memory_privacy_live_contract_available,
+        cross_session_search_default_denied=memory_privacy_live_contract_available,
+        local_privacy_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -367,6 +388,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.0.0-rc.3",
         "v1.0.0-rc.4",
         "v1.0.0-rc.5",
+        "v1.0.0-rc.6",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -386,6 +408,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.0.0-rc.6":
+        return (
+            "memory_privacy_live_release_gate_manual_qa",
+            "memory_privacy_live_local_smoke_manual_qa",
+            "memory_privacy_live_secret_quarantine_manual_qa",
+            "memory_privacy_live_delete_retention_manual_qa",
+            "memory_privacy_live_promotion_block_manual_qa",
+            "memory_privacy_live_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0-rc.5":
         return (
             "sandbox_terminal_live_release_gate_manual_qa",

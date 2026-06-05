@@ -4,8 +4,8 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.0.0-rc.5` does not claim these live integrations are production-active. It
-establishes the public Sandbox Terminal Live release gate and the dry-run/live
+`v1.0.0-rc.6` does not claim these live integrations are production-active. It
+establishes the public Memory Privacy Live release gate and the dry-run/live
 beta contract slices those integrations must pass through before production
 live execution or promotion is enabled.
 
@@ -237,12 +237,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.0.0-rc.5 Implementation Boundary
+## v1.0.0-rc.6 Implementation Boundary
 
-`v1.0.0-rc.5` includes:
+`v1.0.0-rc.6` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.5 program;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.6 program;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -283,6 +283,10 @@ Every live connection type should pass these gates:
   sandbox dispatch planning, browser live-navigation guard checks, lease-bound
   sandbox executor dispatch, approval-bound command execution, safe environment
   use, evidence capture, network/Docker/SSH blocked posture, and cleanup;
+- Memory Privacy Live reporting for status-only readiness, local SQLite
+  MemoryGraph schema readiness, explicit local fact smoke, secret quarantine,
+  retention deletion, cross-session search default-deny, no active-rule writes,
+  no ontology/learned-rule auto-promotion, and no network or credential access;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -292,7 +296,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.0.0-rc.5` does not include:
+`v1.0.0-rc.6` does not include:
 
 - production live MCP catalog;
 - external non-loopback provider production execution;
@@ -303,6 +307,8 @@ Every live connection type should pass these gates:
 - hosted API server;
 - browser live navigation or remote terminal execution;
 - remote sandbox isolation;
+- cross-session memory search exposure;
+- automatic memory writes from ordinary agent turns;
 - automatic credential vault integration;
 - production web search provider selection.
 - production live readiness or unattended live execution.

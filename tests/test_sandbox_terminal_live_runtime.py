@@ -29,7 +29,7 @@ def test_v100rc5_release_gate_reports_sandbox_terminal_live_checkpoint() -> None
     assert payload["ssh_backend_available"] is False
     assert payload["browser_live_navigation_available"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.6"
     assert "sandbox_terminal_live_local_smoke_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

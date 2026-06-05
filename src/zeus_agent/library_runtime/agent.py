@@ -157,6 +157,7 @@ from zeus_agent.mcp_cockpit_runtime import McpCockpitRuntime
 from zeus_agent.mcp_settings_runtime import McpSettingsRuntime
 from zeus_agent.memory_cockpit_runtime import MemoryCockpitRuntime
 from zeus_agent.memory_entry_runtime import MemoryEntryRuntime
+from zeus_agent.memory_privacy_live_runtime import build_memory_privacy_live_contract
 from zeus_agent.model_cockpit_runtime import ModelCockpitRuntime
 from zeus_agent.model_runtime import provider_catalog_payload
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
@@ -1398,6 +1399,17 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
         return build_sandbox_terminal_live_contract(
             scenario=scenario,
             command=command,
+            home=home or self.home,
+        ).to_payload()
+
+    def memory_privacy_live(
+        self,
+        *,
+        scenario: str = "status",
+        home: Optional[Path] = None,
+    ) -> dict[str, Any]:
+        return build_memory_privacy_live_contract(
+            scenario=scenario,
             home=home or self.home,
         ).to_payload()
 
