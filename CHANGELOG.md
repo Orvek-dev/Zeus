@@ -2,6 +2,42 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc.5 - 2026-06-06
+
+### Added
+
+- Sandbox Terminal Live runtime and CLI command for governed local terminal
+  planning, sandbox dispatch planning, browser live-navigation guard checks,
+  lease-bound sandbox executor dispatch, approval-bound command execution, safe
+  environment use, evidence capture, and cleanup.
+- Release-gated `v1.0.0-rc.5` checkpoint fields for terminal facade
+  availability, sandbox dispatch facade availability, tool sandbox executor
+  availability, browser dispatch guard availability, local sandbox readiness,
+  remote sandbox blocked posture, Docker blocked posture, SSH blocked posture,
+  and browser live-navigation blocked posture.
+- Python library facade method for `sandbox_terminal_live(...)` so library
+  callers can inspect the same sandbox/terminal live-local contract as the CLI.
+- Secret-safe network and remote blocks that prevent network, Docker socket,
+  SSH, browser live navigation, and remote sandbox execution from reaching
+  handlers.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc5` for Python packaging
+  and `v1.0.0-rc.5` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Sandbox Terminal Live checkpoint on top of the Gateway Live
+  Delivery boundary.
+
+### Notes
+
+- `v1.0.0-rc.5` is still local-first and deterministic by default.
+- The Sandbox Terminal Live local smoke can execute an allowlisted local command
+  in a temporary sandbox through a runtime lease, approval receipt, broker
+  dispatch, safe environment, evidence capture, and cleanup. It does not claim
+  browser live navigation, Docker/SSH/remote sandbox execution, hosted SaaS
+  readiness, unattended execution, or hard-isolated remote runtime operation.
+
 ## v1.0.0-rc.4 - 2026-06-06
 
 ### Added

@@ -165,6 +165,7 @@ from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCo
 from zeus_agent.research_runtime import build_research_brief
 from zeus_agent.runtime_lease import RuntimeLease
 from zeus_agent.runtime_cockpit import RuntimeCockpitRuntime
+from zeus_agent.sandbox_terminal_live_runtime import build_sandbox_terminal_live_contract
 from zeus_agent.security_cockpit_runtime import SecurityCockpitRuntime
 from zeus_agent.secret_resolver_runtime import SecretResolverPlanRuntime
 from zeus_agent.tool_runtime import native_tool_catalog_payload
@@ -1385,6 +1386,19 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             target=target,
             message=message,
             home=self.home,
+        ).to_payload()
+
+    def sandbox_terminal_live(
+        self,
+        *,
+        scenario: str = "status",
+        command: str = "pwd",
+        home: Optional[Path] = None,
+    ) -> dict[str, Any]:
+        return build_sandbox_terminal_live_contract(
+            scenario=scenario,
+            command=command,
+            home=home or self.home,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:

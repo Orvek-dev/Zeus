@@ -35,6 +35,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.0.0-rc.2",
     "v1.0.0-rc.3",
     "v1.0.0-rc.4",
+    "v1.0.0-rc.5",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -47,6 +48,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.0.0-rc.2": "provider_live_api",
     "v1.0.0-rc.3": "mcp_live_server",
     "v1.0.0-rc.4": "gateway_live_delivery",
+    "v1.0.0-rc.5": "sandbox_terminal_live",
 }
 
 
@@ -146,6 +148,17 @@ class ReleaseGatedUlwStatus(BaseModel):
     gateway_external_delivery_available: bool = False
     gateway_webhook_available: bool = False
     gateway_live_delivery_ready: bool = False
+    sandbox_terminal_live_contract_available: bool = False
+    terminal_facade_available: bool = False
+    sandbox_dispatch_facade_available: bool = False
+    tool_sandbox_executor_available: bool = False
+    browser_dispatch_guard_available: bool = False
+    local_terminal_smoke_available: bool = False
+    local_sandbox_execution_ready: bool = False
+    remote_sandbox_available: bool = False
+    docker_backend_available: bool = False
+    ssh_backend_available: bool = False
+    browser_live_navigation_available: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -200,6 +213,9 @@ def build_release_gated_ulw_status(
     )
     gateway_live_delivery_contract_available = (
         normalized_version == "v1.0.0-rc.4" and "unknown_target_version" not in blocked_reasons
+    )
+    sandbox_terminal_live_contract_available = (
+        normalized_version == "v1.0.0-rc.5" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -301,6 +317,17 @@ def build_release_gated_ulw_status(
         gateway_external_delivery_available=False,
         gateway_webhook_available=False,
         gateway_live_delivery_ready=False,
+        sandbox_terminal_live_contract_available=sandbox_terminal_live_contract_available,
+        terminal_facade_available=sandbox_terminal_live_contract_available,
+        sandbox_dispatch_facade_available=sandbox_terminal_live_contract_available,
+        tool_sandbox_executor_available=sandbox_terminal_live_contract_available,
+        browser_dispatch_guard_available=sandbox_terminal_live_contract_available,
+        local_terminal_smoke_available=sandbox_terminal_live_contract_available,
+        local_sandbox_execution_ready=False,
+        remote_sandbox_available=False,
+        docker_backend_available=False,
+        ssh_backend_available=False,
+        browser_live_navigation_available=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -339,6 +366,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.0.0-rc.2",
         "v1.0.0-rc.3",
         "v1.0.0-rc.4",
+        "v1.0.0-rc.5",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -358,6 +386,18 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.0.0-rc.5":
+        return (
+            "sandbox_terminal_live_release_gate_manual_qa",
+            "sandbox_terminal_live_local_smoke_manual_qa",
+            "sandbox_terminal_live_blocked_network_manual_qa",
+            "sandbox_terminal_live_blocked_remote_manual_qa",
+            "sandbox_terminal_live_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0-rc.4":
         return (
             "gateway_live_delivery_release_gate_manual_qa",

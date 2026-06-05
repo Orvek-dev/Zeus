@@ -28,7 +28,7 @@ def test_v100rc4_release_gate_reports_gateway_live_delivery_checkpoint() -> None
     assert payload["gateway_webhook_available"] is False
     assert payload["gateway_live_delivery_ready"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.0.0-rc.5"
     assert "gateway_live_delivery_loopback_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

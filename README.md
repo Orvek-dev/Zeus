@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.0.0-rc.4"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--rc.4-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.0.0-rc.5"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--rc.5-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1288%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1294%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,17 +35,16 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v1.0.0-rc.4` source checkpoint adds the
-Gateway Live Delivery surface on top of Provider Live API and MCP Live Server:
-a governed loopback gateway delivery path that composes configured target
-allowlist, pairing proof, runtime lease, credential binding, secret material
-proof, delivery envelope, delivery body, execution authorization, loopback
-transport, loopback HTTP delivery, audit, response redaction, and cleanup
-without claiming external gateway delivery, webhook production execution, or
-production live readiness. Browser control, terminal execution, remote
-runtimes, hosted gateways, and production external AI APIs should still be
-connected through the same authority, lease, approval, sandbox, evidence,
-retention, and promotion boundaries.
+an unconstrained chat loop. The public `v1.0.0-rc.5` source checkpoint adds
+Sandbox Terminal Live on top of Provider Live API, MCP Live Server, and Gateway
+Live Delivery: a governed local sandbox/terminal smoke path that plans terminal,
+sandbox, and browser-guard surfaces, executes only an allowlisted local command
+through lease, approval, broker dispatch, safe environment, evidence capture,
+and cleanup, and blocks network, Docker, SSH, remote sandbox, browser live
+navigation, external delivery, and production readiness claims by default.
+Hosted gateways and production external AI APIs should still be connected
+through the same authority, lease, approval, sandbox, evidence, retention, and
+promotion boundaries.
 
 ## Quickstart
 
@@ -70,7 +69,7 @@ zeus final-eval --json
 zeus total-plan --json
 zeus total-blocks --secret-like ghp_TEST_FIXTURE --json
 zeus total-eval --json
-zeus release-gated-ulw --target-version v1.0.0-rc.4 --json
+zeus release-gated-ulw --target-version v1.0.0-rc.5 --json
 zeus tool-limbs --tool-id files.read --json
 zeus platform-surface --surface gateway --json
 zeus memory-ontology --subject Zeus --json
@@ -85,6 +84,10 @@ zeus mcp-live-server --scenario prompt-injection-scan --json
 zeus gateway-live-delivery --scenario status --json
 ZEUS_RC4_GATEWAY_TOKEN=local-fixture-value zeus gateway-live-delivery --scenario loopback-smoke --secret-ref env://ZEUS_RC4_GATEWAY_TOKEN --json
 ZEUS_RC4_GATEWAY_TOKEN=local-fixture-value zeus gateway-live-delivery --scenario blocked-target --target discord://ops --secret-ref env://ZEUS_RC4_GATEWAY_TOKEN --json
+zeus sandbox-terminal-live --scenario status --json
+zeus sandbox-terminal-live --scenario local-smoke --json
+zeus sandbox-terminal-live --scenario blocked-network --json
+zeus sandbox-terminal-live --scenario blocked-remote --json
 ```
 
 Status commands do not require live provider keys. The loopback smoke commands
@@ -116,6 +119,7 @@ external systems are wired in.
 | `provider_live_api_runtime` | Provider Live API contract for controlled loopback provider smoke, secret binding, authorization, audit, redaction, and no external non-loopback production claim | `zeus provider-live-api --scenario status --json` |
 | `mcp_live_server_runtime` | MCP Live Server contract for catalog provenance, activation policy, loopback MCP HTTP smoke, prompt-injection scan, audit, redaction, and no remote production claim | `zeus mcp-live-server --scenario status --json` |
 | `gateway_live_delivery_runtime` | Gateway Live Delivery contract for target allowlist, pairing proof, delivery envelope/body, loopback transport, loopback HTTP, audit, redaction, and no external delivery claim | `zeus gateway-live-delivery --scenario status --json` |
+| `sandbox_terminal_live_runtime` | Sandbox Terminal Live contract for local terminal planning, allowlisted sandbox command execution, browser guard checks, network/Docker/SSH blocks, evidence, and cleanup | `zeus sandbox-terminal-live --scenario local-smoke --json` |
 | `skill_evolution` | Proposed improvements that cannot self-promote, widen authority, or bypass evidence gates | [Hermes comparison](docs/hermes-comparison.md) |
 
 ## Zeus Core Language
@@ -181,7 +185,7 @@ gravity is different.
 | --- | --- | --- |
 | Primary product shape | General-purpose self-improving agent that lives across CLI, gateway, ACP, batch, API, and library surfaces | Goal-oriented governed runtime that turns objectives into contracts and evidence obligations |
 | Core loop | `AIAgent` builds prompts, resolves providers, dispatches tools, persists sessions, and continues conversation | Objective compiler -> authority gate -> work-loop plan -> runtime dispatch -> evidence -> promotion decision |
-| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.0.0-rc.4 Gateway Live Delivery checkpoint with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, loopback provider HTTP smoke, loopback MCP HTTP smoke, MCP prompt-injection scan, loopback gateway delivery, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
+| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.0.0-rc.5 Sandbox Terminal Live checkpoint with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, loopback provider HTTP smoke, loopback MCP HTTP smoke, MCP prompt-injection scan, loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, network/Docker/SSH blocked posture, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
 | Safety center | Approval, profile isolation, tool availability, command checks, gateway authorization, and platform controls | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo checks, and promotion blocks |
 | Self-improvement | Built-in learning loop and skill creation from experience | Validation-gated skill-evolution queue; proposed skills cannot self-promote, widen authority, enable live transport, or bypass evidence |
 | Completion model | Conversational progress and tool-visible execution | Evidence-backed completion; "done" is blocked when objective, artifact, verification, or promotion evidence is missing |
@@ -197,12 +201,12 @@ Read the longer comparison in [docs/hermes-comparison.md](docs/hermes-comparison
 
 ## Live Connection Design
 
-`v1.0.0-rc.4` includes the public Gateway Live Delivery checkpoint for attaching
-gateway delivery targets through a governed contract. It proves configured
-target allowlist, pairing proof, runtime lease, credential binding, secret
-material proof, delivery envelope, delivery body, execution authorization,
-loopback transport, loopback HTTP delivery, audit, redaction, and cleanup.
-Native tools, web research, browser or terminal automation, remote sandboxes,
+`v1.0.0-rc.5` includes the public Sandbox Terminal Live checkpoint for local
+terminal/sandbox execution through a governed contract. It proves local terminal
+planning, sandbox dispatch planning, browser live-navigation guard checks,
+lease-bound sandbox executor dispatch, approval-bound command execution, safe
+environment use, evidence capture, network/Docker/SSH blocked posture, and
+cleanup. Native tools, web research, browser automation, remote sandboxes,
 remote MCP servers, hosted gateways, and production external AI APIs remain
 future live surfaces that must pass through entrypoint contracts, adaptive
 workflow selection, live readiness, opt-in smoke, identity/auth controls,
@@ -233,11 +237,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, core language, release version, public docs hygiene, and total architecture surfaces | `1288` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, core language, release version, public docs hygiene, and total architecture surfaces | `1294` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.0.0rc4` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.0.0rc5` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | pending remote CI after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -247,14 +251,14 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v1.0.0-rc.4 Readiness
+## v1.0.0-rc.5 Readiness
 
-`v1.0.0-rc.4` is a governed Gateway Live Delivery source checkpoint. The
+`v1.0.0-rc.5` is a governed Sandbox Terminal Live source checkpoint. The
 supported public surface is:
 
 - local deterministic CLI scenarios through `zeus`;
-- `release-gated-ulw --target-version v1.0.0-rc.4 --json` for the sequential
-  v0.6.0 -> v1.0.0-rc.4 release-gate program contract;
+- `release-gated-ulw --target-version v1.0.0-rc.5 --json` for the sequential
+  v0.6.0 -> v1.0.0-rc.5 release-gate program contract;
 - `tool-limbs --tool-id files.read --json` for governed native tool, MCP
   discovery, and API connector boundary reporting;
 - `platform-surface --surface gateway --json` for governed CLI, API, gateway,
@@ -278,6 +282,11 @@ supported public surface is:
   approval, runtime lease, credential binding, secret resolver, audit, sandbox,
   rollback, and independent-review controls without opening network access or
   reading credential material;
+- `sandbox-terminal-live --scenario local-smoke --json` for a governed local
+  sandbox/terminal smoke that executes only an allowlisted local command through
+  lease, approval, broker dispatch, safe environment, evidence capture, and
+  cleanup. `blocked-network` and `blocked-remote` scenarios prove network,
+  Docker socket, SSH, browser live navigation, and remote execution fail closed;
 - `provider-live-api --scenario status --json` for governed provider live API
   readiness without opening network access;
 - `provider-live-api --scenario loopback-smoke --secret-ref env://ZEUS_RC2_PROVIDER_KEY --json`
@@ -347,7 +356,7 @@ zeus wave13-eval --json
 zeus total-plan --json
 zeus total-blocks --secret-like ghp_TEST_FIXTURE --json
 zeus total-eval --json
-zeus release-gated-ulw --target-version v1.0.0-rc.4 --json
+zeus release-gated-ulw --target-version v1.0.0-rc.5 --json
 zeus tool-limbs --tool-id files.read --json
 zeus platform-surface --surface gateway --json
 zeus memory-ontology --subject Zeus --json
@@ -362,6 +371,9 @@ zeus mcp-live-server --scenario prompt-injection-scan --json
 zeus gateway-live-delivery --scenario status --json
 ZEUS_RC4_GATEWAY_TOKEN=local-fixture-value zeus gateway-live-delivery --scenario loopback-smoke --secret-ref env://ZEUS_RC4_GATEWAY_TOKEN --json
 ZEUS_RC4_GATEWAY_TOKEN=local-fixture-value zeus gateway-live-delivery --scenario blocked-target --target discord://ops --secret-ref env://ZEUS_RC4_GATEWAY_TOKEN --json
+zeus sandbox-terminal-live --scenario local-smoke --json
+zeus sandbox-terminal-live --scenario blocked-network --json
+zeus sandbox-terminal-live --scenario blocked-remote --json
 
 # Product-level checks
 zeus final-core --objective "Build a governed coding agent" --json
@@ -395,6 +407,8 @@ src/zeus_agent/
                            MCP live-server status, loopback smoke, prompt scan
   gateway_live_delivery_runtime/
                            gateway allowlist, pairing, loopback delivery smoke
+  sandbox_terminal_live_runtime/
+                           terminal planning, local sandbox smoke, live guards
   ontology_runtime/       proposed ontology terms with provenance controls
   capability_runtime/     sandbox policy and workflow optimization hints
   orchestration_runtime/  dry-run parallel scheduling with write-scope checks
@@ -412,7 +426,7 @@ docs/                     public architecture and Hermes comparison notes
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus should keep a governed kernel/runtime split |
 | [Hermes-grade platform master design](docs/hermes-grade-platform-master-design.md) | Target product, UX, architecture, security, and roadmap contract for reaching at least Hermes-half live platform breadth |
 | [Live connection architecture](docs/live-connection-architecture.md) | Target design for real AI API, MCP, tool, gateway, web, browser, terminal, and sandbox connections |
-| [Security policy](SECURITY.md) | Public security posture and current v1.0.0-rc.4 boundary |
+| [Security policy](SECURITY.md) | Public security posture and current v1.0.0-rc.5 boundary |
 | [Changelog](CHANGELOG.md) | Release history and public-safe notes |
 
 ## License
