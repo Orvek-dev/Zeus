@@ -14,6 +14,7 @@ from zeus_agent.gateway_cockpit_runtime import GatewayCockpitRuntime
 from zeus_agent.gateway_pairing_runtime import GatewayPairingRuntime
 from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
+from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionResult
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionRuntime
 from zeus_agent.live_dry_run_runtime import LiveDryRunRuntime
@@ -1314,6 +1315,19 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
 
     def live_optin_smoke(self) -> dict[str, Any]:
         return run_live_optin_smoke().to_payload()
+
+    def live_beta_candidate(
+        self,
+        *,
+        include_smoke: bool = False,
+        scenario: str = "happy",
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_live_beta_candidate_contract(
+            include_smoke=include_smoke,
+            scenario=scenario,
+            operator_note=operator_note,
+        ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
         return McpCockpitRuntime().build(server_id=server_id).to_payload()

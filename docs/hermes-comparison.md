@@ -107,11 +107,11 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v0.10.0` code does not claim all live surfaces are production-active.
+The public `v1.0.0-rc` code does not claim all live surfaces are production-active.
 It establishes the contracts, total architecture dry-run checks, Tool Limbs,
 Platform Surface boundary, Memory/Ontology boundary, Adaptive Zeus workflow
-selection boundary, and live connection design those surfaces should pass
-through.
+selection boundary, Live Beta Candidate boundary, and live connection design
+those surfaces should pass through.
 
 ## What Is Different With Hermes
 
@@ -123,7 +123,7 @@ through.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v0.10.0 is a local deterministic Adaptive Zeus checkpoint with CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog reporting, MCP discovery and API connector dry-run contracts, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, release-gated provider/MCP loopback readiness, and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v1.0.0-rc is a local deterministic Live Beta Candidate with CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog reporting, MCP discovery and API connector dry-run contracts, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, release-gated provider/MCP loopback readiness, and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
@@ -156,7 +156,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v0.10.0 Boundary
+## Current v1.0.0-rc Boundary
 
 Implemented public foundation:
 
@@ -176,15 +176,18 @@ Implemented public foundation:
   selection, critique checkpoints, parallel fan-out synthesis plans, lean ULW
   plans, adversarial verification plans, and no self-modification/no
   auto-memory-write boundaries;
+- governed Live Beta Candidate reporting for live readiness, local opt-in
+  smoke, live cockpit state, provider/MCP/gateway beta evidence, rollback,
+  approval, lease, and independent-review controls;
 - security planning, research graph, ontology candidate, sandbox workflow, and
   dry-run orchestration contracts;
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 1256 public tests, a 10/10 final architecture eval, and a 9/9 total
+- 1262 public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc program with v0.10.0
-  Adaptive Zeus checkpoint reporting;
+- release-gated ULW status for the v0.6.0 -> v1.0.0-rc program with
+  v1.0.0-rc Live Beta Candidate checkpoint reporting;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.
 

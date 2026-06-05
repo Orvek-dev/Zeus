@@ -145,6 +145,8 @@ from zeus_agent.doctor_runtime import doctor_report
 from zeus_agent.entry_runtime import ZeusChatRuntime, default_zeus_home, entry_status_payload
 from zeus_agent.eval import run_golden_journeys
 from zeus_agent.gateway_runtime import gateway_adapter_catalog_payload
+from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
+from zeus_agent.live_beta_candidate_runtime import parse_live_beta_candidate_scenario
 from zeus_agent.memory_graph_runtime import MemoryGraphStore
 from zeus_agent.memory_ontology_surface_runtime import build_memory_ontology_surface_contract
 from zeus_agent.mcp_runtime import curated_mcp_catalog_payload
@@ -281,6 +283,25 @@ def adaptive_zeus(
         requires_research=requires_research,
         risk_level=risk_level,
         evidence_target=evidence_target,
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("live-beta-candidate")
+def live_beta_candidate(
+    include_smoke: bool = typer.Option(False, "--include-smoke"),
+    scenario: str = typer.Option("happy", "--scenario"),
+    operator_note: Optional[str] = typer.Option(None, "--operator-note"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    try:
+        parsed_scenario = parse_live_beta_candidate_scenario(scenario)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    payload = build_live_beta_candidate_contract(
+        include_smoke=include_smoke,
+        scenario=parsed_scenario,
+        operator_note=operator_note,
     ).to_payload()
     _print_payload(payload, as_json=as_json)
 

@@ -2,6 +2,36 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-rc - 2026-06-05
+
+### Added
+
+- Live Beta Candidate runtime and CLI command for release-candidate live beta
+  readiness, opt-in smoke, live cockpit, rollback, review, approval, and lease
+  boundary reporting.
+- Release-gated `v1.0.0-rc` checkpoint fields for live beta candidate
+  contracts, live readiness, opt-in smoke, live cockpit, live beta activation,
+  RC closeout, and no-production readiness.
+- Python library facade method for `live_beta_candidate(...)` so library
+  callers can inspect the same RC contract as the CLI.
+- Secret-safe operator-note handling that blocks credential-like RC notes
+  without echoing raw secret-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0rc0` for Python packaging
+  and `v1.0.0-rc` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, master design, and
+  security policy now describe the Live Beta Candidate checkpoint instead of
+  only the `v0.10.0` Adaptive Zeus checkpoint.
+
+### Notes
+
+- `v1.0.0-rc` is still local-first and deterministic by default.
+- The RC can claim live-beta candidate readiness from local opt-in smoke, but
+  it does not claim production live readiness, hosted SaaS readiness,
+  unattended execution, or hard-isolated remote runtime operation.
+
 ## v0.10.0 - 2026-06-05
 
 ### Added

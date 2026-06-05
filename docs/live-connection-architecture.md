@@ -4,10 +4,10 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v0.10.0` does not claim these live integrations are production-active. It
-establishes the public Adaptive Zeus release gate and the dry-run contract slice
-those integrations must pass through before live execution or promotion is
-enabled.
+`v1.0.0-rc` does not claim these live integrations are production-active. It
+establishes the public Live Beta Candidate release gate and the dry-run/live
+beta contract slice those integrations must pass through before production live
+execution or promotion is enabled.
 
 ## Design Goal
 
@@ -235,9 +235,9 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v0.10.0 Implementation Boundary
+## v1.0.0-rc Implementation Boundary
 
-`v0.10.0` includes:
+`v1.0.0-rc` includes:
 
 - deterministic total architecture CLI/eval surfaces;
 - release-gated ULW status for the v0.6.0 -> v1.0.0-rc program;
@@ -256,6 +256,10 @@ Every live connection type should pass these gates:
 - Adaptive Zeus reporting for objective-sensitive workflow pattern selection,
   critique checkpoints, parallel fan-out plans, lean ULW plans, adversarial
   verification plans, and no self-modification/no auto-memory-write checks;
+- Live Beta Candidate reporting for live readiness, local opt-in smoke, live
+  cockpit state, provider/MCP/gateway beta contracts, rollback controls,
+  approval/lease controls, independent review controls, and no production-ready
+  claim;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -265,7 +269,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v0.10.0` does not include:
+`v1.0.0-rc` does not include:
 
 - production live MCP catalog;
 - long-running gateway daemon;
@@ -274,6 +278,7 @@ Every live connection type should pass these gates:
 - remote sandbox isolation;
 - automatic credential vault integration;
 - production web search provider selection.
+- production live readiness or unattended live execution.
 
 ## Implementation Roadmap
 

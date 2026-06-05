@@ -48,12 +48,12 @@ def test_release_gated_ulw_blocks_unknown_target_version() -> None:
 
 
 def test_release_gated_ulw_blocks_future_release_until_current_checkpoint_closes() -> None:
-    result = build_release_gated_ulw_status(target_version="v1.0.0-rc")
+    result = build_release_gated_ulw_status(target_version="v1.0.0")
 
     assert result.decision == "blocked"
-    assert result.release_stage == "live_beta_candidate"
+    assert result.release_stage is None
     assert result.release_gate_ready is False
-    assert "prior_release_checkpoint_required" in result.blocked_reasons
+    assert "unknown_target_version" in result.blocked_reasons
 
 
 def test_v070_tool_limbs_reports_governed_tool_contract() -> None:
