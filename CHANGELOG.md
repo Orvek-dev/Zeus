@@ -2,6 +2,33 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0 - 2026-06-06
+
+### Added
+
+- Stable Release runtime and CLI command for the governed live platform
+  boundary.
+- Python library facade method for `stable_release(...)`.
+- Release-gated ULW `v1.0.0` checkpoint fields for stable governed live
+  platform readiness and stable public release readiness.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.0.0` for Python packaging and
+  `v1.0.0` for the GitHub release tag.
+- README, Hermes comparison, live connection architecture, master plan, and
+  security policy now describe `v1.0.0` as the stable governed live platform
+  release.
+- Release-gated ULW now advances `v1.0.0-rc.9` to `v1.0.0`.
+
+### Notes
+
+- `v1.0.0` is stable for the public governed live platform boundary.
+- It does not claim unrestricted external provider execution, production remote
+  MCP execution, external gateway/webhook production delivery, browser live
+  execution, remote sandbox execution, unattended live operation, or automatic
+  memory/ontology/rule promotion.
+
 ## v1.0.0-rc.9 - 2026-06-06
 
 ### Added

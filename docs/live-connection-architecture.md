@@ -4,8 +4,8 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.0.0-rc.9` does not claim these live integrations are production-active. It
-establishes the public MCP Owned Client Live release gate and the dry-run/live
+`v1.0.0` does not claim these live integrations are production-active. It
+establishes the stable governed live platform release gate and the dry-run/live
 beta contract slices those integrations must pass through before production
 live execution or promotion is enabled.
 
@@ -237,12 +237,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.0.0-rc.9 Implementation Boundary
+## v1.0.0 Implementation Boundary
 
-`v1.0.0-rc.9` includes:
+`v1.0.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.0.0-rc.9 program;
+- release-gated ULW status for the v0.6.0 -> v1.0.0 program;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -300,6 +300,8 @@ Every live connection type should pass these gates:
   handoff, remote MCP policy, remote executor preflight, owned client receipt
   validation, audit, redaction, cleanup, resources/prompts disabled posture, and
   no production-ready claim;
+- Stable Release reporting for the governed live platform boundary while
+  keeping unrestricted live production execution disabled by default;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -309,7 +311,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.0.0-rc.9` does not include:
+`v1.0.0` does not include:
 
 - production live MCP catalog;
 - unrestricted or production external provider execution;

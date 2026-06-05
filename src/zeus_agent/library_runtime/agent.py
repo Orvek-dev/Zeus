@@ -172,6 +172,7 @@ from zeus_agent.runtime_cockpit import RuntimeCockpitRuntime
 from zeus_agent.sandbox_terminal_live_runtime import build_sandbox_terminal_live_contract
 from zeus_agent.security_cockpit_runtime import SecurityCockpitRuntime
 from zeus_agent.secret_resolver_runtime import SecretResolverPlanRuntime
+from zeus_agent.stable_release_runtime import build_stable_release_contract
 from zeus_agent.tool_runtime import native_tool_catalog_payload
 from zeus_agent.tool_cockpit_runtime import ToolCockpitRuntime
 from zeus_agent.setup_runtime import setup_apply
@@ -1474,6 +1475,9 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             tool_name=tool_name,
             query=query,
         ).to_payload()
+
+    def stable_release(self, *, raw_release_note: str = "") -> dict[str, Any]:
+        return build_stable_release_contract(raw_release_note=raw_release_note).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
         return McpCockpitRuntime().build(server_id=server_id).to_payload()
