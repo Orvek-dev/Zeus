@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.8.0 - 2026-06-05
+
+### Added
+
+- Platform Surface runtime and CLI surface for governed CLI, API, gateway, ACP,
+  batch, and Python library entrypoint boundary reporting.
+- Release-gated `v0.8.0` checkpoint fields for Platform Surface readiness,
+  entrypoint availability, approval lease, security gate, and dry-run evidence.
+- Gateway entrypoint coverage in the platform cockpit without starting a daemon,
+  opening network access, or enabling external delivery.
+- Secret-safe Platform Surface handling that blocks unknown or credential-like
+  surface identifiers without echoing raw secret-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==0.8.0`.
+- README, Hermes comparison, live connection architecture, and security policy
+  now describe the Platform Surface checkpoint instead of only the `v0.7.0`
+  Tool Limbs checkpoint.
+
+### Notes
+
+- `v0.8.0` is still local-first and deterministic by default.
+- Platform entrypoint visibility is not execution authorization. Hosted API,
+  gateway delivery, ACP sessions, batch execution, browser/terminal automation,
+  remote sandboxing, and external provider/MCP production execution remain gated
+  behind explicit authority, lease, approval, sandbox, evidence, rollback, and
+  release review.
+
 ## v0.7.0 - 2026-06-05
 
 ### Added

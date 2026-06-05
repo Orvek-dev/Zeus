@@ -73,6 +73,14 @@ class ReleaseGatedUlwStatus(BaseModel):
     tool_approval_lease_required: bool = False
     tool_security_gate_required: bool = False
     tool_limbs_ready: bool = False
+    platform_surface_contract_available: bool = False
+    cli_surface_contract_available: bool = False
+    api_server_contract_available: bool = False
+    gateway_surface_contract_available: bool = False
+    acp_adapter_contract_available: bool = False
+    batch_runner_contract_available: bool = False
+    python_library_contract_available: bool = False
+    platform_surface_ready: bool = False
     credential_material_accessed: bool = False
     network_opened: bool = False
     external_delivery_opened: bool = False
@@ -104,6 +112,7 @@ def build_release_gated_ulw_status(
     )
     live_spine_contract_available = normalized_version == "v0.6.0" and "unknown_target_version" not in blocked_reasons
     tool_limbs_contract_available = normalized_version == "v0.7.0" and "unknown_target_version" not in blocked_reasons
+    platform_surface_contract_available = normalized_version == "v0.8.0" and "unknown_target_version" not in blocked_reasons
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
         target_version=normalized_version,
@@ -117,15 +126,7 @@ def build_release_gated_ulw_status(
             "independent_review_approved",
             "github_push_tag_release_complete",
         ),
-        required_checkpoint_evidence=(
-            "provider_loopback_manual_qa",
-            "mcp_loopback_manual_qa",
-            "approval_lease_boundary_review",
-            "red_green_tests_captured",
-            "manual_qa_evidence_captured",
-            "independent_review_approved",
-            "github_release_checkpoint_complete",
-        ),
+        required_checkpoint_evidence=_required_checkpoint_evidence(normalized_version),
         blocked_reasons=blocked_reasons,
         live_spine_contract_available=live_spine_contract_available,
         provider_loopback_contract_available=live_spine_contract_available,
@@ -147,6 +148,14 @@ def build_release_gated_ulw_status(
         tool_approval_lease_required=tool_limbs_contract_available,
         tool_security_gate_required=tool_limbs_contract_available,
         tool_limbs_ready=False,
+        platform_surface_contract_available=platform_surface_contract_available,
+        cli_surface_contract_available=platform_surface_contract_available,
+        api_server_contract_available=platform_surface_contract_available,
+        gateway_surface_contract_available=platform_surface_contract_available,
+        acp_adapter_contract_available=platform_surface_contract_available,
+        batch_runner_contract_available=platform_surface_contract_available,
+        python_library_contract_available=platform_surface_contract_available,
+        platform_surface_ready=False,
         credential_material_accessed=False,
         network_opened=False,
         external_delivery_opened=False,
@@ -166,7 +175,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
     reasons = []
     if target_version not in _PROGRAM_ORDER:
         reasons.append("unknown_target_version")
-    elif target_version not in {"v0.6.0", "v0.7.0"}:
+    elif target_version not in {"v0.6.0", "v0.7.0", "v0.8.0"}:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
         reasons.append("raw_secret_marker_detected")
@@ -182,6 +191,39 @@ def _next_version(target_version: str) -> Optional[str]:
     if next_index >= len(_PROGRAM_ORDER):
         return None
     return _PROGRAM_ORDER[next_index]
+
+
+def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v0.8.0":
+        return (
+            "platform_surface_release_gate_manual_qa",
+            "platform_surface_gateway_manual_qa",
+            "platform_surface_secret_boundary_manual_qa",
+            "platform_surface_adjacent_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
+    if target_version == "v0.7.0":
+        return (
+            "tool_limbs_contract_manual_qa",
+            "tool_limbs_secret_boundary_manual_qa",
+            "tool_limbs_adjacent_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
+    return (
+        "provider_loopback_manual_qa",
+        "mcp_loopback_manual_qa",
+        "approval_lease_boundary_review",
+        "red_green_tests_captured",
+        "manual_qa_evidence_captured",
+        "independent_review_approved",
+        "github_release_checkpoint_complete",
+    )
 
 
 def _has_secret_marker(text: str) -> bool:

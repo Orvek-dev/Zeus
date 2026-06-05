@@ -33,10 +33,12 @@ class PlatformCockpitResult(BaseModel):
     blocked_reasons: tuple[str, ...] = ()
     recommended_next_commands: tuple[str, ...]
     api_server_started: bool = False
+    gateway_daemon_started: bool = False
     acp_session_opened: bool = False
     batch_executed: bool = False
     cli_process_started: bool = False
     python_library_handler_executed: bool = False
+    external_delivery_opened: bool = False
     credential_material_accessed: bool = False
     network_opened: bool = False
     handler_executed: bool = False
@@ -59,10 +61,12 @@ class PlatformCockpitRuntime:
             blocked_reasons=blocked_reasons,
             recommended_next_commands=_recommended_next_commands(surface_id=surface_id),
             api_server_started=False,
+            gateway_daemon_started=False,
             acp_session_opened=False,
             batch_executed=False,
             cli_process_started=False,
             python_library_handler_executed=False,
+            external_delivery_opened=False,
             credential_material_accessed=False,
             network_opened=False,
             handler_executed=False,
@@ -91,6 +95,21 @@ def _surface_summaries() -> tuple[dict[str, JsonValue], ...]:
             "loopback_default": True,
             "non_loopback_requires_review": True,
             "server_started": False,
+            "handler_executed": False,
+            "network_opened": False,
+            "live_production_claimed": False,
+        },
+        {
+            "surface_id": "gateway",
+            "display_name": "Gateway",
+            "kind": "messaging",
+            "adapters": ["slack", "discord", "telegram", "webhook"],
+            "loopback_default": True,
+            "auth_required": True,
+            "pairing_required": True,
+            "delivery_target_allowlist_required": True,
+            "external_delivery_enabled": False,
+            "daemon_started": False,
             "handler_executed": False,
             "network_opened": False,
             "live_production_claimed": False,

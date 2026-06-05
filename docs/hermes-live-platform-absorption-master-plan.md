@@ -24,7 +24,7 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v0.7.0 boundary is designed/prepared/dry-run/future for live-capable
+The public v0.8.0 boundary is designed/prepared/dry-run/future for live-capable
 surfaces unless a specific surface has separate production evidence and release
 approval.
 
@@ -191,16 +191,16 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v0.7.0 release tree:
+Measured in the public v0.8.0 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |
-| Public source/test/docs/config files | 1,019 |
-| `src` Python source lines | 72,966 |
-| `tests` Python source lines | 38,360 |
-| `docs` Markdown lines | 2,824 |
-| Python test files | 284 |
-| CLI/product commands | 220 |
+| Public source/test/docs/config files | 1,022 |
+| `src` Python source lines | 73,146 |
+| `tests` Python source lines | 38,454 |
+| `docs` Markdown lines | 2,831 |
+| Python test files | 285 |
+| CLI/product commands | 221 |
 
 Current Zeus already has many runtime anchors:
 
@@ -240,10 +240,10 @@ The target should be expressed as useful platform mass, not empty line padding.
 
 | Metric | Current Zeus | Hermes reference signal | Zeus parity target |
 | --- | ---: | ---: | ---: |
-| Runtime Python LOC | 72.9k source / 63.6k non-comment | Hermes is materially larger and live | 180k-280k useful runtime LOC |
-| Test LOC | 38.4k source / 31.2k non-comment | broad tests across agent/gateway/tools/providers | 120k+ test LOC |
-| Runtime files | 721 Python modules in `src/zeus_agent` | broad multi-surface runtime | 700-1,000 useful runtime files |
-| Test files | 284 | broad unit/integration/e2e coverage | 700+ test files |
+| Runtime Python LOC | 73.1k source / 63.7k non-comment | Hermes is materially larger and live | 180k-280k useful runtime LOC |
+| Test LOC | 38.5k source / 31.3k non-comment | broad tests across agent/gateway/tools/providers | 120k+ test LOC |
+| Runtime files | 723 Python modules in `src/zeus_agent` | broad multi-surface runtime | 700-1,000 useful runtime files |
+| Test files | 285 | broad unit/integration/e2e coverage | 700+ test files |
 | Product docs | 2.8k public docs lines | large public docs and references | 80k+ practical docs lines |
 | Entry surfaces | CLI/eval/scaffolded API/gateway | CLI, gateway, ACP, batch, API, library | 8 production/beta surfaces |
 | Providers | fake/local/OpenAI-compatible scaffolds | many provider paths and fallbacks | 15+ provider profiles |

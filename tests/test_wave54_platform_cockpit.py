@@ -13,7 +13,7 @@ def test_platform_cockpit_reports_hermes_style_entry_surfaces_without_starting_t
     result = PlatformCockpitRuntime().build()
 
     assert result.decision == "report"
-    assert result.surface_count == 5
+    assert result.surface_count == 6
     assert result.selected_surface is None
     assert "zeus platform --surface api --json" in result.recommended_next_commands
     assert result.api_server_started is False

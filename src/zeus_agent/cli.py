@@ -153,6 +153,7 @@ from zeus_agent.model_runtime import (
 )
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
 from zeus_agent.plugin_runtime import validate_plugin_manifest
+from zeus_agent.platform_surface_runtime import build_platform_surface_contract
 from zeus_agent.research_runtime import build_research_brief
 from zeus_agent.release_gated_ulw_runtime import build_release_gated_ulw_status
 from zeus_agent.runtime_lease import RuntimeLease
@@ -234,6 +235,15 @@ def tool_limbs(
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     payload = build_tool_limbs_contract(tool_id=tool_id).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("platform-surface")
+def platform_surface(
+    surface_id: Optional[str] = typer.Option(None, "--surface"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_platform_surface_contract(surface_id=surface_id).to_payload()
     _print_payload(payload, as_json=as_json)
 
 
