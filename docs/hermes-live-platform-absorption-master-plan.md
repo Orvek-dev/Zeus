@@ -24,7 +24,7 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v0.5.0 boundary is designed/prepared/dry-run/future for live-capable
+The public v0.6.0 boundary is designed/prepared/dry-run/future for live-capable
 surfaces unless a specific surface has separate production evidence and release
 approval.
 
@@ -191,7 +191,7 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v0.5.0 release tree:
+Measured in the public v0.6.0 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |

@@ -2,6 +2,31 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.6.0 - 2026-06-05
+
+### Added
+
+- Release-gated ULW runtime and CLI surface for the sequential `v0.6.0` through
+  `v1.0.0-rc` program.
+- `v0.6.0` live-spine checkpoint reporting for provider loopback readiness, MCP
+  loopback readiness, approval/lease requirements, manual QA, independent
+  review, and GitHub release checkpoints.
+- Secret-safe adversarial boundary handling for release-gated notes without
+  echoing raw credential-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==0.6.0`.
+- README evidence and readiness language now describe the live-spine release
+  checkpoint instead of only the `v0.5.0` design checkpoint.
+
+### Notes
+
+- `v0.6.0` is still local-first and deterministic by default.
+- Real external provider/MCP/gateway/browser/terminal/sandbox production
+  execution remains gated behind explicit authority, lease, approval, sandbox,
+  evidence, rollback, and release review.
+
 ## v0.5.0 - 2026-06-05
 
 ### Added

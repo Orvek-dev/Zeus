@@ -154,6 +154,7 @@ from zeus_agent.model_runtime import (
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
 from zeus_agent.plugin_runtime import validate_plugin_manifest
 from zeus_agent.research_runtime import build_research_brief
+from zeus_agent.release_gated_ulw_runtime import build_release_gated_ulw_status
 from zeus_agent.runtime_lease import RuntimeLease
 from zeus_agent.session_runtime import SessionStore
 from zeus_agent.setup_runtime import setup_apply, setup_plan
@@ -211,6 +212,19 @@ def status(
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     _print_payload(entry_status_payload(home or default_zeus_home()), as_json=as_json)
+
+
+@app.command("release-gated-ulw")
+def release_gated_ulw(
+    target_version: str = typer.Option(..., "--target-version"),
+    raw_secret_marker_detected: bool = typer.Option(False, "--raw-secret-marker-detected"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_release_gated_ulw_status(
+        target_version=target_version,
+        raw_secret_marker_detected=raw_secret_marker_detected,
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
 
 
 @app.command("setup")

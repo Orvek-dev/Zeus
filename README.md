@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v0.5.0"><img alt="Version" src="https://img.shields.io/badge/version-0.5.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v0.6.0"><img alt="Version" src="https://img.shields.io/badge/version-0.6.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1230%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1238%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,14 +35,13 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v0.5.0` source checkpoint extends the
-deterministic local runtime foundation with a stabilized Zeus Core Language,
-total architecture contracts, security planning, source-pinned research graphs,
-ontology candidates, sandbox workflow optimization, dry-run parallel
-orchestration, and a public blueprint for live connections. Live external AI
-APIs, MCP servers, gateway delivery, browser control, terminal execution, and
-remote runtimes should be connected through the same authority, lease,
-approval, sandbox, and evidence boundaries.
+an unconstrained chat loop. The public `v0.6.0` source checkpoint promotes the
+live spine from design-only language into a release-gated program surface:
+provider loopback, MCP loopback, approval/lease requirements, manual QA, review,
+and GitHub publication checkpoints are now represented as a single governed
+release contract. Live external AI APIs, MCP servers, gateway delivery, browser
+control, terminal execution, and remote runtimes should still be connected
+through the same authority, lease, approval, sandbox, and evidence boundaries.
 
 ## Quickstart
 
@@ -153,7 +152,7 @@ gravity is different.
 | --- | --- | --- |
 | Primary product shape | General-purpose self-improving agent that lives across CLI, gateway, ACP, batch, API, and library surfaces | Goal-oriented governed runtime that turns objectives into contracts and evidence obligations |
 | Core loop | `AIAgent` builds prompts, resolves providers, dispatches tools, persists sessions, and continues conversation | Objective compiler -> authority gate -> work-loop plan -> runtime dispatch -> evidence -> promotion decision |
-| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v0.5.0 foundation with deterministic local provider/tool/connector/transport/workflow/gateway scaffolds, total architecture contracts, Zeus Core Language, and live-connection design |
+| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v0.6.0 live-spine checkpoint with deterministic provider/MCP loopback readiness, release-gated authority/lease evidence, local provider/tool/connector/transport/workflow/gateway scaffolds, total architecture contracts, and Zeus Core Language |
 | Safety center | Approval, profile isolation, tool availability, command checks, gateway authorization, and platform controls | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo checks, and promotion blocks |
 | Self-improvement | Built-in learning loop and skill creation from experience | Validation-gated skill-evolution queue; proposed skills cannot self-promote, widen authority, enable live transport, or bypass evidence |
 | Completion model | Conversational progress and tool-visible execution | Evidence-backed completion; "done" is blocked when objective, artifact, verification, or promotion evidence is missing |
@@ -169,7 +168,7 @@ Read the longer comparison in [docs/hermes-comparison.md](docs/hermes-comparison
 
 ## Live Connection Design
 
-`v0.5.0` includes the public design for attaching real external AI APIs, MCP
+`v0.6.0` includes the public live-spine checkpoint for attaching real external AI APIs, MCP
 servers, tools, gateway delivery, web research, browser or terminal automation,
 and remote sandboxes.
 
@@ -196,11 +195,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, core language, release version, and total architecture surfaces | `1230` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, core language, release version, and total architecture surfaces | `1238` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==0.5.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==0.6.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | pending remote CI after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -210,12 +209,14 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v0.5.0 Readiness
+## v0.6.0 Readiness
 
-`v0.5.0` is a governed total-architecture source checkpoint. The supported public
+`v0.6.0` is a governed live-spine source checkpoint. The supported public
 surface is:
 
 - local deterministic CLI scenarios through `zeus`;
+- `release-gated-ulw --target-version v0.6.0 --json` for the sequential
+  v0.6.0 -> v1.0.0-rc release-gate program contract;
 - objective compilation and governed runtime contract models;
 - authority-gated capability broker behavior;
 - provider, tool, connector, transport, workflow, gateway, verification, and
@@ -289,7 +290,7 @@ docs/                     public architecture and Hermes comparison notes
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus should keep a governed kernel/runtime split |
 | [Hermes-grade platform master design](docs/hermes-grade-platform-master-design.md) | Target product, UX, architecture, security, and roadmap contract for reaching at least Hermes-half live platform breadth |
 | [Live connection architecture](docs/live-connection-architecture.md) | Target design for real AI API, MCP, tool, gateway, web, browser, terminal, and sandbox connections |
-| [Security policy](SECURITY.md) | Public security posture and current v0.5.0 boundary |
+| [Security policy](SECURITY.md) | Public security posture and current v0.6.0 boundary |
 | [Changelog](CHANGELOG.md) | Release history and public-safe notes |
 
 ## License
