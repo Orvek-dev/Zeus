@@ -81,6 +81,17 @@ class ReleaseGatedUlwStatus(BaseModel):
     batch_runner_contract_available: bool = False
     python_library_contract_available: bool = False
     platform_surface_ready: bool = False
+    memory_ontology_contract_available: bool = False
+    memory_graph_contract_available: bool = False
+    llm_wiki_contract_available: bool = False
+    ontology_review_contract_available: bool = False
+    skill_learning_memory_contract_available: bool = False
+    retention_policy_contract_available: bool = False
+    memory_ontology_ready: bool = False
+    memory_auto_promotion: bool = False
+    ontology_auto_promotion: bool = False
+    wiki_page_update_written: bool = False
+    active_rule_written: bool = False
     credential_material_accessed: bool = False
     network_opened: bool = False
     external_delivery_opened: bool = False
@@ -113,6 +124,7 @@ def build_release_gated_ulw_status(
     live_spine_contract_available = normalized_version == "v0.6.0" and "unknown_target_version" not in blocked_reasons
     tool_limbs_contract_available = normalized_version == "v0.7.0" and "unknown_target_version" not in blocked_reasons
     platform_surface_contract_available = normalized_version == "v0.8.0" and "unknown_target_version" not in blocked_reasons
+    memory_ontology_contract_available = normalized_version == "v0.9.0" and "unknown_target_version" not in blocked_reasons
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
         target_version=normalized_version,
@@ -156,6 +168,17 @@ def build_release_gated_ulw_status(
         batch_runner_contract_available=platform_surface_contract_available,
         python_library_contract_available=platform_surface_contract_available,
         platform_surface_ready=False,
+        memory_ontology_contract_available=memory_ontology_contract_available,
+        memory_graph_contract_available=memory_ontology_contract_available,
+        llm_wiki_contract_available=memory_ontology_contract_available,
+        ontology_review_contract_available=memory_ontology_contract_available,
+        skill_learning_memory_contract_available=memory_ontology_contract_available,
+        retention_policy_contract_available=memory_ontology_contract_available,
+        memory_ontology_ready=False,
+        memory_auto_promotion=False,
+        ontology_auto_promotion=False,
+        wiki_page_update_written=False,
+        active_rule_written=False,
         credential_material_accessed=False,
         network_opened=False,
         external_delivery_opened=False,
@@ -175,7 +198,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
     reasons = []
     if target_version not in _PROGRAM_ORDER:
         reasons.append("unknown_target_version")
-    elif target_version not in {"v0.6.0", "v0.7.0", "v0.8.0"}:
+    elif target_version not in {"v0.6.0", "v0.7.0", "v0.8.0", "v0.9.0"}:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
         reasons.append("raw_secret_marker_detected")
@@ -194,6 +217,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v0.9.0":
+        return (
+            "memory_ontology_release_gate_manual_qa",
+            "memory_ontology_local_store_manual_qa",
+            "memory_ontology_secret_boundary_manual_qa",
+            "memory_ontology_adjacent_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v0.8.0":
         return (
             "platform_surface_release_gate_manual_qa",

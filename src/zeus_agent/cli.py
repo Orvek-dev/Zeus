@@ -145,6 +145,7 @@ from zeus_agent.entry_runtime import ZeusChatRuntime, default_zeus_home, entry_s
 from zeus_agent.eval import run_golden_journeys
 from zeus_agent.gateway_runtime import gateway_adapter_catalog_payload
 from zeus_agent.memory_graph_runtime import MemoryGraphStore
+from zeus_agent.memory_ontology_surface_runtime import build_memory_ontology_surface_contract
 from zeus_agent.mcp_runtime import curated_mcp_catalog_payload
 from zeus_agent.model_runtime import (
     evaluate_provider_fallback,
@@ -244,6 +245,21 @@ def platform_surface(
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     payload = build_platform_surface_contract(surface_id=surface_id).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("memory-ontology")
+def memory_ontology(
+    home: Optional[Path] = typer.Option(None, "--home"),
+    subject: Optional[str] = typer.Option(None, "--subject"),
+    candidate_id: Optional[str] = typer.Option(None, "--candidate-id"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_memory_ontology_surface_contract(
+        home=home or default_zeus_home(),
+        subject=subject,
+        candidate_id=candidate_id,
+    ).to_payload()
     _print_payload(payload, as_json=as_json)
 
 

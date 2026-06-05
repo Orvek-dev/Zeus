@@ -4,6 +4,7 @@ import json
 from typing import Any, Optional
 
 from zeus_agent.ontology_cockpit_runtime import OntologyCockpitRuntime
+from zeus_agent.memory_ontology_surface_runtime import build_memory_ontology_surface_contract
 from zeus_agent.orchestration_runtime import WorkflowCompileRequest
 from zeus_agent.persona_cockpit_runtime import PersonaCockpitRuntime
 from zeus_agent.platform_cockpit_runtime import PlatformCockpitRuntime
@@ -65,6 +66,18 @@ class GrowthFacadeMixin:
 
     def ontology_status(self, *, candidate_id: Optional[str] = None) -> dict[str, Any]:
         return OntologyCockpitRuntime(self.home).build(candidate_id=candidate_id).to_payload()
+
+    def memory_ontology_status(
+        self,
+        *,
+        subject: Optional[str] = None,
+        candidate_id: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_memory_ontology_surface_contract(
+            home=self.home,
+            subject=subject,
+            candidate_id=candidate_id,
+        ).to_payload()
 
     def platform_status(self, *, surface_id: Optional[str] = None) -> dict[str, Any]:
         return PlatformCockpitRuntime().build(surface_id=surface_id).to_payload()

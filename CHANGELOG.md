@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v0.9.0 - 2026-06-05
+
+### Added
+
+- Memory/Ontology Surface runtime and CLI command for local MemoryGraph, LLM
+  Wiki, ontology review queue, skill-learning memory, and retention-policy
+  boundary reporting.
+- Release-gated `v0.9.0` checkpoint fields for Memory/Ontology readiness,
+  local storage, LLM Wiki visibility, ontology review, no auto-promotion, and
+  dry-run evidence.
+- Python library facade method for `memory_ontology_status(...)` so library
+  callers can inspect the same contract as the CLI.
+- Secret-safe selector handling that blocks credential-like subject or
+  candidate identifiers without echoing raw secret-like material.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==0.9.0`.
+- README, Hermes comparison, live connection architecture, master design, and
+  security policy now describe the Memory/Ontology checkpoint instead of only
+  the `v0.8.0` Platform Surface checkpoint.
+
+### Notes
+
+- `v0.9.0` is still local-first and deterministic by default.
+- Memory writes remain proposed or quarantined local facts. Ontology terms,
+  wiki pages, skill learnings, active rules, authority widening, and live
+  transports are not auto-promoted without review.
+
 ## v0.8.0 - 2026-06-05
 
 ### Added

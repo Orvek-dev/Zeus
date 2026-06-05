@@ -4,9 +4,10 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v0.8.0` does not claim these live integrations are production-active. It
-establishes the public Platform Surface release gate and the dry-run contract
-slice those integrations must pass through before live execution is enabled.
+`v0.9.0` does not claim these live integrations are production-active. It
+establishes the public Memory/Ontology release gate and the dry-run contract
+slice those integrations must pass through before live execution or promotion is
+enabled.
 
 ## Design Goal
 
@@ -234,9 +235,9 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v0.8.0 Implementation Boundary
+## v0.9.0 Implementation Boundary
 
-`v0.8.0` includes:
+`v0.9.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
 - release-gated ULW status for the v0.6.0 -> v1.0.0-rc program;
@@ -249,6 +250,9 @@ Every live connection type should pass these gates:
   library entrypoints with loopback default posture, non-loopback review,
   auth/pairing/allowlist posture, approval lease, security gate, evidence
   capture, and no live handler execution;
+- Memory/Ontology reporting for local MemoryGraph storage, LLM Wiki rendering,
+  ontology review queue visibility, skill-learning memory bridge visibility,
+  retention policy, no auto-promotion, and no-secret-echo checks;
 - security planning for live-capable surfaces;
 - runtime lease scope checks;
 - research evidence graph contracts;
@@ -258,7 +262,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v0.8.0` does not include:
+`v0.9.0` does not include:
 
 - production live MCP catalog;
 - long-running gateway daemon;

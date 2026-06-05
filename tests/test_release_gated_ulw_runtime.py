@@ -48,10 +48,10 @@ def test_release_gated_ulw_blocks_unknown_target_version() -> None:
 
 
 def test_release_gated_ulw_blocks_future_release_until_current_checkpoint_closes() -> None:
-    result = build_release_gated_ulw_status(target_version="v0.9.0")
+    result = build_release_gated_ulw_status(target_version="v0.10.0")
 
     assert result.decision == "blocked"
-    assert result.release_stage == "memory_ontology"
+    assert result.release_stage == "adaptive_zeus"
     assert result.release_gate_ready is False
     assert "prior_release_checkpoint_required" in result.blocked_reasons
 
