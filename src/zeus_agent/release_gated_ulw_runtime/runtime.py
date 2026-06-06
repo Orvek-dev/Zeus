@@ -230,6 +230,13 @@ class ReleaseGatedUlwStatus(BaseModel):
     browser_live_guard_available: bool = False
     network_remote_block_available: bool = False
     real_execution_runtime_ready: bool = False
+    real_memory_operation_contract_available: bool = False
+    local_memory_operation_available: bool = False
+    ontology_wiki_operation_available: bool = False
+    memory_secret_quarantine_available: bool = False
+    retention_delete_operation_available: bool = False
+    skill_learning_memory_bridge_available: bool = False
+    real_memory_operation_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -314,6 +321,9 @@ def build_release_gated_ulw_status(
     )
     real_execution_runtime_contract_available = (
         normalized_version == "v1.4.0" and "unknown_target_version" not in blocked_reasons
+    )
+    real_memory_operation_contract_available = (
+        normalized_version == "v1.5.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -481,6 +491,13 @@ def build_release_gated_ulw_status(
         browser_live_guard_available=real_execution_runtime_contract_available,
         network_remote_block_available=real_execution_runtime_contract_available,
         real_execution_runtime_ready=False,
+        real_memory_operation_contract_available=real_memory_operation_contract_available,
+        local_memory_operation_available=real_memory_operation_contract_available,
+        ontology_wiki_operation_available=real_memory_operation_contract_available,
+        memory_secret_quarantine_available=real_memory_operation_contract_available,
+        retention_delete_operation_available=real_memory_operation_contract_available,
+        skill_learning_memory_bridge_available=real_memory_operation_contract_available,
+        real_memory_operation_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -551,6 +568,20 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.5.0":
+        return (
+            "real_memory_operation_status_manual_qa",
+            "real_memory_operation_local_store_manual_qa",
+            "real_memory_operation_ontology_wiki_manual_qa",
+            "real_memory_operation_secret_quarantine_manual_qa",
+            "real_memory_operation_retention_delete_manual_qa",
+            "real_memory_operation_skill_learning_bridge_manual_qa",
+            "real_memory_operation_promotion_block_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.4.0":
         return (
             "real_execution_runtime_status_manual_qa",

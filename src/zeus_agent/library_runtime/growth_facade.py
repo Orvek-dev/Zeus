@@ -11,6 +11,7 @@ from zeus_agent.persona_cockpit_runtime import PersonaCockpitRuntime
 from zeus_agent.platform_cockpit_runtime import PlatformCockpitRuntime
 from zeus_agent.plugin_cockpit_runtime import PluginCockpitRuntime
 from zeus_agent.real_execution_runtime import build_real_execution_contract
+from zeus_agent.real_memory_operation_runtime import build_real_memory_operation_contract
 from zeus_agent.real_mcp_runtime import build_real_mcp_contract
 from zeus_agent.real_platform_runtime import build_real_platform_contract
 from zeus_agent.real_provider_runtime import build_real_provider_contract
@@ -184,3 +185,15 @@ class GrowthFacadeMixin:
         command: str = "pwd",
     ) -> dict[str, Any]:
         return build_real_execution_contract(scenario=scenario, command=command).to_payload()
+
+    def memory_operation(
+        self,
+        *,
+        scenario: str = "status",
+        subject: str = "Zeus",
+    ) -> dict[str, Any]:
+        return build_real_memory_operation_contract(
+            scenario=scenario,
+            home=self.home,
+            subject=subject,
+        ).to_payload()

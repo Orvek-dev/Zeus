@@ -2,6 +2,33 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.5.0 - 2026-06-06
+
+### Added
+
+- Real Memory Operation Runtime and CLI command for local MemoryGraph smoke,
+  Memory/Ontology wiki smoke, secret quarantine, retention deletion,
+  skill-learning memory bridge, and promotion block scenarios.
+- Release-gated ULW `v1.5.0` checkpoint fields for local memory operation,
+  ontology/wiki operation, secret quarantine, retention deletion,
+  skill-learning memory bridge, and real memory operation readiness.
+- Python library facade method for `memory_operation(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.5.0` for Python packaging and
+  `v1.5.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.4.0` to `v1.5.0`.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real Memory Operation Runtime as the fifth post-stable
+  live-platform expansion.
+
+### Notes
+
+- `v1.5.0` writes only local reviewable memory facts, quarantine/delete records,
+  and skill-learning bridge facts. It does not auto-promote memory, ontology,
+  wiki pages, active rules, active skills, authority, or production live state.
+
 ## v1.4.0 - 2026-06-06
 
 ### Added

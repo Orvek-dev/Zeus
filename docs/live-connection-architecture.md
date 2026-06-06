@@ -4,7 +4,7 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.4.0` does not claim these live integrations are production-active. It
+`v1.5.0` does not claim these live integrations are production-active. It
 establishes the stable governed live platform release gate and the dry-run/live
 beta contract slices those integrations must pass through before production
 live execution or promotion is enabled.
@@ -237,12 +237,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.4.0 Implementation Boundary
+## v1.5.0 Implementation Boundary
 
-`v1.4.0` includes:
+`v1.5.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.4.0 program;
+- release-gated ULW status for the v0.6.0 -> v1.5.0 program;
 - Real Provider Runtime status, governed local deterministic provider smoke,
   controlled external provider receipt validation, budget/timeout gates, audit,
   redaction, and no-production-claim reporting;
@@ -257,6 +257,10 @@ Every live connection type should pass these gates:
 - Real Execution Runtime status, controlled local terminal/sandbox command
   smoke, live browser-navigation guard, network-command block, remote
   sandbox/Docker-socket block, cleanup, and no-production-claim reporting;
+- Real Memory Operation Runtime status, local MemoryGraph smoke,
+  Memory/Ontology wiki smoke, secret quarantine, retention deletion,
+  skill-learning memory bridge, promotion block, cleanup, and
+  no-production-claim reporting;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -325,7 +329,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.4.0` does not include:
+`v1.5.0` does not include:
 
 - production live MCP catalog;
 - unrestricted or production external provider execution;
