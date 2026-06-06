@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/zeus-symbol-transparent-white-tight.png">
     <source media="(prefers-color-scheme: light)" srcset="./assets/zeus-symbol-transparent-black-tight.png">
-    <img src="./assets/zeus-symbol-transparent-black-tight.png" width="560" alt="Zeus: goal-oriented AI agent" />
+    <img src="./assets/zeus-symbol-transparent-black-tight.png" width="360" alt="Zeus: goal-oriented AI agent" />
   </picture>
 </p>
 
