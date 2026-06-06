@@ -224,6 +224,12 @@ class ReleaseGatedUlwStatus(BaseModel):
     session_store_export_available: bool = False
     acp_batch_smoke_available: bool = False
     real_platform_runtime_ready: bool = False
+    real_execution_runtime_contract_available: bool = False
+    controlled_terminal_smoke_available: bool = False
+    sandbox_command_smoke_available: bool = False
+    browser_live_guard_available: bool = False
+    network_remote_block_available: bool = False
+    real_execution_runtime_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -305,6 +311,9 @@ def build_release_gated_ulw_status(
     )
     gateway_api_session_platform_contract_available = (
         normalized_version == "v1.3.0" and "unknown_target_version" not in blocked_reasons
+    )
+    real_execution_runtime_contract_available = (
+        normalized_version == "v1.4.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -466,6 +475,12 @@ def build_release_gated_ulw_status(
         session_store_export_available=gateway_api_session_platform_contract_available,
         acp_batch_smoke_available=gateway_api_session_platform_contract_available,
         real_platform_runtime_ready=False,
+        real_execution_runtime_contract_available=real_execution_runtime_contract_available,
+        controlled_terminal_smoke_available=real_execution_runtime_contract_available,
+        sandbox_command_smoke_available=real_execution_runtime_contract_available,
+        browser_live_guard_available=real_execution_runtime_contract_available,
+        network_remote_block_available=real_execution_runtime_contract_available,
+        real_execution_runtime_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -536,6 +551,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.4.0":
+        return (
+            "real_execution_runtime_status_manual_qa",
+            "real_execution_runtime_local_smoke_manual_qa",
+            "real_execution_runtime_browser_block_manual_qa",
+            "real_execution_runtime_network_block_manual_qa",
+            "real_execution_runtime_remote_block_manual_qa",
+            "real_execution_runtime_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.3.0":
         return (
             "real_platform_runtime_status_manual_qa",

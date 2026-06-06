@@ -119,7 +119,6 @@ def test_sandbox_terminal_live_blocks_remote_docker_ssh_and_browser_live(tmp_pat
     assert "docker_socket_mount" in payload["blocked_reasons"]
     assert "network_egress_blocked" in payload["blocked_reasons"]
     assert "resource_profile_unbounded" in payload["blocked_reasons"]
-    assert "missing_cleanup_obligation" in payload["blocked_reasons"]
     assert "network_command_blocked" in payload["blocked_reasons"]
     assert "live_navigation_not_supported" in payload["blocked_reasons"]
     assert "remote_execution_not_supported" in payload["blocked_reasons"]
@@ -130,6 +129,7 @@ def test_sandbox_terminal_live_blocks_remote_docker_ssh_and_browser_live(tmp_pat
     assert payload["handler_executed"] is False
     assert payload["remote_execution_opened"] is False
     assert payload["cleanup_performed"] is True
+    assert payload["sandbox_plan"]["cleanup_obligation"]["decision"] == "planned"
     assert payload["no_secret_echo"] is True
 
 

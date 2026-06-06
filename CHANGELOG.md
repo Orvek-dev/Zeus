@@ -2,6 +2,33 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.4.0 - 2026-06-06
+
+### Added
+
+- Real Execution Runtime and CLI command for controlled local terminal/sandbox
+  command smoke, live browser-navigation guard, network-command block, and
+  remote sandbox/Docker-socket block checks.
+- Release-gated ULW `v1.4.0` checkpoint fields for terminal smoke, sandbox
+  command smoke, browser live guard, network/remote block readiness, and real
+  execution runtime readiness.
+- Python library facade method for `execution_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.4.0` for Python packaging and
+  `v1.4.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.3.0` to `v1.4.0`.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real Execution Runtime as the fourth post-stable live-platform
+  expansion.
+
+### Notes
+
+- `v1.4.0` executes only controlled local sandbox smoke paths and keeps live
+  browser navigation, open network egress, remote sandbox execution, Docker/SSH
+  backends, and production execution blocked.
+
 ## v1.3.0 - 2026-06-06
 
 ### Added

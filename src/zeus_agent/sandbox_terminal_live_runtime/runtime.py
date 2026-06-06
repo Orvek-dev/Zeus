@@ -206,7 +206,7 @@ def _blocked_remote(*, root: Path) -> SandboxTerminalLiveContract:
             egress_policy="open",
             resource_profile="unbounded",
             cleanup_required=True,
-            cleanup_plan=None,
+            cleanup_plan="temporary sandbox directory removed after evidence capture",
             evidence_target="mneme.rc5.sandbox.remote",
         ),
     )
