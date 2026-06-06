@@ -14,6 +14,7 @@ from zeus_agent.gateway_cockpit_runtime import GatewayCockpitRuntime
 from zeus_agent.gateway_live_delivery_runtime import build_gateway_live_delivery_contract
 from zeus_agent.gateway_pairing_runtime import GatewayPairingRuntime
 from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
+from zeus_agent.goal_intelligence_runtime import build_goal_intelligence_contract
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.mcp_live_server_runtime import build_mcp_live_server_contract
@@ -1516,6 +1517,26 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             scenario=scenario,
             home=self.home,
             operator_note=operator_note,
+        ).to_payload()
+
+    def goal_intelligence_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        objective: str = "Help Zeus understand the user goal and choose a safe adaptive execution workflow.",
+        task_count: int = 4,
+        requires_code: bool = False,
+        requires_research: bool = False,
+        risk_level: str = "normal",
+    ) -> dict[str, Any]:
+        return build_goal_intelligence_contract(
+            scenario=scenario,
+            home=self.home,
+            objective=objective,
+            task_count=task_count,
+            requires_code=requires_code,
+            requires_research=requires_research,
+            risk_level=risk_level,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:

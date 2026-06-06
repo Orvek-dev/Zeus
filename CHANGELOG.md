@@ -2,6 +2,32 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v2.0.0 - 2026-06-06
+
+### Added
+
+- Goal Intelligence Runtime and CLI command for objective understanding,
+  deep-interview context candidates, adaptive replanning, workflow critic
+  reporting, ontology-context smoke, and secret-boundary scenarios.
+- Python library facade method for `goal_intelligence_runtime(...)`.
+- Release-gated ULW `v2.0.0` checkpoint fields for objective understanding,
+  deep interview, user context model, context ontology, adaptive replanning,
+  workflow critic, and eval-loop readiness.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==2.0.0` for Python packaging and
+  `v2.0.0` for the GitHub release tag.
+- Release-gated ULW now closes the compressed v1.8.0 -> v2.0.0 roadmap.
+
+### Notes
+
+- `v2.0.0` makes Zeus more purpose-aware by combining objective contracts,
+  interview questions, user-context candidates, adaptive workflow selection,
+  ontology context, and self-evolution status into one governed product
+  surface. It still does not auto-promote memory, ontology, workflow patterns,
+  active skills, or active rules.
+
 ## v1.9.0 - 2026-06-06
 
 ### Added

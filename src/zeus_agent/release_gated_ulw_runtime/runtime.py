@@ -283,6 +283,15 @@ class ReleaseGatedUlwStatus(BaseModel):
     terminal_sandbox_connection_available: bool = False
     remote_sandbox_connection_available: bool = False
     production_safe_connections_ready: bool = False
+    goal_intelligence_contract_available: bool = False
+    objective_understanding_runtime_available: bool = False
+    deep_interview_runtime_available: bool = False
+    user_context_model_available: bool = False
+    context_ontology_runtime_available: bool = False
+    adaptive_replanning_runtime_available: bool = False
+    workflow_critic_runtime_available: bool = False
+    eval_loop_runtime_available: bool = False
+    goal_intelligence_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -382,6 +391,9 @@ def build_release_gated_ulw_status(
     )
     production_safe_live_platform_contract_available = (
         normalized_version == "v1.9.0" and "unknown_target_version" not in blocked_reasons
+    )
+    goal_intelligence_contract_available = (
+        normalized_version == "v2.0.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -596,6 +608,15 @@ def build_release_gated_ulw_status(
         terminal_sandbox_connection_available=production_safe_live_platform_contract_available,
         remote_sandbox_connection_available=production_safe_live_platform_contract_available,
         production_safe_connections_ready=False,
+        goal_intelligence_contract_available=goal_intelligence_contract_available,
+        objective_understanding_runtime_available=goal_intelligence_contract_available,
+        deep_interview_runtime_available=goal_intelligence_contract_available,
+        user_context_model_available=goal_intelligence_contract_available,
+        context_ontology_runtime_available=goal_intelligence_contract_available,
+        adaptive_replanning_runtime_available=goal_intelligence_contract_available,
+        workflow_critic_runtime_available=goal_intelligence_contract_available,
+        eval_loop_runtime_available=goal_intelligence_contract_available,
+        goal_intelligence_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -669,6 +690,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v2.0.0":
+        return (
+            "goal_intelligence_objective_understanding_manual_qa",
+            "goal_intelligence_deep_interview_manual_qa",
+            "goal_intelligence_adaptive_replan_manual_qa",
+            "goal_intelligence_context_ontology_manual_qa",
+            "goal_intelligence_secret_boundary_manual_qa",
+            "goal_intelligence_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.9.0":
         return (
             "production_safe_live_platform_status_manual_qa",
