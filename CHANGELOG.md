@@ -2,6 +2,36 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v2.3.0 - 2026-06-06
+
+### Added
+
+- Installable Live Platform runtime for package-level status reporting across
+  provider, MCP, gateway, API, CLI, Python library, plugin manifest, local
+  sandbox policy, and remote sandbox policy surfaces.
+- CLI command `installable-live-platform` and Python library facade method
+  `ZeusAgent.installable_live_platform_runtime(...)`.
+- Plugin manifest install scenario that keeps valid plugin manifests
+  quarantined until review and prevents tool registration or handler execution.
+- Remote sandbox policy scenario that reports remote sandbox execution as
+  blocked without opening network, Docker, SSH, or remote execution.
+- Release-gated ULW `v2.3.0` checkpoint fields for installable live platform
+  readiness and install surfaces.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==2.3.0` for Python packaging and
+  `v2.3.0` for the GitHub release tag.
+- The public installable platform surface now exposes a single readiness
+  contract instead of requiring users to inspect provider, MCP, gateway, plugin,
+  sandbox, and API readiness separately.
+
+### Notes
+
+- `v2.3.0` remains an installable governed-live platform checkpoint. It does
+  not claim unrestricted production external provider, MCP, gateway, browser,
+  terminal, or remote sandbox execution.
+
 ## v2.2.0 - 2026-06-06
 
 ### Added

@@ -313,6 +313,17 @@ class ReleaseGatedUlwStatus(BaseModel):
     broker_dispatch_required: bool = False
     broker_evidence_required: bool = False
     broker_evidence_recorded: bool = False
+    installable_live_platform_contract_available: bool = False
+    provider_install_surface_available: bool = False
+    mcp_install_surface_available: bool = False
+    gateway_install_surface_available: bool = False
+    api_install_surface_available: bool = False
+    cli_install_surface_available: bool = False
+    python_library_install_surface_available: bool = False
+    plugin_manifest_install_surface_available: bool = False
+    local_sandbox_policy_install_surface_available: bool = False
+    remote_sandbox_policy_install_surface_available: bool = False
+    installable_live_platform_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -421,6 +432,9 @@ def build_release_gated_ulw_status(
     )
     goal_intelligence_platform_available = (
         normalized_version == "v2.2.0" and "unknown_target_version" not in blocked_reasons
+    )
+    installable_live_platform_available = (
+        normalized_version == "v2.3.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -674,6 +688,17 @@ def build_release_gated_ulw_status(
         broker_dispatch_required=kernel_throughput_integration_available,
         broker_evidence_required=kernel_throughput_integration_available,
         broker_evidence_recorded=False,
+        installable_live_platform_contract_available=installable_live_platform_available,
+        provider_install_surface_available=installable_live_platform_available,
+        mcp_install_surface_available=installable_live_platform_available,
+        gateway_install_surface_available=installable_live_platform_available,
+        api_install_surface_available=installable_live_platform_available,
+        cli_install_surface_available=installable_live_platform_available,
+        python_library_install_surface_available=installable_live_platform_available,
+        plugin_manifest_install_surface_available=installable_live_platform_available,
+        local_sandbox_policy_install_surface_available=installable_live_platform_available,
+        remote_sandbox_policy_install_surface_available=installable_live_platform_available,
+        installable_live_platform_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -730,6 +755,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v2.0.0",
         "v2.1.0",
         "v2.2.0",
+        "v2.3.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -751,6 +777,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v2.3.0":
+        return (
+            "installable_live_platform_status_manual_qa",
+            "installable_live_platform_plugin_quarantine_manual_qa",
+            "installable_live_platform_remote_sandbox_block_manual_qa",
+            "installable_live_platform_cli_library_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v2.2.0":
         return (
             "goal_intelligence_intent_frame_manual_qa",

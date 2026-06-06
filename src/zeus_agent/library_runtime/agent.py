@@ -15,6 +15,7 @@ from zeus_agent.gateway_live_delivery_runtime import build_gateway_live_delivery
 from zeus_agent.gateway_pairing_runtime import GatewayPairingRuntime
 from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.goal_intelligence_runtime import build_goal_intelligence_contract
+from zeus_agent.installable_live_platform_runtime import build_installable_live_platform_contract
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.mcp_live_server_runtime import build_mcp_live_server_contract
@@ -1543,6 +1544,18 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             interview_answers=interview_answers,
             proceed_override=proceed_override,
             cognitive_provider_output=cognitive_provider_output,
+        ).to_payload()
+
+    def installable_live_platform_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_installable_live_platform_contract(
+            scenario=scenario,
+            home=self.home,
+            operator_note=operator_note,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
