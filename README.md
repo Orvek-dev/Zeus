@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v2.3.0"><img alt="Version" src="https://img.shields.io/badge/version-2.3.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v2.4.0"><img alt="Version" src="https://img.shields.io/badge/version-2.4.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1456%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1462%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,7 +35,7 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v2.3.0` source release builds on the
+an unconstrained chat loop. The public `v2.4.0` source release builds on the
 stable governed live platform boundary with Real Provider Runtime, Real MCP
 Runtime, Real Platform Runtime, Real Execution Runtime, and Real Memory
 Operation Runtime, Real Self Evolution Runtime, and Real Product Platform
@@ -69,7 +69,10 @@ acceptance criteria, slot-driven deep interview loops, governed fake cognitive
 provider validation, work-loop bridge fields, and candidate-only context
 learning. v2.3.0 adds the Installable Live Platform: package-level readiness
 reporting for provider, MCP, gateway, API, CLI, Python library, plugin manifest,
-local sandbox policy, and remote sandbox policy surfaces.
+local sandbox policy, and remote sandbox policy surfaces. v2.4.0 adds the
+Production Scale Platform: plugin ecosystem quarantine, remote sandbox backend
+policy, tenant/principal auth contracts, role/scope enforcement, append-only
+audit requirements, and candidate-only learning operations.
 Provider, MCP, memory, and sandbox/terminal smoke paths remain governed by
 quarantine, retention, cross-session search default-deny, lease, approval,
 broker dispatch, safe environment, evidence capture, cleanup, and
@@ -115,6 +118,7 @@ zeus release-gated-ulw --target-version v2.0.0 --json
 zeus release-gated-ulw --target-version v2.1.0 --json
 zeus release-gated-ulw --target-version v2.2.0 --json
 zeus release-gated-ulw --target-version v2.3.0 --json
+zeus release-gated-ulw --target-version v2.4.0 --json
 zeus identity-activation-runtime --scenario identity-status --json
 zeus identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json
 zeus identity-activation-runtime --scenario activation-check --objective-id objective.demo --lease-id lease.demo --approval-id approval.demo --credential-binding-ref credential.demo --sandbox-policy-ref sandbox.demo --audit-receipt-ref audit.demo --json
@@ -128,6 +132,11 @@ zeus goal-intelligence-runtime --scenario ontology-context --objective "Organize
 zeus installable-live-platform --scenario status --json
 zeus installable-live-platform --scenario plugin-manifest --json
 zeus installable-live-platform --scenario remote-sandbox-policy --json
+zeus production-scale-platform --scenario status --json
+zeus production-scale-platform --scenario plugin-ecosystem --json
+zeus production-scale-platform --scenario remote-sandbox-policy --json
+zeus production-scale-platform --scenario tenant-auth-contract --json
+zeus production-scale-platform --scenario learning-ops --json
 zeus stable-release --json
 zeus provider-runtime --scenario status --json
 zeus provider-runtime --scenario local-deterministic-smoke --message "hello Zeus" --json
@@ -386,11 +395,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, Stable Release, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, Zeus Identity Activation Runtime, Production Safe Live Platform Runtime, Goal Intelligence Runtime, Kernel-Throughput Integration Runtime, Goal Intelligence Platform, Installable Live Platform, core language, release version, public docs hygiene, and total architecture surfaces | `1456` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, Stable Release, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, Zeus Identity Activation Runtime, Production Safe Live Platform Runtime, Goal Intelligence Runtime, Kernel-Throughput Integration Runtime, Goal Intelligence Platform, Installable Live Platform, Production Scale Platform, core language, release version, public docs hygiene, and total architecture surfaces | `1462` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==2.3.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==2.4.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | release-gated after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -400,10 +409,10 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v2.3.0 Readiness
+## v2.4.0 Readiness
 
-`v2.3.0` is the Installable Live Platform checkpoint after the v2.2.0
-Goal Intelligence Platform boundary. The supported public surface is:
+`v2.4.0` is the Production Scale Platform checkpoint after the v2.3.0
+Installable Live Platform boundary. The supported public surface is:
 
 - local deterministic CLI scenarios through `zeus`;
 - `release-gated-ulw --target-version v1.0.0 --json` for the sequential
@@ -442,6 +451,8 @@ Goal Intelligence Platform boundary. The supported public surface is:
   work-loop bridge checkpoint;
 - `release-gated-ulw --target-version v2.3.0 --json` for the installable live
   platform checkpoint;
+- `release-gated-ulw --target-version v2.4.0 --json` for the production scale
+  platform checkpoint;
 - `identity-activation-runtime --scenario identity-status --json` for Zeus
   persona identity and call-name contract reporting;
 - `identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json`
@@ -463,6 +474,16 @@ Goal Intelligence Platform boundary. The supported public surface is:
   manifest quarantine reporting;
 - `installable-live-platform --scenario remote-sandbox-policy --json` for the
   remote sandbox default-block policy;
+- `production-scale-platform --scenario status --json` for operating-scale
+  platform readiness reporting without production execution;
+- `production-scale-platform --scenario plugin-ecosystem --json` for plugin
+  manifest validation and quarantine reporting;
+- `production-scale-platform --scenario remote-sandbox-policy --json` for
+  Docker, SSH, and remote backend default-deny policy reporting;
+- `production-scale-platform --scenario tenant-auth-contract --json` for
+  tenant, principal, scoped API key, role/scope, isolation, and audit contracts;
+- `production-scale-platform --scenario learning-ops --json` for eval registry,
+  error ledger, promotion review, and candidate-only learning contracts;
 - `goal-intelligence-runtime --scenario deep-interview --interview-answer "..." --json`
   for multi-turn slot-driven interview convergence without automatic memory
   writes;

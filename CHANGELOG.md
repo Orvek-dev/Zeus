@@ -2,6 +2,39 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v2.4.0 - 2026-06-06
+
+### Added
+
+- Production Scale Platform runtime for plugin ecosystem, remote sandbox policy,
+  tenant/principal auth contract, and candidate-only learning operations.
+- CLI command `production-scale-platform` and Python library facade method
+  `ZeusAgent.production_scale_platform_runtime(...)`.
+- Plugin ecosystem reporting that preserves manifest validation, permission
+  policy, and quarantine without registering tools or executing handlers.
+- Remote sandbox policy reporting for local, Docker, SSH, and remote backend
+  interfaces with network egress, mount, and credential passthrough default
+  denied.
+- Tenant/auth contract reporting for tenant id, principal identity, scoped API
+  keys, role/scope enforcement, cross-tenant default deny, and append-only
+  audit requirements.
+- Learning operations reporting for eval registry, error ledger,
+  promotion-review, and candidate-only learning without automatic active rule or
+  memory promotion.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==2.4.0` for Python packaging and
+  `v2.4.0` for the GitHub release tag.
+- Release-gated ULW now recognizes `v2.4.0` as the Production Scale Platform
+  checkpoint before the `v3.0.0` stable release.
+
+### Notes
+
+- `v2.4.0` is an operating-scale contract checkpoint. It still does not open
+  unrestricted production live execution, remote sandbox execution, or
+  unattended self-promotion.
+
 ## v2.3.0 - 2026-06-06
 
 ### Added

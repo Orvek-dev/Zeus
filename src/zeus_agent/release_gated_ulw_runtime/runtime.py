@@ -324,6 +324,23 @@ class ReleaseGatedUlwStatus(BaseModel):
     local_sandbox_policy_install_surface_available: bool = False
     remote_sandbox_policy_install_surface_available: bool = False
     installable_live_platform_ready: bool = False
+    production_scale_platform_contract_available: bool = False
+    plugin_ecosystem_available: bool = False
+    plugin_manifest_validation_available: bool = False
+    plugin_quarantine_available: bool = False
+    remote_sandbox_backend_interface_available: bool = False
+    docker_backend_policy_available: bool = False
+    ssh_backend_policy_available: bool = False
+    eval_registry_available: bool = False
+    error_ledger_available: bool = False
+    promotion_review_available: bool = False
+    candidate_only_learning_available: bool = False
+    tenant_model_available: bool = False
+    principal_model_available: bool = False
+    api_key_auth_contract_available: bool = False
+    role_scope_enforcement_available: bool = False
+    tenant_isolation_contract_available: bool = False
+    production_scale_platform_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -435,6 +452,9 @@ def build_release_gated_ulw_status(
     )
     installable_live_platform_available = (
         normalized_version == "v2.3.0" and "unknown_target_version" not in blocked_reasons
+    )
+    production_scale_platform_available = (
+        normalized_version == "v2.4.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -699,6 +719,23 @@ def build_release_gated_ulw_status(
         local_sandbox_policy_install_surface_available=installable_live_platform_available,
         remote_sandbox_policy_install_surface_available=installable_live_platform_available,
         installable_live_platform_ready=False,
+        production_scale_platform_contract_available=production_scale_platform_available,
+        plugin_ecosystem_available=production_scale_platform_available,
+        plugin_manifest_validation_available=production_scale_platform_available,
+        plugin_quarantine_available=production_scale_platform_available,
+        remote_sandbox_backend_interface_available=production_scale_platform_available,
+        docker_backend_policy_available=production_scale_platform_available,
+        ssh_backend_policy_available=production_scale_platform_available,
+        eval_registry_available=production_scale_platform_available,
+        error_ledger_available=production_scale_platform_available,
+        promotion_review_available=production_scale_platform_available,
+        candidate_only_learning_available=production_scale_platform_available,
+        tenant_model_available=production_scale_platform_available,
+        principal_model_available=production_scale_platform_available,
+        api_key_auth_contract_available=production_scale_platform_available,
+        role_scope_enforcement_available=production_scale_platform_available,
+        tenant_isolation_contract_available=production_scale_platform_available,
+        production_scale_platform_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -756,6 +793,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v2.1.0",
         "v2.2.0",
         "v2.3.0",
+        "v2.4.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -777,6 +815,18 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v2.4.0":
+        return (
+            "production_scale_platform_status_manual_qa",
+            "production_scale_platform_plugin_ecosystem_manual_qa",
+            "production_scale_platform_remote_sandbox_policy_manual_qa",
+            "production_scale_platform_tenant_auth_manual_qa",
+            "production_scale_platform_learning_ops_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v2.3.0":
         return (
             "installable_live_platform_status_manual_qa",
