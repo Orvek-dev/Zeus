@@ -10,20 +10,22 @@ from zeus_agent.release_gated_ulw_runtime import build_release_gated_ulw_status
 from zeus_agent.stable_release_runtime import build_stable_release_contract
 
 
-def test_v100_release_gate_reports_stable_governed_live_platform_checkpoint() -> None:
-    result = build_release_gated_ulw_status(target_version="v1.0.0")
+def test_v300_release_gate_reports_stable_live_agent_platform_checkpoint() -> None:
+    result = build_release_gated_ulw_status(target_version="v3.0.0")
     payload = result.to_payload()
 
     assert payload["decision"] == "report"
-    assert payload["target_version"] == "v1.0.0"
-    assert payload["release_stage"] == "stable_governed_live_platform"
-    assert payload["stable_release_contract_available"] is True
-    assert payload["stable_governed_live_platform_ready"] is True
-    assert payload["stable_public_release_ready"] is True
+    assert payload["target_version"] == "v3.0.0"
+    assert payload["release_stage"] == "zeus_stable_live_agent_platform"
+    assert payload["zeus_stable_live_agent_platform_contract_available"] is True
+    assert payload["stable_goal_intelligence_platform_ready"] is True
+    assert payload["stable_installable_live_platform_ready"] is True
+    assert payload["stable_production_scale_platform_ready"] is True
+    assert payload["stable_platform_public_boundary_ready"] is True
     assert payload["production_ready"] is False
     assert payload["live_production_claimed"] is False
-    assert payload["next_version"] == "v1.1.0"
-    assert "stable_governed_live_platform_manual_qa" in payload["required_checkpoint_evidence"]
+    assert payload["next_version"] is None
+    assert "zeus_stable_live_agent_platform_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 
 
@@ -32,9 +34,15 @@ def test_stable_release_contract_reports_governed_platform_without_unrestricted_
     payload = result.to_payload()
 
     assert payload["decision"] == "report"
-    assert payload["target_version"] == "v1.0.0"
+    assert payload["target_version"] == "v3.0.0"
+    assert payload["release_stage"] == "zeus_stable_live_agent_platform"
     assert payload["stable_release_ready"] is True
     assert payload["governed_live_platform_ready"] is True
+    assert payload["goal_intelligence_platform_ready"] is True
+    assert payload["installable_live_platform_ready"] is True
+    assert payload["production_scale_platform_ready"] is True
+    assert payload["candidate_only_learning_available"] is True
+    assert payload["tenant_auth_contract_available"] is True
     assert payload["production_live_ready"] is False
     assert payload["unrestricted_live_execution_enabled"] is False
     assert payload["provider_owned_client_live_available"] is True

@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v2.4.0"><img alt="Version" src="https://img.shields.io/badge/version-2.4.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v3.0.0"><img alt="Version" src="https://img.shields.io/badge/version-3.0.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
@@ -35,7 +35,7 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v2.4.0` source release builds on the
+an unconstrained chat loop. The public `v3.0.0` source release builds on the
 stable governed live platform boundary with Real Provider Runtime, Real MCP
 Runtime, Real Platform Runtime, Real Execution Runtime, and Real Memory
 Operation Runtime, Real Self Evolution Runtime, and Real Product Platform
@@ -72,7 +72,8 @@ reporting for provider, MCP, gateway, API, CLI, Python library, plugin manifest,
 local sandbox policy, and remote sandbox policy surfaces. v2.4.0 adds the
 Production Scale Platform: plugin ecosystem quarantine, remote sandbox backend
 policy, tenant/principal auth contracts, role/scope enforcement, append-only
-audit requirements, and candidate-only learning operations.
+audit requirements, and candidate-only learning operations. v3.0.0 stabilizes
+those layers into a single Stable Live Agent Platform contract.
 Provider, MCP, memory, and sandbox/terminal smoke paths remain governed by
 quarantine, retention, cross-session search default-deny, lease, approval,
 broker dispatch, safe environment, evidence capture, cleanup, and
@@ -119,6 +120,7 @@ zeus release-gated-ulw --target-version v2.1.0 --json
 zeus release-gated-ulw --target-version v2.2.0 --json
 zeus release-gated-ulw --target-version v2.3.0 --json
 zeus release-gated-ulw --target-version v2.4.0 --json
+zeus release-gated-ulw --target-version v3.0.0 --json
 zeus identity-activation-runtime --scenario identity-status --json
 zeus identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json
 zeus identity-activation-runtime --scenario activation-check --objective-id objective.demo --lease-id lease.demo --approval-id approval.demo --credential-binding-ref credential.demo --sandbox-policy-ref sandbox.demo --audit-receipt-ref audit.demo --json
@@ -399,7 +401,7 @@ release, not as proof of broad production readiness.
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==2.4.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==3.0.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | release-gated after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -409,10 +411,10 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v2.4.0 Readiness
+## v3.0.0 Readiness
 
-`v2.4.0` is the Production Scale Platform checkpoint after the v2.3.0
-Installable Live Platform boundary. The supported public surface is:
+`v3.0.0` is the Stable Live Agent Platform release after the v2.4.0
+Production Scale Platform boundary. The supported public surface is:
 
 - local deterministic CLI scenarios through `zeus`;
 - `release-gated-ulw --target-version v1.0.0 --json` for the sequential
@@ -453,6 +455,8 @@ Installable Live Platform boundary. The supported public surface is:
   platform checkpoint;
 - `release-gated-ulw --target-version v2.4.0 --json` for the production scale
   platform checkpoint;
+- `release-gated-ulw --target-version v3.0.0 --json` for the stable live agent
+  platform checkpoint;
 - `identity-activation-runtime --scenario identity-status --json` for Zeus
   persona identity and call-name contract reporting;
 - `identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json`
@@ -484,6 +488,9 @@ Installable Live Platform boundary. The supported public surface is:
   tenant, principal, scoped API key, role/scope, isolation, and audit contracts;
 - `production-scale-platform --scenario learning-ops --json` for eval registry,
   error ledger, promotion review, and candidate-only learning contracts;
+- `stable-release --json` for the final stable platform contract aggregating
+  goal intelligence, installable live platform, and production scale platform
+  readiness;
 - `goal-intelligence-runtime --scenario deep-interview --interview-answer "..." --json`
   for multi-turn slot-driven interview convergence without automatic memory
   writes;

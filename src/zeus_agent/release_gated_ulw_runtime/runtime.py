@@ -341,6 +341,11 @@ class ReleaseGatedUlwStatus(BaseModel):
     role_scope_enforcement_available: bool = False
     tenant_isolation_contract_available: bool = False
     production_scale_platform_ready: bool = False
+    zeus_stable_live_agent_platform_contract_available: bool = False
+    stable_goal_intelligence_platform_ready: bool = False
+    stable_installable_live_platform_ready: bool = False
+    stable_production_scale_platform_ready: bool = False
+    stable_platform_public_boundary_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -455,6 +460,9 @@ def build_release_gated_ulw_status(
     )
     production_scale_platform_available = (
         normalized_version == "v2.4.0" and "unknown_target_version" not in blocked_reasons
+    )
+    zeus_stable_live_agent_platform_available = (
+        normalized_version == "v3.0.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -736,6 +744,11 @@ def build_release_gated_ulw_status(
         role_scope_enforcement_available=production_scale_platform_available,
         tenant_isolation_contract_available=production_scale_platform_available,
         production_scale_platform_ready=False,
+        zeus_stable_live_agent_platform_contract_available=zeus_stable_live_agent_platform_available,
+        stable_goal_intelligence_platform_ready=zeus_stable_live_agent_platform_available,
+        stable_installable_live_platform_ready=zeus_stable_live_agent_platform_available,
+        stable_production_scale_platform_ready=zeus_stable_live_agent_platform_available,
+        stable_platform_public_boundary_ready=zeus_stable_live_agent_platform_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -794,6 +807,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v2.2.0",
         "v2.3.0",
         "v2.4.0",
+        "v3.0.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -815,6 +829,18 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v3.0.0":
+        return (
+            "zeus_stable_live_agent_platform_manual_qa",
+            "stable_release_cli_library_regression_manual_qa",
+            "stable_release_public_boundary_review",
+            "stable_release_package_build",
+            "stable_release_remote_ci_success",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v2.4.0":
         return (
             "production_scale_platform_status_manual_qa",

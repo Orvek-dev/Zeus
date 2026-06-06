@@ -2,6 +2,33 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v3.0.0 - 2026-06-06
+
+### Added
+
+- Stable Live Agent Platform contract that aggregates Goal Intelligence,
+  Installable Live Platform, and Production Scale Platform readiness.
+- `stable-release` now reports the `v3.0.0` stable Zeus platform objective
+  instead of the earlier `v1.0.0` stable checkpoint.
+- Release-gated ULW `v3.0.0` final checkpoint fields for stable goal
+  intelligence, installable platform, production-scale platform, and public
+  boundary readiness.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==3.0.0` for Python packaging and
+  `v3.0.0` for the GitHub release tag.
+- Stable release reporting now treats the public platform as ready only when
+  goal intelligence, installable live platform, and production-scale platform
+  contracts all report ready.
+
+### Notes
+
+- `v3.0.0` is the stable governed live agent platform release. It still keeps
+  unrestricted production live execution, browser live execution, remote
+  sandbox execution, external gateway production delivery, MCP resources/prompts
+  activation, and unattended execution disabled by default.
+
 ## v2.4.0 - 2026-06-06
 
 ### Added

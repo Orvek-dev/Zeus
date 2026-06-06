@@ -28,13 +28,22 @@ class StableReleaseContract(BaseModel):
     model_config = _MODEL_CONFIG
 
     decision: StableReleaseDecision
-    target_version: Literal["v1.0.0"]
-    release_stage: Literal["stable_governed_live_platform"]
-    objective_contract_id: Literal["zeus.v1.0.0.stable_governed_live_platform"]
+    target_version: Literal["v3.0.0"]
+    release_stage: Literal["zeus_stable_live_agent_platform"]
+    objective_contract_id: Literal["zeus.v3.0.0.stable_live_agent_platform"]
     blocked_reasons: tuple[str, ...] = ()
     stable_release_ready: bool = False
     governed_live_platform_ready: bool = False
     stable_public_release_ready: bool = False
+    goal_intelligence_platform_ready: bool = False
+    installable_live_platform_ready: bool = False
+    production_scale_platform_ready: bool = False
+    plugin_ecosystem_available: bool = True
+    remote_sandbox_policy_available: bool = True
+    tenant_auth_contract_available: bool = True
+    learning_ops_contract_available: bool = True
+    candidate_only_learning_available: bool = True
+    persistent_audit_contract_available: bool = True
     production_live_ready: bool = False
     unrestricted_live_execution_enabled: bool = False
     provider_live_api_available: bool = True

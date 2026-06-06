@@ -161,7 +161,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v2.4.0 Boundary
+## Current v3.0.0 Boundary
 
 Implemented public foundation:
 
@@ -253,6 +253,9 @@ Implemented public foundation:
   remote sandbox backend policy, tenant/principal auth contracts, role/scope
   enforcement, append-only audit requirements, and candidate-only learning
   operations;
+- governed Stable Live Agent Platform reporting that aggregates Goal
+  Intelligence, Installable Live Platform, and Production Scale Platform
+  readiness into the public stable release contract;
 - governed Stable Release reporting for the public stable platform boundary
   while keeping unrestricted live production execution disabled by default;
 - security planning, research graph, ontology candidate, sandbox workflow, and
@@ -262,8 +265,8 @@ Implemented public foundation:
 - CLI eval surfaces;
 - current public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
-- release-gated ULW status for the v0.6.0 -> v2.4.0 program with
-  v2.4.0 production scale platform checkpoint reporting;
+- release-gated ULW status for the v0.6.0 -> v3.0.0 program with
+  v3.0.0 stable live agent platform checkpoint reporting;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.
 
