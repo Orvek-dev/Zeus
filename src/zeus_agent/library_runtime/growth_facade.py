@@ -15,6 +15,7 @@ from zeus_agent.real_memory_operation_runtime import build_real_memory_operation
 from zeus_agent.real_mcp_runtime import build_real_mcp_contract
 from zeus_agent.real_platform_runtime import build_real_platform_contract
 from zeus_agent.real_provider_runtime import build_real_provider_contract
+from zeus_agent.real_product_platform_runtime import build_real_product_platform_contract
 from zeus_agent.real_self_evolution_runtime import build_real_self_evolution_contract
 from zeus_agent.research_cockpit_runtime import ResearchCockpitRuntime
 from zeus_agent.skill_cockpit_runtime import SkillCockpitRuntime
@@ -209,4 +210,16 @@ class GrowthFacadeMixin:
             scenario=scenario,
             home=self.home,
             objective=objective,
+        ).to_payload()
+
+    def product_platform_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_real_product_platform_contract(
+            scenario=scenario,
+            home=self.home,
+            operator_note=operator_note,
         ).to_payload()

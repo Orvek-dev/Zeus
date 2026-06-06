@@ -4,7 +4,7 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v1.6.0` does not claim these live integrations are production-active. It
+`v1.7.0` does not claim these live integrations are production-active. It
 establishes the stable governed live platform release gate and the dry-run/live
 beta contract slices those integrations must pass through before production
 live execution or promotion is enabled.
@@ -84,6 +84,7 @@ policy before dispatching a handler.
 | `orchestration_runtime` | Schedules parallel agents and tasks with write-scope, dependency, and evidence checks | `src/zeus_agent/orchestration_runtime/` |
 | `verification_runtime` | Validates artifacts, requirements, evidence, and no-secret-echo before completion | `src/zeus_agent/verification_runtime/` |
 | `skill_evolution` | Proposes improvements without self-promoting authority | `src/zeus_agent/skill_evolution/` |
+| `real_product_platform_runtime` | Composes persona, platform, live, model, MCP, and runtime status into a product-facing operator surface without enabling production live execution | `src/zeus_agent/real_product_platform_runtime/` |
 
 ## Live Connection Flow
 
@@ -237,12 +238,12 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v1.6.0 Implementation Boundary
+## v1.7.0 Implementation Boundary
 
-`v1.6.0` includes:
+`v1.7.0` includes:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v1.6.0 program;
+- release-gated ULW status for the v0.6.0 -> v1.7.0 program;
 - Real Provider Runtime status, governed local deterministic provider smoke,
   controlled external provider receipt validation, budget/timeout gates, audit,
   redaction, and no-production-claim reporting;
@@ -265,6 +266,9 @@ Every live connection type should pass these gates:
   proposal smoke, workflow critique memory, promotion block, secret-boundary
   checks, cleanup, and no active skill/rule or workflow-pattern
   auto-promotion;
+- Real Product Platform Runtime status, persona smoke, platform cockpit smoke,
+  live status smoke, operator command map reporting, public boundary reporting,
+  secret-boundary checks, cleanup, and no production-live claim;
 - provider and MCP loopback readiness as part of the live-spine checkpoint;
 - Tool Limbs reporting for native tool catalog visibility, MCP discovery
   contract availability, API connector contract availability, include/exclude
@@ -333,7 +337,7 @@ Every live connection type should pass these gates:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - public design for live connections.
 
-`v1.6.0` does not include:
+`v1.7.0` does not include:
 
 - production live MCP catalog;
 - unrestricted or production external provider execution;

@@ -245,6 +245,16 @@ class ReleaseGatedUlwStatus(BaseModel):
     workflow_learning_runtime_available: bool = False
     promotion_review_gate_available: bool = False
     real_self_evolution_ready: bool = False
+    real_product_platform_contract_available: bool = False
+    persona_surface_available: bool = False
+    platform_cockpit_available: bool = False
+    live_status_surface_available: bool = False
+    model_status_surface_available: bool = False
+    mcp_status_surface_available: bool = False
+    runtime_status_surface_available: bool = False
+    operator_command_map_available: bool = False
+    public_boundary_report_available: bool = False
+    product_platform_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -335,6 +345,9 @@ def build_release_gated_ulw_status(
     )
     real_self_evolution_contract_available = (
         normalized_version == "v1.6.0" and "unknown_target_version" not in blocked_reasons
+    )
+    real_product_platform_contract_available = (
+        normalized_version == "v1.7.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -517,6 +530,16 @@ def build_release_gated_ulw_status(
         workflow_learning_runtime_available=real_self_evolution_contract_available,
         promotion_review_gate_available=real_self_evolution_contract_available,
         real_self_evolution_ready=False,
+        real_product_platform_contract_available=real_product_platform_contract_available,
+        persona_surface_available=real_product_platform_contract_available,
+        platform_cockpit_available=real_product_platform_contract_available,
+        live_status_surface_available=real_product_platform_contract_available,
+        model_status_surface_available=real_product_platform_contract_available,
+        mcp_status_surface_available=real_product_platform_contract_available,
+        runtime_status_surface_available=real_product_platform_contract_available,
+        operator_command_map_available=real_product_platform_contract_available,
+        public_boundary_report_available=real_product_platform_contract_available,
+        product_platform_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -587,6 +610,21 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.7.0":
+        return (
+            "product_platform_status_manual_qa",
+            "product_platform_persona_manual_qa",
+            "product_platform_cockpit_manual_qa",
+            "product_platform_live_status_manual_qa",
+            "product_platform_operator_command_map_manual_qa",
+            "product_platform_public_boundary_manual_qa",
+            "product_platform_secret_boundary_manual_qa",
+            "product_platform_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.6.0":
         return (
             "real_self_evolution_status_manual_qa",

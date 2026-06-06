@@ -2,6 +2,37 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.7.0 - 2026-06-06
+
+### Added
+
+- Real Product Platform Runtime and CLI command for product-facing persona,
+  platform, live, model, MCP, and runtime cockpit aggregation.
+- Product platform scenarios for status aggregation, Zeus work persona smoke,
+  platform cockpit smoke, live status smoke, operator command map reporting,
+  public boundary reporting, and secret-boundary blocking.
+- Release-gated ULW `v1.7.0` checkpoint fields for product platform contract,
+  persona surface, platform cockpit, live status surface, model/MCP/runtime
+  status surfaces, operator command map, public boundary report, and product
+  platform readiness.
+- Python library facade method for `product_platform_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.7.0` for Python packaging and
+  `v1.7.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.6.0` to `v1.7.0`.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real Product Platform Runtime as the seventh post-stable
+  live-platform expansion.
+
+### Notes
+
+- `v1.7.0` makes Zeus feel more like a broad live platform shell by exposing a
+  single product status surface and operator command map. It still does not
+  start hosted API servers, gateway daemons, external provider transports,
+  remote MCP production servers, browser live navigation, or remote sandboxes.
+
 ## v1.6.0 - 2026-06-06
 
 ### Added
