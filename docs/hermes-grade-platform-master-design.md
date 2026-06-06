@@ -10,14 +10,14 @@ waves should satisfy before Zeus can claim Hermes-scale breadth.
 ## Scope
 
 This document governs the target design for Hermes-grade platform absorption.
-It does not replace the current v1.0.0 implementation boundary. It defines the
-future product and architecture standard for entry surfaces, persona, objective
-control, provider runtime, MCP, tools, gateway, memory, skills, security,
-observability, and release readiness.
+It does not replace the current public release boundary described in
+`README.md` and `SECURITY.md`. It defines the future product and architecture
+standard for entry surfaces, persona, objective control, provider runtime, MCP,
+tools, gateway, memory, skills, security, observability, and release readiness.
 
 This document changes product design language and roadmap expectations. It does
-not claim that the listed live surfaces are already production-active.
-Hermes remains upstream/reference only. Mercury is the Zeus internal transport product name for transport, connector, MCP, API, and gateway routing.
+not claim that the listed live surfaces are already production-active. Zeus is
+the canonical product identity. Hermes remains upstream/reference only. Mercury is the Zeus internal transport product name for transport, connector, MCP, API, and gateway routing.
 
 ## Canonical Terms
 

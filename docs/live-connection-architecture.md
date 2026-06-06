@@ -4,10 +4,10 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-`v2.0.0` does not claim these live integrations are production-active. It
-establishes the stable governed live platform release gate and the dry-run/live
-beta contract slices those integrations must pass through before production
-live execution or promotion is enabled.
+The current public `v4.0.0` boundary does not claim these live integrations are
+production-active. It establishes the stable governed live platform release gate
+and the dry-run/live beta contract slices those integrations must pass through
+before production live execution or promotion is enabled.
 
 ## Design Goal
 
@@ -238,12 +238,13 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## v2.0.0 Implementation Boundary
+## Current v4.0.0 Governed Boundary
 
-`v2.0.0` includes:
+`v4.0.0` includes the accumulated governed local surfaces from the v0.6.0
+through v4.0.0 release program:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v2.0.0 program;
+- release-gated ULW status for the v0.6.0 -> v4.0.0 program;
 - Real Provider Runtime status, governed local deterministic provider smoke,
   controlled external provider receipt validation, budget/timeout gates, audit,
   redaction, and no-production-claim reporting;
@@ -347,7 +348,7 @@ Every live connection type should pass these gates:
   promotion;
 - public design for live connections.
 
-`v2.0.0` does not include:
+The current governed boundary does not include:
 
 - production live MCP catalog;
 - unrestricted or production external provider execution;

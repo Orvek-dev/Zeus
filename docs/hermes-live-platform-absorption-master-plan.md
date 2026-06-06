@@ -24,26 +24,23 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v1.0.0 boundary remains designed/prepared/dry-run/future for
-production live-capable surfaces, while adding live-beta-candidate and
-production-foundation contracts for local smoke, readiness, identity/auth,
-approval, lease, credential, secret, audit, sandbox, rollback, and review
-evidence plus Provider Live API loopback smoke, credential binding, secret
-material proof, execution authorization, audit, redaction, cleanup evidence,
-and MCP Live Server loopback smoke, prompt-injection scan, resources/prompts
-disabled posture, remote-server blocked posture, and Gateway Live Delivery
-loopback smoke, target allowlist, pairing proof, delivery envelope/body, audit,
-redaction, cleanup evidence, external delivery blocked posture, webhook blocked
-posture, and Sandbox Terminal Live local sandbox command smoke, browser guard,
-network/Docker/SSH blocked posture, evidence, cleanup, Memory Privacy Live,
-Provider Live Opt-in external receipt validation, Provider Owned Client Live
-adapter execution, MCP Owned Client Live remote tool execution, Stable Release
-governed live platform reporting,
-local SQLite MemoryGraph privacy, secret quarantine, retention deletion,
-cross-session search default-deny, and no-auto-promotion evidence unless a
-specific surface has separate production evidence and release approval.
+The public v4.0.0 boundary remains governed local-first:
+designed/prepared/dry-run/future for production live-capable surfaces unless a
+specific surface has separate production evidence and release approval. The
+implemented boundary includes live-beta-candidate and production-foundation
+contracts for local smoke, readiness, identity/auth, approval, lease,
+credential, secret, audit, sandbox, rollback, and review evidence; Provider
+Live API loopback smoke; MCP Live Server loopback smoke and prompt-injection
+scanning; Gateway Live Delivery loopback smoke and target allowlists; Sandbox
+Terminal local command smoke and browser/network/Docker/SSH guards; Memory
+Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned
+Client Live, Stable Release reporting, local SQLite MemoryGraph privacy, secret
+quarantine, retention deletion, cross-session search default-deny, and
+no-auto-promotion evidence.
 
-Hermes remains upstream/reference only. Mercury is the Zeus internal transport product name for transport, connector, MCP, API, and gateway routing.
+Zeus is the canonical product identity. Hermes remains upstream/reference only.
+Mercury is the Zeus internal transport product name for transport, connector,
+MCP, API, and gateway routing.
 
 ## Canonical Terms
 
@@ -61,8 +58,8 @@ Hermes remains upstream/reference only. Mercury is the Zeus internal transport p
 | Demeter | Durable memory, MemoryGraph, ontology, LLM Wiki, retention, and local knowledge growth. | unscoped memory dump |
 | Olympus | Parallel orchestration, ULW loop, task DAG, write scopes, recovery, and worker evidence. | more agents without ownership |
 | Prometheus | Skill evolution, reviewed self-improvement, eval, and controlled promotion. | auto-promoted skill |
-| Hermes live platform | The practical breadth of Hermes Agent: CLI, gateway, providers, tools, MCP, sessions, memory, skills, cron, API, ACP, batch, and library surfaces. | simple chatbot, coding-only agent |
-| Zeus live platform | Hermes-grade live breadth routed through Zeus objective authority, leases, security, evidence, and verification. | Hermes clone, generic agent wrapper |
+| Hermes reference breadth | The practical breadth signal Zeus studies from Hermes Agent: CLI, gateway, providers, tools, MCP, sessions, memory, skills, cron, API, ACP, batch, and library surfaces. | product identity, Zeus runtime name |
+| Zeus live platform | Broad live capability routed through Zeus objective authority, leases, security, evidence, and verification. | Hermes clone, generic agent wrapper |
 | MemoryGraph | Evidence-grounded schema/fact/passage graph used by Demeter. | vector-only memory, raw chat log |
 | LLM Wiki | Human-readable curation view over MemoryGraph. | source of truth, unchecked generated docs |
 | Adaptive Workflow Intelligence | Zeus's ability to choose, compose, critique, and revise work patterns while staying inside authority, budget, evidence, and security boundaries. | uncontrolled self-optimization |
@@ -206,7 +203,7 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v1.0.0 release tree:
+Measured in the public v4.0.0 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |
@@ -392,8 +389,8 @@ decision, and evidence target.
 
 ## Entry Surface Plan
 
-Zeus should reach eight serious entry surfaces before claiming Hermes-grade
-direction.
+Zeus should reach eight serious entry surfaces before claiming broad live
+platform direction.
 
 | Surface | Minimum commands / endpoints | Notes |
 | --- | --- | --- |
@@ -1363,6 +1360,6 @@ If Zeus only stays strict, it will feel heavy. If Zeus only copies Hermes, it
 will lose its reason to exist. The target product is both:
 
 ```text
-Hermes-grade live breadth.
+Broad live platform breadth.
 Zeus-grade objective control.
 ```

@@ -107,16 +107,13 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v2.0.0` code does not claim all live surfaces are production-active.
-It establishes the contracts, total architecture dry-run checks, Tool Limbs,
-Platform Surface boundary, Memory/Ontology boundary, Adaptive Zeus workflow
-selection boundary, Live Beta Candidate boundary, Production Foundation
-boundary, Provider Live API boundary, MCP Live Server boundary, Gateway Live
-Delivery boundary, Sandbox Terminal Live boundary, Memory Privacy Live boundary,
-Provider Live Opt-in boundary, Provider Owned Client Live boundary, MCP Owned
-Client Live boundary, Stable Release boundary, Real Provider Runtime boundary,
-Real MCP Runtime boundary, Real Platform Runtime boundary, Real Execution Runtime boundary, Real Memory Operation Runtime boundary, Real Self Evolution Runtime boundary, Real Product Platform Runtime boundary, Zeus Identity Activation Runtime boundary, Production Safe Live Platform Runtime boundary, Goal Intelligence Runtime boundary, and live connection design those
-surfaces should pass through.
+The public `v4.0.0` code does not claim all live surfaces are
+production-active. It establishes the accumulated governed local contracts,
+dry-run checks, live-beta slices, productized platform status, Goal
+Intelligence, Cognitive Provider Activation, installable platform surfaces,
+production-scale policy contracts, provider/MCP/gateway/runtime reporting, and
+live connection design those surfaces should pass through before any
+production-ready live claim is allowed.
 
 ## What Is Different With Hermes
 
@@ -128,7 +125,7 @@ surfaces should pass through.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v2.0.0 is a governed live platform boundary with CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog reporting, MCP discovery and API connector dry-run contracts, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, release-gated provider/MCP/gateway loopback readiness, controlled loopback provider HTTP smoke, controlled loopback MCP HTTP smoke, MCP prompt-injection scan, controlled loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, Provider Live Opt-in external receipt validation, Provider Owned Client Live adapter execution, MCP Owned Client Live remote tool execution, Real Provider Runtime reporting, Real MCP Runtime reporting, Real Platform Runtime reporting for API dry-run, gateway loopback sessions, session export redaction, and batch/ACP smoke, Real Execution Runtime reporting for controlled local terminal/sandbox smoke, live browser guard, network-command block, and remote sandbox block, Real Memory Operation Runtime reporting for local MemoryGraph, ontology/wiki, secret quarantine, retention delete, skill-learning bridge, and promotion block, Real Self Evolution Runtime reporting for eval-learning smoke, reviewable skill proposals, workflow critique memory, promotion block, and secret-boundary checks, Real Product Platform Runtime reporting for product-facing persona/platform/live/model/MCP/runtime status aggregation and operator command maps, Zeus Identity Activation Runtime reporting for call names and common live activation prerequisites, Production Safe Live Platform Runtime reporting for provider/MCP/API/gateway/browser/terminal/sandbox connector mapping, Goal Intelligence Runtime reporting for objective understanding, deep interview, context ontology, adaptive replanning, workflow critic, and eval-loop status, Stable Release reporting, and stabilized Zeus Core Language; production live integrations remain behind the same governance boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v4.0.0 is a governed local-first platform boundary with Goal Intelligence, Cognitive Provider Activation, productized status, provider/MCP/gateway/runtime contracts, memory/ontology surfaces, self-evolution review queues, loopback/dry-run/live-beta reporting, and stabilized Zeus Core Language; production live integrations remain behind the same authority, lease, approval, sandbox, audit, evidence, rollback, and promotion boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
