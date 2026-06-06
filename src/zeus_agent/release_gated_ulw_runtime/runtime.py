@@ -212,6 +212,12 @@ class ReleaseGatedUlwStatus(BaseModel):
     governed_external_provider_available: bool = False
     local_provider_smoke_available: bool = False
     real_provider_runtime_ready: bool = False
+    real_mcp_runtime_contract_available: bool = False
+    mcp_catalog_runtime_available: bool = False
+    mcp_setup_dry_run_available: bool = False
+    mcp_login_dry_run_available: bool = False
+    mcp_governed_smoke_available: bool = False
+    real_mcp_runtime_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -287,6 +293,9 @@ def build_release_gated_ulw_status(
     )
     real_provider_runtime_contract_available = (
         normalized_version == "v1.1.0" and "unknown_target_version" not in blocked_reasons
+    )
+    real_mcp_runtime_contract_available = (
+        normalized_version == "v1.2.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -436,6 +445,12 @@ def build_release_gated_ulw_status(
         governed_external_provider_available=real_provider_runtime_contract_available,
         local_provider_smoke_available=real_provider_runtime_contract_available,
         real_provider_runtime_ready=False,
+        real_mcp_runtime_contract_available=real_mcp_runtime_contract_available,
+        mcp_catalog_runtime_available=real_mcp_runtime_contract_available,
+        mcp_setup_dry_run_available=real_mcp_runtime_contract_available,
+        mcp_login_dry_run_available=real_mcp_runtime_contract_available,
+        mcp_governed_smoke_available=real_mcp_runtime_contract_available,
+        real_mcp_runtime_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -506,6 +521,20 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.2.0":
+        return (
+            "real_mcp_runtime_status_manual_qa",
+            "real_mcp_runtime_setup_dry_run_manual_qa",
+            "real_mcp_runtime_inspect_manual_qa",
+            "real_mcp_runtime_governed_test_manual_qa",
+            "real_mcp_runtime_login_dry_run_manual_qa",
+            "real_mcp_runtime_security_blocks_manual_qa",
+            "real_mcp_runtime_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.1.0":
         return (
             "real_provider_runtime_status_manual_qa",

@@ -2,6 +2,37 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.2.0 - 2026-06-06
+
+### Added
+
+- Real MCP Runtime and CLI command for MCP catalog reporting, setup dry-run,
+  server list, manifest inspection, governed fake-client test smoke, login
+  dry-run, include/exclude policy, resource/prompt wrapper policy, and
+  prompt-injection quarantine.
+- Release-gated ULW `v1.2.0` checkpoint fields for real MCP runtime contract
+  availability, MCP catalog runtime availability, setup dry-run availability,
+  login dry-run availability, governed MCP smoke availability, and real MCP
+  runtime readiness.
+- Python library facade method for `mcp_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.2.0` for Python packaging and
+  `v1.2.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.1.0` to `v1.2.0`.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real MCP Runtime as the second post-stable live-platform
+  expansion.
+
+### Notes
+
+- `v1.2.0` opens a governed real MCP runtime boundary for catalog, setup,
+  inspection, login dry-run, and fake-client MCP testing. It still does not
+  claim unrestricted production remote MCP server execution, enabled MCP
+  resources/prompts, unattended external MCP operation, or credential material
+  release.
+
 ## v1.1.0 - 2026-06-06
 
 ### Added

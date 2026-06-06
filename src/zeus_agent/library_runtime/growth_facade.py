@@ -10,6 +10,7 @@ from zeus_agent.orchestration_runtime import WorkflowCompileRequest
 from zeus_agent.persona_cockpit_runtime import PersonaCockpitRuntime
 from zeus_agent.platform_cockpit_runtime import PlatformCockpitRuntime
 from zeus_agent.plugin_cockpit_runtime import PluginCockpitRuntime
+from zeus_agent.real_mcp_runtime import build_real_mcp_contract
 from zeus_agent.real_provider_runtime import build_real_provider_contract
 from zeus_agent.research_cockpit_runtime import ResearchCockpitRuntime
 from zeus_agent.skill_cockpit_runtime import SkillCockpitRuntime
@@ -142,4 +143,27 @@ class GrowthFacadeMixin:
             budget_limit=budget_limit,
             budget_requested=budget_requested,
             timeout_ms=timeout_ms,
+        ).to_payload()
+
+    def mcp_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        server_id: str = "mcp.github",
+        include_tools: tuple[str, ...] = (),
+        exclude_tools: tuple[str, ...] = (),
+        resources_requested: bool = False,
+        prompts_requested: bool = False,
+        source_pinned: bool = True,
+        description: str = "Pinned MCP server manifest for governed Zeus runtime.",
+    ) -> dict[str, Any]:
+        return build_real_mcp_contract(
+            scenario=scenario,
+            server_id=server_id,
+            include_tools=include_tools,
+            exclude_tools=exclude_tools,
+            resources_requested=resources_requested,
+            prompts_requested=prompts_requested,
+            source_pinned=source_pinned,
+            description=description,
         ).to_payload()
