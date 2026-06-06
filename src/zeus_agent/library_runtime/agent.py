@@ -9,6 +9,7 @@ from zeus_agent.approval_cockpit_runtime import ApprovalCockpitRuntime
 from zeus_agent.approval_receipt_runtime import ApprovalReceiptResult
 from zeus_agent.approval_receipt_runtime import ApprovalReceiptRuntime
 from zeus_agent.credential_readiness_runtime import CredentialReadinessRuntime
+from zeus_agent.cognitive_provider_activation_runtime import build_cognitive_provider_activation_contract
 from zeus_agent.entry_runtime import ZeusChatRuntime, default_zeus_home
 from zeus_agent.gateway_cockpit_runtime import GatewayCockpitRuntime
 from zeus_agent.gateway_live_delivery_runtime import build_gateway_live_delivery_contract
@@ -1568,6 +1569,21 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
         return build_production_scale_platform_contract(
             scenario=scenario,
             home=self.home,
+            operator_note=operator_note,
+        ).to_payload()
+
+    def cognitive_provider_activation_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        objective: str = "제우스야, build a safe governed workflow from my objective.",
+        provider_kind: str = "fake",
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_cognitive_provider_activation_contract(
+            scenario=scenario,
+            objective=objective,
+            provider_kind=provider_kind,
             operator_note=operator_note,
         ).to_payload()
 

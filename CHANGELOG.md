@@ -2,6 +2,34 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v3.1.0 - 2026-06-06
+
+### Added
+
+- Cognitive Provider Activation runtime that routes Goal Intelligence through
+  the governed `model_runtime.ProviderRegistry` path.
+- `cognitive-provider-activation` CLI command and Python library facade method
+  `ZeusAgent.cognitive_provider_activation_runtime(...)`.
+- Fake cognitive provider JSON output mode behind the `zeus.intent_schema`
+  metadata contract, preserving the default fake provider response for existing
+  callers.
+- Release-gated ULW `v3.1.0` checkpoint fields for cognitive provider
+  activation, model-runtime-to-goal-intelligence bridge, output schema gate,
+  deterministic fallback, goal operating loop, and governed live thin-slice
+  readiness.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==3.1.0` for Python packaging and
+  `v3.1.0` for the GitHub release tag.
+- The public README banner image is replaced with the new Zeus portrait asset.
+
+### Notes
+
+- `v3.1.0` connects cognition to the provider runtime without opening
+  unrestricted external provider execution, raw credential access, handler
+  execution, or live production claims.
+
 ## v3.0.0 - 2026-06-06
 
 ### Added

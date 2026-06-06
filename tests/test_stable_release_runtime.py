@@ -24,7 +24,7 @@ def test_v300_release_gate_reports_stable_live_agent_platform_checkpoint() -> No
     assert payload["stable_platform_public_boundary_ready"] is True
     assert payload["production_ready"] is False
     assert payload["live_production_claimed"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v3.1.0"
     assert "zeus_stable_live_agent_platform_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

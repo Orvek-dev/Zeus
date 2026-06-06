@@ -56,6 +56,8 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v2.3.0",
     "v2.4.0",
     "v3.0.0",
+    "v3.1.0",
+    "v4.0.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -89,6 +91,8 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v2.3.0": "installable_live_platform",
     "v2.4.0": "production_scale_platform",
     "v3.0.0": "zeus_stable_live_agent_platform",
+    "v3.1.0": "intelligence_to_live_execution_platform",
+    "v4.0.0": "productized_zeus_platform",
 }
 
 
@@ -346,6 +350,15 @@ class ReleaseGatedUlwStatus(BaseModel):
     stable_installable_live_platform_ready: bool = False
     stable_production_scale_platform_ready: bool = False
     stable_platform_public_boundary_ready: bool = False
+    cognitive_provider_activation_contract_available: bool = False
+    cognitive_provider_runtime_available: bool = False
+    cognitive_provider_activation_ready: bool = False
+    model_runtime_goal_intelligence_bridge_available: bool = False
+    intent_output_schema_gate_available: bool = False
+    deterministic_cognitive_fallback_available: bool = False
+    goal_operating_loop_available: bool = False
+    governed_live_thin_slice_available: bool = False
+    productized_zeus_platform_contract_available: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -463,6 +476,12 @@ def build_release_gated_ulw_status(
     )
     zeus_stable_live_agent_platform_available = (
         normalized_version == "v3.0.0" and "unknown_target_version" not in blocked_reasons
+    )
+    cognitive_provider_activation_available = (
+        normalized_version == "v3.1.0" and "unknown_target_version" not in blocked_reasons
+    )
+    productized_zeus_platform_available = (
+        normalized_version == "v4.0.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -749,6 +768,15 @@ def build_release_gated_ulw_status(
         stable_installable_live_platform_ready=zeus_stable_live_agent_platform_available,
         stable_production_scale_platform_ready=zeus_stable_live_agent_platform_available,
         stable_platform_public_boundary_ready=zeus_stable_live_agent_platform_available,
+        cognitive_provider_activation_contract_available=cognitive_provider_activation_available,
+        cognitive_provider_runtime_available=cognitive_provider_activation_available,
+        cognitive_provider_activation_ready=cognitive_provider_activation_available,
+        model_runtime_goal_intelligence_bridge_available=cognitive_provider_activation_available,
+        intent_output_schema_gate_available=cognitive_provider_activation_available,
+        deterministic_cognitive_fallback_available=cognitive_provider_activation_available,
+        goal_operating_loop_available=cognitive_provider_activation_available,
+        governed_live_thin_slice_available=cognitive_provider_activation_available,
+        productized_zeus_platform_contract_available=productized_zeus_platform_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -808,6 +836,8 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v2.3.0",
         "v2.4.0",
         "v3.0.0",
+        "v3.1.0",
+        "v4.0.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -829,6 +859,28 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v4.0.0":
+        return (
+            "productized_zeus_platform_manual_qa",
+            "zeus_persona_setup_status_manual_qa",
+            "platform_cockpit_operator_map_manual_qa",
+            "public_docs_banner_sync",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
+    if target_version == "v3.1.0":
+        return (
+            "cognitive_provider_activation_manual_qa",
+            "goal_operating_loop_bridge_manual_qa",
+            "governed_live_thin_slice_boundary_manual_qa",
+            "cognitive_provider_security_boundary_review",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v3.0.0":
         return (
             "zeus_stable_live_agent_platform_manual_qa",
