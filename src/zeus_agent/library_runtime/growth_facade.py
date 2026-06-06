@@ -11,6 +11,7 @@ from zeus_agent.persona_cockpit_runtime import PersonaCockpitRuntime
 from zeus_agent.platform_cockpit_runtime import PlatformCockpitRuntime
 from zeus_agent.plugin_cockpit_runtime import PluginCockpitRuntime
 from zeus_agent.real_mcp_runtime import build_real_mcp_contract
+from zeus_agent.real_platform_runtime import build_real_platform_contract
 from zeus_agent.real_provider_runtime import build_real_provider_contract
 from zeus_agent.research_cockpit_runtime import ResearchCockpitRuntime
 from zeus_agent.skill_cockpit_runtime import SkillCockpitRuntime
@@ -167,3 +168,10 @@ class GrowthFacadeMixin:
             source_pinned=source_pinned,
             description=description,
         ).to_payload()
+
+    def platform_runtime(
+        self,
+        *,
+        scenario: str = "status",
+    ) -> dict[str, Any]:
+        return build_real_platform_contract(scenario=scenario).to_payload()

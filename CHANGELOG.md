@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.3.0 - 2026-06-06
+
+### Added
+
+- Real Platform Runtime and CLI command for API dry-run reporting, gateway
+  loopback session smoke, gateway external-delivery blocking, local session
+  export redaction, and batch/ACP adapter smoke.
+- Release-gated ULW `v1.3.0` checkpoint fields for gateway/API/session platform
+  availability, API dry-run availability, gateway session smoke availability,
+  session export availability, ACP/batch smoke availability, and real platform
+  runtime readiness.
+- Python library facade method for `platform_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.3.0` for Python packaging and
+  `v1.3.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.2.0` to `v1.3.0`.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real Platform Runtime as the third post-stable live-platform
+  expansion.
+
+### Notes
+
+- `v1.3.0` opens a governed API/gateway/session platform boundary. It still
+  does not claim hosted API daemon readiness, external gateway delivery,
+  webhook production execution, unattended operation, or credential material
+  release.
+
 ## v1.2.0 - 2026-06-06
 
 ### Added
