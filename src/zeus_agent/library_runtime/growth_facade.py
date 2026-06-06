@@ -10,6 +10,7 @@ from zeus_agent.orchestration_runtime import WorkflowCompileRequest
 from zeus_agent.persona_cockpit_runtime import PersonaCockpitRuntime
 from zeus_agent.platform_cockpit_runtime import PlatformCockpitRuntime
 from zeus_agent.plugin_cockpit_runtime import PluginCockpitRuntime
+from zeus_agent.real_provider_runtime import build_real_provider_contract
 from zeus_agent.research_cockpit_runtime import ResearchCockpitRuntime
 from zeus_agent.skill_cockpit_runtime import SkillCockpitRuntime
 from zeus_agent.skill_eval_registry_runtime import SkillEvalRegistryRuntime
@@ -117,3 +118,28 @@ class GrowthFacadeMixin:
 
     def persona_status(self, *, profile: Optional[str] = None) -> dict[str, Any]:
         return PersonaCockpitRuntime(self.home).build(profile=profile).to_payload()
+
+    def provider_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        endpoint: str = "https://api.openai.local/v1/chat/completions",
+        allowed_host: str = "api.openai.local",
+        secret_ref: str = "env://ZEUS_V110_PROVIDER_KEY",
+        model_id: str = "gpt-v110-provider",
+        message: str = "summarize Zeus real provider runtime",
+        budget_limit: int = 8,
+        budget_requested: int = 2,
+        timeout_ms: int = 1500,
+    ) -> dict[str, Any]:
+        return build_real_provider_contract(
+            scenario=scenario,
+            endpoint=endpoint,
+            allowed_host=allowed_host,
+            secret_ref=secret_ref,
+            model_id=model_id,
+            message=message,
+            budget_limit=budget_limit,
+            budget_requested=budget_requested,
+            timeout_ms=timeout_ms,
+        ).to_payload()

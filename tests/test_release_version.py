@@ -12,7 +12,7 @@ PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
 def test_exported_package_version_matches_project_metadata() -> None:
     project_version = _project_version(PROJECT_ROOT / "pyproject.toml")
 
-    assert project_version == "1.0.0"
+    assert project_version == "1.1.0"
     assert zeus_agent.__version__ == project_version
 
 

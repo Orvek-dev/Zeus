@@ -2,6 +2,38 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.1.0 - 2026-06-06
+
+### Added
+
+- Real Provider Runtime and CLI command for provider profile reporting,
+  governed local deterministic provider smoke, and controlled external provider
+  receipt validation through explicit operator opt-in, endpoint allowlisting,
+  scoped environment secret references, budget/timeout gates, audit, redaction,
+  and no-production-claim reporting.
+- Release-gated ULW `v1.1.0` checkpoint fields for real provider runtime
+  contract availability, provider profile availability, governed external
+  provider availability, local provider smoke availability, and real provider
+  runtime readiness.
+- Python library facade method for `provider_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.1.0` for Python packaging and
+  `v1.1.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.0.0` to `v1.1.0` and prepares the
+  sequential v1.2.0 through v1.7.0 expansion program.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real Provider Runtime as the first post-stable live-platform
+  expansion.
+
+### Notes
+
+- `v1.1.0` opens a governed real provider runtime boundary. It still does not
+  claim unrestricted production provider execution, unattended live operation,
+  browser execution, remote sandbox execution, or automatic memory/skill
+  promotion.
+
 ## v1.0.0 - 2026-06-06
 
 ### Added

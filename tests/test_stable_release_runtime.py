@@ -22,7 +22,7 @@ def test_v100_release_gate_reports_stable_governed_live_platform_checkpoint() ->
     assert payload["stable_public_release_ready"] is True
     assert payload["production_ready"] is False
     assert payload["live_production_claimed"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.1.0"
     assert "stable_governed_live_platform_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

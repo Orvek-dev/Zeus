@@ -41,6 +41,13 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.0.0-rc.8",
     "v1.0.0-rc.9",
     "v1.0.0",
+    "v1.1.0",
+    "v1.2.0",
+    "v1.3.0",
+    "v1.4.0",
+    "v1.5.0",
+    "v1.6.0",
+    "v1.7.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -59,6 +66,13 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.0.0-rc.8": "provider_owned_client_live",
     "v1.0.0-rc.9": "mcp_owned_client_live",
     "v1.0.0": "stable_governed_live_platform",
+    "v1.1.0": "real_provider_runtime",
+    "v1.2.0": "real_mcp_runtime",
+    "v1.3.0": "gateway_api_session_platform",
+    "v1.4.0": "browser_terminal_sandbox_execution",
+    "v1.5.0": "memory_ontology_production_operation",
+    "v1.6.0": "self_evolution_production_loop",
+    "v1.7.0": "product_ux_platform_status",
 }
 
 
@@ -193,6 +207,11 @@ class ReleaseGatedUlwStatus(BaseModel):
     stable_release_contract_available: bool = False
     stable_governed_live_platform_ready: bool = False
     stable_public_release_ready: bool = False
+    real_provider_runtime_contract_available: bool = False
+    provider_profiles_available: bool = False
+    governed_external_provider_available: bool = False
+    local_provider_smoke_available: bool = False
+    real_provider_runtime_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -265,6 +284,9 @@ def build_release_gated_ulw_status(
     )
     stable_release_contract_available = (
         normalized_version == "v1.0.0" and "unknown_target_version" not in blocked_reasons
+    )
+    real_provider_runtime_contract_available = (
+        normalized_version == "v1.1.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -409,6 +431,11 @@ def build_release_gated_ulw_status(
         stable_release_contract_available=stable_release_contract_available,
         stable_governed_live_platform_ready=stable_release_contract_available,
         stable_public_release_ready=stable_release_contract_available,
+        real_provider_runtime_contract_available=real_provider_runtime_contract_available,
+        provider_profiles_available=real_provider_runtime_contract_available,
+        governed_external_provider_available=real_provider_runtime_contract_available,
+        local_provider_smoke_available=real_provider_runtime_contract_available,
+        real_provider_runtime_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -453,6 +480,13 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.0.0-rc.8",
         "v1.0.0-rc.9",
         "v1.0.0",
+        "v1.1.0",
+        "v1.2.0",
+        "v1.3.0",
+        "v1.4.0",
+        "v1.5.0",
+        "v1.6.0",
+        "v1.7.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -472,6 +506,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.1.0":
+        return (
+            "real_provider_runtime_status_manual_qa",
+            "real_provider_runtime_missing_optin_manual_qa",
+            "real_provider_runtime_budget_block_manual_qa",
+            "real_provider_runtime_local_smoke_manual_qa",
+            "real_provider_runtime_external_receipt_manual_qa",
+            "real_provider_runtime_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.0.0":
         return (
             "stable_governed_live_platform_manual_qa",
