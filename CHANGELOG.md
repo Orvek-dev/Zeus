@@ -2,6 +2,33 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.9.0 - 2026-06-06
+
+### Added
+
+- Production Safe Live Platform Runtime and CLI command for live connector
+  status, provider/MCP dry-run connection smoke, platform/execution boundary
+  checks, activation-required blocking, and secret-boundary scenarios.
+- A product-facing live connector map for external AI provider, MCP server,
+  hosted API, gateway daemon, browser live navigation, terminal/sandbox, and
+  remote sandbox surfaces.
+- Release-gated ULW `v1.9.0` checkpoint fields for the live connector
+  activation layer and production-safe live platform connection surfaces.
+- Python library facade method for `production_live_platform_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.9.0` for Python packaging and
+  `v1.9.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.8.0` to `v1.9.0`.
+
+### Notes
+
+- `v1.9.0` connects the live platform surfaces as governed status, dry-run, and
+  fail-closed boundary contracts. It still does not start hosted API servers,
+  gateway daemons, browser live navigation, remote sandboxes, or unrestricted
+  external provider/MCP execution.
+
 ## v1.8.0 - 2026-06-06
 
 ### Added

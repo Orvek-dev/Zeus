@@ -164,6 +164,7 @@ from zeus_agent.model_runtime import provider_catalog_payload
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
 from zeus_agent.objective_runtime import ObjectiveCompiler
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
+from zeus_agent.production_safe_live_platform_runtime import build_production_safe_live_platform_contract
 from zeus_agent.provider_live_optin_runtime import build_provider_live_optin_contract
 from zeus_agent.provider_owned_client_live_runtime import build_provider_owned_client_live_contract
 from zeus_agent.research_runtime import build_research_brief
@@ -1502,6 +1503,18 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             credential_binding_ref=credential_binding_ref,
             sandbox_policy_ref=sandbox_policy_ref,
             audit_receipt_ref=audit_receipt_ref,
+            operator_note=operator_note,
+        ).to_payload()
+
+    def production_live_platform_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_production_safe_live_platform_contract(
+            scenario=scenario,
+            home=self.home,
             operator_note=operator_note,
         ).to_payload()
 

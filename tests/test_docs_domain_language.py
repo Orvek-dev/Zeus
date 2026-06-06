@@ -144,12 +144,15 @@ STALE_PUBLIC_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
     "tests-1398%20passed",
     "`1398` public tests passed",
     "1398 public tests",
+    "tests-1405%20passed",
+    "`1405` public tests passed",
+    "1405 public tests",
     "`8/8` checks passed",
     "8/8 total",
 )
 CURRENT_PUBLIC_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
-    "tests-1405%20passed",
-    "`1405` public tests passed",
+    "tests-1412%20passed",
+    "`1412` public tests passed",
     "`10/10` checks passed",
     "`9/9` checks passed",
 )

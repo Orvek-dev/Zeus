@@ -273,6 +273,16 @@ class ReleaseGatedUlwStatus(BaseModel):
     audit_receipt_requirement_available: bool = False
     zeus_identity_ready: bool = False
     live_activation_foundation_ready: bool = False
+    production_safe_live_platform_contract_available: bool = False
+    live_connector_activation_layer_available: bool = False
+    external_provider_connection_available: bool = False
+    mcp_production_connection_available: bool = False
+    hosted_api_connection_available: bool = False
+    gateway_daemon_connection_available: bool = False
+    browser_live_connection_available: bool = False
+    terminal_sandbox_connection_available: bool = False
+    remote_sandbox_connection_available: bool = False
+    production_safe_connections_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -369,6 +379,9 @@ def build_release_gated_ulw_status(
     )
     zeus_identity_contract_available = (
         normalized_version == "v1.8.0" and "unknown_target_version" not in blocked_reasons
+    )
+    production_safe_live_platform_contract_available = (
+        normalized_version == "v1.9.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -573,6 +586,16 @@ def build_release_gated_ulw_status(
         audit_receipt_requirement_available=zeus_identity_contract_available,
         zeus_identity_ready=False,
         live_activation_foundation_ready=False,
+        production_safe_live_platform_contract_available=production_safe_live_platform_contract_available,
+        live_connector_activation_layer_available=production_safe_live_platform_contract_available,
+        external_provider_connection_available=production_safe_live_platform_contract_available,
+        mcp_production_connection_available=production_safe_live_platform_contract_available,
+        hosted_api_connection_available=production_safe_live_platform_contract_available,
+        gateway_daemon_connection_available=production_safe_live_platform_contract_available,
+        browser_live_connection_available=production_safe_live_platform_contract_available,
+        terminal_sandbox_connection_available=production_safe_live_platform_contract_available,
+        remote_sandbox_connection_available=production_safe_live_platform_contract_available,
+        production_safe_connections_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -646,6 +669,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.9.0":
+        return (
+            "production_safe_live_platform_status_manual_qa",
+            "production_safe_provider_mcp_connection_manual_qa",
+            "production_safe_platform_execution_boundary_manual_qa",
+            "production_safe_activation_required_block_manual_qa",
+            "production_safe_secret_boundary_manual_qa",
+            "production_safe_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.8.0":
         return (
             "zeus_identity_call_name_manual_qa",
