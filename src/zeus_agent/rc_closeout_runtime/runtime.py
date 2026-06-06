@@ -30,14 +30,14 @@ _REMAINING_CHECKPOINTS: Final[tuple[str, ...]] = (
 )
 _BOUNDARY_NOTES: Final[tuple[str, ...]] = (
     "W205-W212 are local micro checkpoints, not official macro design waves.",
-    "The official macro target remains Wave 9: Hermes-Parity Release Candidate.",
+    "The official macro target remains Wave 9: Zeus Live Platform Release Candidate.",
     "Public releases can report source/test coverage without private plans or evidence artifacts.",
     "RC evidence can prove dry-run and beta breadth; production-ready live surfaces need separate opt-in proof.",
 )
 _SPECS: Final[tuple[MacroWaveSpec, ...]] = (
     MacroWaveSpec(
         wave_id="W1",
-        title="Product Shell And Hermes-Compatible Entry",
+        title="Product Shell And Zeus Entry",
         source_dirs=("entry_runtime", "setup_runtime", "doctor_runtime", "work_entry_runtime"),
         test_terms=("entry_provider_api", "chat_entry", "work_entry", "golden_journeys"),
         evidence_terms=("live-beta", "live-readiness", "golden", "entry"),
@@ -108,7 +108,7 @@ _SPECS: Final[tuple[MacroWaveSpec, ...]] = (
     ),
     MacroWaveSpec(
         wave_id="W9",
-        title="Hermes-Parity Release Candidate",
+        title="Zeus Live Platform Release Candidate",
         source_dirs=("eval", "platform_cockpit_runtime", "live_readiness_runtime", "security_cockpit_runtime"),
         test_terms=("golden", "platform", "security", "live_readiness", "wave205"),
         evidence_terms=("golden", "platform", "security", "w205", "release"),

@@ -2,6 +2,36 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.8.0 - 2026-06-06
+
+### Added
+
+- Zeus Identity Activation Runtime and CLI command for identity status, Korean
+  call-name smoke, activation status, activation-check, and secret-boundary
+  blocking scenarios.
+- Explicit Zeus call-name contract for `Zeus` and `제우스`, including the
+  Korean response `네, 제우스입니다.`.
+- Release-gated ULW `v1.8.0` checkpoint fields for Zeus identity, call-name
+  runtime, live activation contract, activation gate, objective, runtime lease,
+  approval, credential binding, sandbox policy, and audit receipt requirements.
+- Python library facade method for `identity_activation_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.8.0` for Python packaging and
+  `v1.8.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.7.0` to `v1.8.0`.
+- Persona cockpit and chat call-name handling now return `네, 제우스입니다.`
+  for `제우스` / `제우스야`.
+- RC macro wording now names the Zeus Live Platform Release Candidate instead
+  of a Hermes-parity target.
+
+### Notes
+
+- `v1.8.0` does not open production live execution. It makes the common live
+  activation prerequisites explicit before future provider, MCP, gateway,
+  browser, terminal, sandbox, or hosted API execution can be claimed.
+
 ## v1.7.0 - 2026-06-06
 
 ### Added

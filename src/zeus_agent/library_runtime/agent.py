@@ -178,6 +178,7 @@ from zeus_agent.tool_cockpit_runtime import ToolCockpitRuntime
 from zeus_agent.setup_runtime import setup_apply
 from zeus_agent.workflow_cockpit_runtime import WorkflowCockpitRuntime
 from zeus_agent.work_entry_runtime import WorkEntryRuntime
+from zeus_agent.zeus_identity_activation_runtime import build_zeus_identity_activation_contract
 
 
 class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
@@ -1478,6 +1479,31 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
 
     def stable_release(self, *, raw_release_note: str = "") -> dict[str, Any]:
         return build_stable_release_contract(raw_release_note=raw_release_note).to_payload()
+
+    def identity_activation_runtime(
+        self,
+        *,
+        scenario: str = "identity-status",
+        message: Optional[str] = None,
+        objective_id: Optional[str] = None,
+        lease_id: Optional[str] = None,
+        approval_id: Optional[str] = None,
+        credential_binding_ref: Optional[str] = None,
+        sandbox_policy_ref: Optional[str] = None,
+        audit_receipt_ref: Optional[str] = None,
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_zeus_identity_activation_contract(
+            scenario=scenario,
+            message=message,
+            objective_id=objective_id,
+            lease_id=lease_id,
+            approval_id=approval_id,
+            credential_binding_ref=credential_binding_ref,
+            sandbox_policy_ref=sandbox_policy_ref,
+            audit_receipt_ref=audit_receipt_ref,
+            operator_note=operator_note,
+        ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:
         return McpCockpitRuntime().build(server_id=server_id).to_payload()

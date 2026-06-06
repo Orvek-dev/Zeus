@@ -9,7 +9,7 @@ from zeus_agent import ZeusAgent
 from zeus_agent.cli import app
 
 
-def test_chat_command_defaults_to_hermes_compatible_zeus_persona(tmp_path: Path) -> None:
+def test_chat_command_defaults_to_zeus_persona(tmp_path: Path) -> None:
     runner = CliRunner()
 
     result = runner.invoke(

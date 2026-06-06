@@ -55,7 +55,7 @@ class RealProductPlatformContract(BaseModel):
     public_boundary_ready: bool = False
     production_ready: bool = False
     zeus_call_response: Literal["Zeus is here."] = "Zeus is here."
-    zeus_korean_call_response: Literal["네, Zeus입니다."] = "네, Zeus입니다."
+    zeus_korean_call_response: Literal["네, 제우스입니다."] = "네, 제우스입니다."
     persona_contract: Optional[dict[str, JsonValue]] = None
     platform_contract: Optional[dict[str, JsonValue]] = None
     live_cockpit_contract: Optional[dict[str, JsonValue]] = None

@@ -70,7 +70,7 @@ Hermes remains upstream/reference only. Mercury is the Zeus internal transport p
 | Workflow Pattern Router | Classifier that selects `classify-and-act`, `fan-out-and-synthesize`, `adversarial-verification`, `generate-and-filter`, `tournament`, `loop-until-done`, or a composed pattern. | one fixed ULW loop |
 | Why Not Critique Loop | Runtime review checkpoint where Zeus asks whether the current workflow is still the best way to reach the objective. | unbounded second guessing |
 | Workflow Improvement Candidate | Evidence-backed proposal to change future workflow defaults, stored through Demeter and reviewed through Prometheus. | automatic rule rewrite |
-| Hermes parity target | Capability and UX breadth target comparable to Hermes practical live platform mass. | line-count padding |
+| Platform breadth target | Capability and UX breadth target comparable to practical live agent platform mass. | line-count padding |
 
 ## Entities
 
@@ -279,7 +279,7 @@ Zeus must provide two simultaneous experiences.
 
 ### Light General Agent
 
-This is the Hermes-compatible entry feeling:
+This is the Zeus general-agent entry feeling:
 
 - direct chat;
 - model switching;
@@ -406,7 +406,7 @@ direction.
 | Batch runner | `zeus batch run`, `zeus batch export` | Eval, datasets, trajectories. |
 | Web dashboard | local cockpit | Sessions, tools, active leases, memory, audit, runs. |
 
-## Hermes-Compatible UX Guarantees
+## Zeus Platform UX Guarantees
 
 Zeus must not burden Hermes users during basic use.
 
@@ -1084,7 +1084,7 @@ Safety rules:
 
 ## Implementation Waves
 
-### Wave 1: Product Shell And Hermes-Compatible Entry
+### Wave 1: Product Shell And Zeus Entry
 
 Deliver:
 
@@ -1257,7 +1257,7 @@ Exit criteria:
 - plugins are manifest-gated;
 - trajectories are exportable and redacted.
 
-### Wave 9: Hermes-Parity Release Candidate
+### Wave 9: Zeus Live Platform Release Candidate
 
 Deliver:
 

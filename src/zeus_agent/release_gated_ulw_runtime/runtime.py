@@ -48,6 +48,9 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.5.0",
     "v1.6.0",
     "v1.7.0",
+    "v1.8.0",
+    "v1.9.0",
+    "v2.0.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -73,6 +76,9 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.5.0": "memory_ontology_production_operation",
     "v1.6.0": "self_evolution_production_loop",
     "v1.7.0": "product_ux_platform_status",
+    "v1.8.0": "zeus_identity_live_activation_foundation",
+    "v1.9.0": "production_safe_live_platform_connections",
+    "v2.0.0": "goal_intelligence_adaptive_execution_platform",
 }
 
 
@@ -255,6 +261,18 @@ class ReleaseGatedUlwStatus(BaseModel):
     operator_command_map_available: bool = False
     public_boundary_report_available: bool = False
     product_platform_ready: bool = False
+    zeus_identity_contract_available: bool = False
+    zeus_call_name_runtime_available: bool = False
+    live_activation_contract_available: bool = False
+    activation_gate_available: bool = False
+    objective_requirement_available: bool = False
+    lease_requirement_available: bool = False
+    approval_requirement_available: bool = False
+    credential_binding_requirement_available: bool = False
+    sandbox_policy_requirement_available: bool = False
+    audit_receipt_requirement_available: bool = False
+    zeus_identity_ready: bool = False
+    live_activation_foundation_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -348,6 +366,9 @@ def build_release_gated_ulw_status(
     )
     real_product_platform_contract_available = (
         normalized_version == "v1.7.0" and "unknown_target_version" not in blocked_reasons
+    )
+    zeus_identity_contract_available = (
+        normalized_version == "v1.8.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -540,6 +561,18 @@ def build_release_gated_ulw_status(
         operator_command_map_available=real_product_platform_contract_available,
         public_boundary_report_available=real_product_platform_contract_available,
         product_platform_ready=False,
+        zeus_identity_contract_available=zeus_identity_contract_available,
+        zeus_call_name_runtime_available=zeus_identity_contract_available,
+        live_activation_contract_available=zeus_identity_contract_available,
+        activation_gate_available=zeus_identity_contract_available,
+        objective_requirement_available=zeus_identity_contract_available,
+        lease_requirement_available=zeus_identity_contract_available,
+        approval_requirement_available=zeus_identity_contract_available,
+        credential_binding_requirement_available=zeus_identity_contract_available,
+        sandbox_policy_requirement_available=zeus_identity_contract_available,
+        audit_receipt_requirement_available=zeus_identity_contract_available,
+        zeus_identity_ready=False,
+        live_activation_foundation_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -591,6 +624,9 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.5.0",
         "v1.6.0",
         "v1.7.0",
+        "v1.8.0",
+        "v1.9.0",
+        "v2.0.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if raw_secret_marker_detected:
@@ -610,6 +646,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.8.0":
+        return (
+            "zeus_identity_call_name_manual_qa",
+            "zeus_identity_chat_smoke_manual_qa",
+            "live_activation_contract_manual_qa",
+            "live_activation_missing_lease_block_manual_qa",
+            "live_activation_secret_boundary_manual_qa",
+            "identity_activation_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.7.0":
         return (
             "product_platform_status_manual_qa",

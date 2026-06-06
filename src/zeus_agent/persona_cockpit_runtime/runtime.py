@@ -35,7 +35,7 @@ class PersonaCockpitResult(BaseModel):
     display_name: Literal["Zeus"] = "Zeus"
     tagline: Literal["Goal-oriented AI agent"] = "Goal-oriented AI agent"
     default_call_response: Literal["Zeus is here."] = "Zeus is here."
-    korean_call_response: Literal["네, Zeus입니다."] = "네, Zeus입니다."
+    korean_call_response: Literal["네, 제우스입니다."] = "네, 제우스입니다."
     profile_count: int
     session_count: int
     provider_profile_count: int

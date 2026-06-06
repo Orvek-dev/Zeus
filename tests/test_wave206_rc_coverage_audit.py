@@ -21,7 +21,7 @@ def test_rc_coverage_audit_reports_all_macro_waves_and_latest_checkpoint() -> No
     assert result.network_opened is False
     assert result.no_secret_echo is True
     assert tuple(wave.wave_id for wave in result.macro_waves) == tuple(f"W{number}" for number in range(1, 10))
-    assert result.macro_waves[-1].title == "Hermes-Parity Release Candidate"
+    assert result.macro_waves[-1].title == "Zeus Live Platform Release Candidate"
     assert result.remaining_checkpoints == ("W206", "W207", "W208", "W209", "W210", "W211", "W212")
 
 

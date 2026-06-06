@@ -26,7 +26,7 @@ def test_v170_release_gate_reports_product_platform_checkpoint() -> None:
     assert payload["public_boundary_report_available"] is True
     assert payload["product_platform_ready"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v1.8.0"
     assert "product_platform_status_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 
@@ -40,7 +40,7 @@ def test_real_product_platform_status_aggregates_user_facing_surfaces(tmp_path: 
     assert payload["objective_contract_id"] == "zeus.v1.7.0.product_ux_platform_status"
     assert payload["status_surface_count"] >= 6
     assert payload["zeus_call_response"] == "Zeus is here."
-    assert payload["zeus_korean_call_response"] == "네, Zeus입니다."
+    assert payload["zeus_korean_call_response"] == "네, 제우스입니다."
     assert payload["persona_contract"]["decision"] == "report"
     assert payload["platform_contract"]["decision"] == "report"
     assert payload["live_cockpit_contract"]["decision"] == "report"

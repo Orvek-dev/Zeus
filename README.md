@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.7.0"><img alt="Version" src="https://img.shields.io/badge/version-1.7.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v1.8.0"><img alt="Version" src="https://img.shields.io/badge/version-1.8.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1398%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1405%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,7 +35,7 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v1.7.0` source release builds on the
+an unconstrained chat loop. The public `v1.8.0` source release builds on the
 stable governed live platform boundary with Real Provider Runtime, Real MCP
 Runtime, Real Platform Runtime, Real Execution Runtime, and Real Memory
 Operation Runtime, Real Self Evolution Runtime, and Real Product Platform
@@ -52,7 +52,8 @@ retention delete, skill-learning memory bridge, promotion block,
 eval-learning smoke, reviewable skill proposal smoke, workflow critique memory,
 self-evolution promotion block, product platform status aggregation,
 persona/work profile smoke, platform cockpit smoke, live status smoke,
-operator command map, public boundary reporting, explicit
+operator command map, public boundary reporting, Zeus identity/call-name
+activation status, live activation contract checks, explicit
 opt-in, endpoint allowlisting, scoped secret references, budget/timeout gates,
 audit, redaction, cleanup, and no-production-claim controls.
 Provider, MCP, memory, and sandbox/terminal smoke paths remain governed by
@@ -94,6 +95,10 @@ zeus release-gated-ulw --target-version v1.4.0 --json
 zeus release-gated-ulw --target-version v1.5.0 --json
 zeus release-gated-ulw --target-version v1.6.0 --json
 zeus release-gated-ulw --target-version v1.7.0 --json
+zeus release-gated-ulw --target-version v1.8.0 --json
+zeus identity-activation-runtime --scenario identity-status --json
+zeus identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json
+zeus identity-activation-runtime --scenario activation-check --objective-id objective.demo --lease-id lease.demo --approval-id approval.demo --credential-binding-ref credential.demo --sandbox-policy-ref sandbox.demo --audit-receipt-ref audit.demo --json
 zeus stable-release --json
 zeus provider-runtime --scenario status --json
 zeus provider-runtime --scenario local-deterministic-smoke --message "hello Zeus" --json
@@ -272,7 +277,7 @@ gravity is different.
 | --- | --- | --- |
 | Primary product shape | General-purpose self-improving agent that lives across CLI, gateway, ACP, batch, API, and library surfaces | Goal-oriented governed runtime that turns objectives into contracts and evidence obligations |
 | Core loop | `AIAgent` builds prompts, resolves providers, dispatches tools, persists sessions, and continues conversation | Objective compiler -> authority gate -> work-loop plan -> runtime dispatch -> evidence -> promotion decision |
-| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.7.0 governed live platform with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, loopback provider HTTP smoke, loopback MCP HTTP smoke, MCP prompt-injection scan, loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, Provider Live Opt-in external receipt validation, Provider Owned Client Live adapter execution, MCP Owned Client Live remote tool execution, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, stable release contract, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
+| Runtime breadth | Mature live platform with many providers, tools, toolsets, gateways, terminal/browser/web/MCP backends, memory, skills, and cron | Public v1.8.0 governed live platform with deterministic CLI/API/gateway/ACP/batch/library entrypoint contracts, Tool Limbs, native tool catalog, MCP discovery contract, API connector contract, local MemoryGraph, LLM Wiki, ontology review queue, skill-learning memory bridge, adaptive workflow pattern selection, critique checkpoints, live readiness, opt-in smoke, live cockpit, provider/MCP/gateway beta contracts, identity/auth/approval/lease/credential/secret/audit/sandbox controls, production foundation contracts, loopback provider HTTP smoke, loopback MCP HTTP smoke, MCP prompt-injection scan, loopback gateway delivery, governed local sandbox command smoke, browser live-navigation guard, Memory Privacy Live secret quarantine, retention deletion, cross-session search default-deny, no-auto-promotion posture, Provider Live Opt-in external receipt validation, Provider Owned Client Live adapter execution, MCP Owned Client Live remote tool execution, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, Zeus Identity Activation Runtime, stable release contract, release-gated authority/lease evidence, total architecture contracts, and Zeus Core Language |
 | Safety center | Approval, profile isolation, tool availability, command checks, gateway authorization, and platform controls | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo checks, and promotion blocks |
 | Self-improvement | Built-in learning loop and skill creation from experience | Validation-gated skill-evolution queue; proposed skills cannot self-promote, widen authority, enable live transport, or bypass evidence |
 | Completion model | Conversational progress and tool-visible execution | Evidence-backed completion; "done" is blocked when objective, artifact, verification, or promotion evidence is missing |
@@ -288,8 +293,9 @@ Read the longer comparison in [docs/hermes-comparison.md](docs/hermes-comparison
 
 ## Live Connection Design
 
-`v1.7.0` includes Real Product Platform Runtime on top of the real provider,
-MCP, platform, execution, memory operation, and self-evolution boundaries. It
+`v1.8.0` includes Zeus Identity Activation Runtime on top of Real Product
+Platform Runtime and the real provider, MCP, platform, execution, memory
+operation, and self-evolution boundaries. It
 also preserves the public MCP Owned Client Live checkpoint. It proves provider profile reporting,
 local deterministic provider smoke, controlled external provider receipt
 validation, MCP catalog/setup/list/inspect, governed fake-client MCP testing,
@@ -310,7 +316,10 @@ no ontology/learned-rule auto-promotion, and no ordinary network access.
 Sandbox Terminal Live remains available for governed local terminal/sandbox
 execution. Product Platform Runtime now composes the persona, platform, live,
 model, MCP, and runtime cockpit surfaces into a user-facing operator status and
-command map without opening live production execution. Native tools, web
+command map without opening live production execution. Identity Activation
+Runtime makes "Zeus" and "제우스" call names explicit and checks objective,
+lease, approval, credential binding, sandbox policy, and audit receipt before a
+live activation contract can be marked ready. Native tools, web
 research, browser automation, remote sandboxes,
 remote MCP servers, hosted gateways, and production external AI APIs remain
 future live surfaces that must pass through entrypoint contracts, adaptive
@@ -342,11 +351,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, Stable Release, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, core language, release version, public docs hygiene, and total architecture surfaces | `1398` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, Stable Release, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, Zeus Identity Activation Runtime, core language, release version, public docs hygiene, and total architecture surfaces | `1405` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.7.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==1.8.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | release-gated after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -356,32 +365,41 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v1.7.0 Readiness
+## v1.8.0 Readiness
 
-`v1.7.0` is the seventh post-stable governed live platform expansion. The
+`v1.8.0` is the eighth post-stable governed live platform expansion. The
 supported public surface is:
 
 - local deterministic CLI scenarios through `zeus`;
 - `release-gated-ulw --target-version v1.0.0 --json` for the sequential
   v0.6.0 -> v1.0.0 release-gate program contract;
 - `release-gated-ulw --target-version v1.1.0 --json` for the first post-stable
-  release-gate checkpoint and the v1.2.0 -> v1.7.0 expansion program order;
+  release-gate checkpoint and the v1.2.0 -> v1.8.0 expansion program order;
 - `release-gated-ulw --target-version v1.2.0 --json` for the second
-  post-stable release-gate checkpoint and the v1.3.0 -> v1.7.0 expansion
+  post-stable release-gate checkpoint and the v1.3.0 -> v1.8.0 expansion
   program order;
 - `release-gated-ulw --target-version v1.3.0 --json` for the third
-  post-stable release-gate checkpoint and the v1.4.0 -> v1.7.0 expansion
+  post-stable release-gate checkpoint and the v1.4.0 -> v1.8.0 expansion
   program order;
 - `release-gated-ulw --target-version v1.4.0 --json` for the fourth
-  post-stable release-gate checkpoint and the v1.5.0 -> v1.7.0 expansion
+  post-stable release-gate checkpoint and the v1.5.0 -> v1.8.0 expansion
   program order;
 - `release-gated-ulw --target-version v1.5.0 --json` for the fifth
-  post-stable release-gate checkpoint and the v1.6.0 -> v1.7.0 expansion
+  post-stable release-gate checkpoint and the v1.6.0 -> v1.8.0 expansion
   program order;
 - `release-gated-ulw --target-version v1.6.0 --json` for the sixth
-  post-stable release-gate checkpoint and the v1.7.0 expansion program order;
+  post-stable release-gate checkpoint and the v1.7.0 -> v1.8.0 expansion
+  program order;
 - `release-gated-ulw --target-version v1.7.0 --json` for the seventh
   post-stable release-gate checkpoint and product UX/platform status boundary;
+- `release-gated-ulw --target-version v1.8.0 --json` for the eighth
+  post-stable release-gate checkpoint and identity/live activation boundary;
+- `identity-activation-runtime --scenario identity-status --json` for Zeus
+  persona identity and call-name contract reporting;
+- `identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json`
+  for the explicit Korean call-name response;
+- `identity-activation-runtime --scenario activation-check --json` for the
+  common live activation requirement gate;
 - `provider-runtime --scenario status --json` for provider profile reporting
   without opening network access or reading credential material;
 - `provider-runtime --scenario local-deterministic-smoke --json` for governed
@@ -691,7 +709,7 @@ docs/                     public architecture and Hermes comparison notes
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus should keep a governed kernel/runtime split |
 | [Hermes-grade platform master design](docs/hermes-grade-platform-master-design.md) | Target product, UX, architecture, security, and roadmap contract for reaching at least Hermes-half live platform breadth |
 | [Live connection architecture](docs/live-connection-architecture.md) | Target design for real AI API, MCP, tool, gateway, web, browser, terminal, and sandbox connections |
-| [Security policy](SECURITY.md) | Public security posture and current v1.7.0 boundary |
+| [Security policy](SECURITY.md) | Public security posture and current v1.8.0 boundary |
 | [Changelog](CHANGELOG.md) | Release history and public-safe notes |
 
 ## License

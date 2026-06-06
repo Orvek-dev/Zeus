@@ -17,7 +17,7 @@ def test_persona_cockpit_reports_zeus_identity_without_starting_chat(tmp_path: P
     assert result.persona_id == "zeus"
     assert result.display_name == "Zeus"
     assert result.default_call_response == "Zeus is here."
-    assert result.korean_call_response == "네, Zeus입니다."
+    assert result.korean_call_response == "네, 제우스입니다."
     assert result.profile_count >= 7
     assert result.selected_profile is None
     assert "zeus persona --profile work --json" in result.recommended_next_commands

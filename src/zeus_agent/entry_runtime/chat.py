@@ -93,6 +93,9 @@ class ZeusChatRuntime:
 
 
 def _assistant_reply(message: str, provider_name: str) -> str:
+    call_response = _call_response(message)
+    if call_response is not None:
+        return call_response
     if _looks_like_objective(message):
         return (
             "Zeus is here. I can turn this into an objective contract, then "
@@ -102,6 +105,15 @@ def _assistant_reply(message: str, provider_name: str) -> str:
         "Zeus is here. I can answer in chat mode using {0}; objective controls "
         "stay inactive until the task needs authority, tools, or external systems."
     ).format(provider_name)
+
+
+def _call_response(message: str) -> str | None:
+    normalized = message.strip().casefold()
+    if normalized in {"제우스", "제우스야"}:
+        return "네, 제우스입니다."
+    if normalized in {"zeus", "zeus.", "hey zeus", "hello zeus"}:
+        return "Zeus is here."
+    return None
 
 
 def _looks_like_objective(message: str) -> bool:
