@@ -237,6 +237,14 @@ class ReleaseGatedUlwStatus(BaseModel):
     retention_delete_operation_available: bool = False
     skill_learning_memory_bridge_available: bool = False
     real_memory_operation_ready: bool = False
+    real_self_evolution_contract_available: bool = False
+    skill_eval_runtime_available: bool = False
+    skill_eval_registry_available: bool = False
+    skill_evolution_runtime_available: bool = False
+    skill_learning_runtime_available: bool = False
+    workflow_learning_runtime_available: bool = False
+    promotion_review_gate_available: bool = False
+    real_self_evolution_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -324,6 +332,9 @@ def build_release_gated_ulw_status(
     )
     real_memory_operation_contract_available = (
         normalized_version == "v1.5.0" and "unknown_target_version" not in blocked_reasons
+    )
+    real_self_evolution_contract_available = (
+        normalized_version == "v1.6.0" and "unknown_target_version" not in blocked_reasons
     )
     result = ReleaseGatedUlwStatus(
         decision="blocked" if blocked_reasons else "report",
@@ -498,6 +509,14 @@ def build_release_gated_ulw_status(
         retention_delete_operation_available=real_memory_operation_contract_available,
         skill_learning_memory_bridge_available=real_memory_operation_contract_available,
         real_memory_operation_ready=False,
+        real_self_evolution_contract_available=real_self_evolution_contract_available,
+        skill_eval_runtime_available=real_self_evolution_contract_available,
+        skill_eval_registry_available=real_self_evolution_contract_available,
+        skill_evolution_runtime_available=real_self_evolution_contract_available,
+        skill_learning_runtime_available=real_self_evolution_contract_available,
+        workflow_learning_runtime_available=real_self_evolution_contract_available,
+        promotion_review_gate_available=real_self_evolution_contract_available,
+        real_self_evolution_ready=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -568,6 +587,20 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v1.6.0":
+        return (
+            "real_self_evolution_status_manual_qa",
+            "real_self_evolution_eval_learning_manual_qa",
+            "real_self_evolution_skill_proposal_manual_qa",
+            "real_self_evolution_workflow_critique_memory_manual_qa",
+            "real_self_evolution_promotion_block_manual_qa",
+            "real_self_evolution_secret_boundary_manual_qa",
+            "real_self_evolution_cli_library_regression_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v1.5.0":
         return (
             "real_memory_operation_status_manual_qa",

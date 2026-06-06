@@ -15,6 +15,7 @@ from zeus_agent.real_memory_operation_runtime import build_real_memory_operation
 from zeus_agent.real_mcp_runtime import build_real_mcp_contract
 from zeus_agent.real_platform_runtime import build_real_platform_contract
 from zeus_agent.real_provider_runtime import build_real_provider_contract
+from zeus_agent.real_self_evolution_runtime import build_real_self_evolution_contract
 from zeus_agent.research_cockpit_runtime import ResearchCockpitRuntime
 from zeus_agent.skill_cockpit_runtime import SkillCockpitRuntime
 from zeus_agent.skill_eval_registry_runtime import SkillEvalRegistryRuntime
@@ -196,4 +197,16 @@ class GrowthFacadeMixin:
             scenario=scenario,
             home=self.home,
             subject=subject,
+        ).to_payload()
+
+    def self_evolution_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        objective: str = "Improve Zeus governed workflow efficiency from verified eval evidence.",
+    ) -> dict[str, Any]:
+        return build_real_self_evolution_contract(
+            scenario=scenario,
+            home=self.home,
+            objective=objective,
         ).to_payload()

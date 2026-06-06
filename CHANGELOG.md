@@ -2,6 +2,33 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.6.0 - 2026-06-06
+
+### Added
+
+- Real Self Evolution Runtime and CLI command for eval-learning smoke,
+  reviewable skill proposal smoke, workflow critique memory recording,
+  promotion blocking, and secret-boundary scenarios.
+- Release-gated ULW `v1.6.0` checkpoint fields for skill eval, eval registry,
+  skill evolution, skill learning, workflow learning, promotion review gates,
+  and real self-evolution readiness.
+- Python library facade method for `self_evolution_runtime(...)`.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==1.6.0` for Python packaging and
+  `v1.6.0` for the GitHub release tag.
+- Release-gated ULW now advances `v1.5.0` to `v1.6.0`.
+- README, security policy, Hermes comparison, and live connection architecture
+  now describe Real Self Evolution Runtime as the sixth post-stable
+  live-platform expansion.
+
+### Notes
+
+- `v1.6.0` can turn verified eval/workflow evidence into reviewable learning
+  candidates and local critique memory. It does not auto-promote active skills,
+  active rules, workflow patterns, authority, memory, or production live state.
+
 ## v1.5.0 - 2026-06-06
 
 ### Added
