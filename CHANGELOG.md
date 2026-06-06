@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v2.1.0 - 2026-06-06
+
+### Added
+
+- Kernel-throughput integration runtime that routes governed live-capable
+  provider smoke work through a trusted governance record, `CapabilityBroker`,
+  scoped authority, approval, live promotion guard, and a broker evidence
+  target before a handler can execute. Broker dispatch evidence is recorded
+  before success is reported.
+- Live capability registry for the governed `provider.local-smoke` capability.
+- Red test pack for authority boundary properties, governed live dispatch, raw
+  secret blocking, and `v2.1.0` release-gate broker-evidence requirements.
+- Release-gated ULW `v2.1.0` checkpoint fields for broker dispatch and broker
+  evidence enforcement.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==2.1.0` for Python packaging and
+  `v2.1.0` for the GitHub release tag.
+- Release-gated ULW now reports the kernel-throughput integration checkpoint
+  after the v2.0.0 goal-intelligence boundary.
+
+### Notes
+
+- `v2.1.0` does not open production external provider, MCP, gateway, browser,
+  terminal, or remote sandbox execution. It narrows the next production-live
+  step by making broker evidence a release-gate requirement before production
+  readiness can be claimed.
+
 ## v2.0.0 - 2026-06-06
 
 ### Added

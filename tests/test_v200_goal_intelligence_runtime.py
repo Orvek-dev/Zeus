@@ -28,7 +28,7 @@ def test_v200_release_gate_reports_goal_intelligence_checkpoint() -> None:
     assert payload["eval_loop_runtime_available"] is True
     assert payload["goal_intelligence_ready"] is False
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v2.1.0"
     assert "goal_intelligence_objective_understanding_manual_qa" in payload["required_checkpoint_evidence"]
     assert payload["no_secret_echo"] is True
 

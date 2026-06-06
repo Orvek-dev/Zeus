@@ -161,7 +161,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v2.0.0 Boundary
+## Current v2.1.0 Boundary
 
 Implemented public foundation:
 
@@ -247,7 +247,7 @@ Implemented public foundation:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 1420 public tests, a 10/10 final architecture eval, and a 9/9 total
+- 1435 public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
 - release-gated ULW status for the v0.6.0 -> v2.0.0 program with
   v2.0.0 goal intelligence checkpoint reporting;

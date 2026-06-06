@@ -51,6 +51,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.8.0",
     "v1.9.0",
     "v2.0.0",
+    "v2.1.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -79,6 +80,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.8.0": "zeus_identity_live_activation_foundation",
     "v1.9.0": "production_safe_live_platform_connections",
     "v2.0.0": "goal_intelligence_adaptive_execution_platform",
+    "v2.1.0": "kernel_throughput_integration",
 }
 
 
@@ -292,6 +294,12 @@ class ReleaseGatedUlwStatus(BaseModel):
     workflow_critic_runtime_available: bool = False
     eval_loop_runtime_available: bool = False
     goal_intelligence_ready: bool = False
+    kernel_throughput_integration_available: bool = False
+    governed_live_dispatcher_available: bool = False
+    live_capability_registry_available: bool = False
+    broker_dispatch_required: bool = False
+    broker_evidence_required: bool = False
+    broker_evidence_recorded: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -395,8 +403,14 @@ def build_release_gated_ulw_status(
     goal_intelligence_contract_available = (
         normalized_version == "v2.0.0" and "unknown_target_version" not in blocked_reasons
     )
+    kernel_throughput_integration_available = (
+        normalized_version == "v2.1.0" and "unknown_target_version" not in blocked_reasons
+    )
+    fatal_blocked_reasons = tuple(
+        reason for reason in blocked_reasons if reason != "broker_evidence_required"
+    )
     result = ReleaseGatedUlwStatus(
-        decision="blocked" if blocked_reasons else "report",
+        decision="blocked" if fatal_blocked_reasons else "report",
         target_version=normalized_version,
         release_stage=stage,
         next_version=_next_version(normalized_version),
@@ -617,6 +631,12 @@ def build_release_gated_ulw_status(
         workflow_critic_runtime_available=goal_intelligence_contract_available,
         eval_loop_runtime_available=goal_intelligence_contract_available,
         goal_intelligence_ready=False,
+        kernel_throughput_integration_available=kernel_throughput_integration_available,
+        governed_live_dispatcher_available=kernel_throughput_integration_available,
+        live_capability_registry_available=kernel_throughput_integration_available,
+        broker_dispatch_required=kernel_throughput_integration_available,
+        broker_evidence_required=kernel_throughput_integration_available,
+        broker_evidence_recorded=False,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -671,8 +691,11 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.8.0",
         "v1.9.0",
         "v2.0.0",
+        "v2.1.0",
     }:
         reasons.append("prior_release_checkpoint_required")
+    if target_version == "v2.1.0":
+        reasons.append("broker_evidence_required")
     if raw_secret_marker_detected:
         reasons.append("raw_secret_marker_detected")
     return tuple(reasons)
@@ -690,6 +713,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v2.1.0":
+        return (
+            "kernel_throughput_integration_broker_evidence_manual_qa",
+            "kernel_throughput_integration_adversarial_boundary_manual_qa",
+            "kernel_throughput_integration_release_gate_manual_qa",
+            "kernel_throughput_integration_docs_boundary_sync",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v2.0.0":
         return (
             "goal_intelligence_objective_understanding_manual_qa",
