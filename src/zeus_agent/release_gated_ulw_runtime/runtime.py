@@ -52,6 +52,10 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v1.9.0",
     "v2.0.0",
     "v2.1.0",
+    "v2.2.0",
+    "v2.3.0",
+    "v2.4.0",
+    "v3.0.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -81,6 +85,10 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v1.9.0": "production_safe_live_platform_connections",
     "v2.0.0": "goal_intelligence_adaptive_execution_platform",
     "v2.1.0": "kernel_throughput_integration",
+    "v2.2.0": "goal_intelligence_platform",
+    "v2.3.0": "installable_live_platform",
+    "v2.4.0": "production_scale_platform",
+    "v3.0.0": "zeus_stable_live_agent_platform",
 }
 
 
@@ -286,6 +294,11 @@ class ReleaseGatedUlwStatus(BaseModel):
     remote_sandbox_connection_available: bool = False
     production_safe_connections_ready: bool = False
     goal_intelligence_contract_available: bool = False
+    intent_frame_available: bool = False
+    acceptance_criteria_available: bool = False
+    deep_interview_loop_available: bool = False
+    governed_cognitive_provider_available: bool = False
+    workloop_goal_bridge_available: bool = False
     objective_understanding_runtime_available: bool = False
     deep_interview_runtime_available: bool = False
     user_context_model_available: bool = False
@@ -405,6 +418,9 @@ def build_release_gated_ulw_status(
     )
     kernel_throughput_integration_available = (
         normalized_version == "v2.1.0" and "unknown_target_version" not in blocked_reasons
+    )
+    goal_intelligence_platform_available = (
+        normalized_version == "v2.2.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -622,14 +638,35 @@ def build_release_gated_ulw_status(
         terminal_sandbox_connection_available=production_safe_live_platform_contract_available,
         remote_sandbox_connection_available=production_safe_live_platform_contract_available,
         production_safe_connections_ready=False,
-        goal_intelligence_contract_available=goal_intelligence_contract_available,
-        objective_understanding_runtime_available=goal_intelligence_contract_available,
-        deep_interview_runtime_available=goal_intelligence_contract_available,
-        user_context_model_available=goal_intelligence_contract_available,
-        context_ontology_runtime_available=goal_intelligence_contract_available,
-        adaptive_replanning_runtime_available=goal_intelligence_contract_available,
-        workflow_critic_runtime_available=goal_intelligence_contract_available,
-        eval_loop_runtime_available=goal_intelligence_contract_available,
+        goal_intelligence_contract_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        intent_frame_available=goal_intelligence_platform_available,
+        acceptance_criteria_available=goal_intelligence_platform_available,
+        deep_interview_loop_available=goal_intelligence_platform_available,
+        governed_cognitive_provider_available=goal_intelligence_platform_available,
+        workloop_goal_bridge_available=goal_intelligence_platform_available,
+        objective_understanding_runtime_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        deep_interview_runtime_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        user_context_model_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        context_ontology_runtime_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        adaptive_replanning_runtime_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        workflow_critic_runtime_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
+        eval_loop_runtime_available=(
+            goal_intelligence_contract_available or goal_intelligence_platform_available
+        ),
         goal_intelligence_ready=False,
         kernel_throughput_integration_available=kernel_throughput_integration_available,
         governed_live_dispatcher_available=kernel_throughput_integration_available,
@@ -692,6 +729,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v1.9.0",
         "v2.0.0",
         "v2.1.0",
+        "v2.2.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -713,6 +751,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v2.2.0":
+        return (
+            "goal_intelligence_intent_frame_manual_qa",
+            "goal_intelligence_slot_interview_manual_qa",
+            "goal_intelligence_deep_interview_loop_manual_qa",
+            "goal_intelligence_cognitive_provider_boundary_manual_qa",
+            "goal_intelligence_workloop_bridge_manual_qa",
+            "goal_intelligence_candidate_only_learning_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v2.1.0":
         return (
             "kernel_throughput_integration_broker_evidence_manual_qa",

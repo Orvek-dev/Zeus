@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import JsonValue
 
 from zeus_agent.goal_intelligence_runtime.models import GoalIntelligenceScenario
-from zeus_agent.goal_intelligence_runtime.models import SECRET_MARKERS
+from zeus_agent.security.credentials import contains_secret_material
 
 
 def parse_scenario(value: str) -> Optional[GoalIntelligenceScenario]:
@@ -23,8 +23,8 @@ def parse_scenario(value: str) -> Optional[GoalIntelligenceScenario]:
 
 
 def has_secret_marker(*values: Optional[str]) -> bool:
-    joined = " ".join(value for value in values if value is not None).lower()
-    return any(marker in joined for marker in SECRET_MARKERS)
+    joined = " ".join(value for value in values if value is not None)
+    return contains_secret_material(joined)
 
 
 def interview_questions(

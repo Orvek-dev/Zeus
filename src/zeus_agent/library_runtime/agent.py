@@ -1528,6 +1528,9 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
         requires_code: bool = False,
         requires_research: bool = False,
         risk_level: str = "normal",
+        interview_answers: tuple[str, ...] = (),
+        proceed_override: bool = False,
+        cognitive_provider_output: Optional[str] = None,
     ) -> dict[str, Any]:
         return build_goal_intelligence_contract(
             scenario=scenario,
@@ -1537,6 +1540,9 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             requires_code=requires_code,
             requires_research=requires_research,
             risk_level=risk_level,
+            interview_answers=interview_answers,
+            proceed_override=proceed_override,
+            cognitive_provider_output=cognitive_provider_output,
         ).to_payload()
 
     def mcp_status(self, *, server_id: Optional[str] = None) -> dict[str, Any]:

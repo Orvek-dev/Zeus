@@ -5,6 +5,8 @@ from typing import Final, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, JsonValue
 
+from zeus_agent.security.credentials import contains_secret_material
+
 GoalIntelligenceDecision = Literal["report", "blocked"]
 GoalIntelligenceScenario = Literal[
     "status",
@@ -14,24 +16,8 @@ GoalIntelligenceScenario = Literal[
     "ontology-context",
 ]
 
-TARGET_VERSION: Final = "v2.0.0"
-OBJECTIVE_CONTRACT_ID: Final = "zeus.v2.0.0.goal_intelligence_adaptive_execution"
-SECRET_MARKERS: Final[tuple[str, ...]] = (
-    "sk-",
-    "ghp_",
-    "github_pat_",
-    "glpat-",
-    "xoxa-",
-    "xoxb-",
-    "xoxp-",
-    "bearer ",
-    "password=",
-    "token=",
-    "private_key",
-    "private-key",
-    "-----begin",
-)
-
+TARGET_VERSION: Final = "v2.2.0"
+OBJECTIVE_CONTRACT_ID: Final = "zeus.v2.2.0.goal_intelligence_platform"
 _MODEL_CONFIG: Final = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True, strict=True)
 
 
@@ -39,17 +25,24 @@ class GoalIntelligenceContract(BaseModel):
     model_config = _MODEL_CONFIG
 
     decision: GoalIntelligenceDecision
-    target_version: Literal["v2.0.0"] = TARGET_VERSION
-    release_stage: Literal["goal_intelligence_adaptive_execution_platform"] = (
-        "goal_intelligence_adaptive_execution_platform"
-    )
-    objective_contract_id: Literal["zeus.v2.0.0.goal_intelligence_adaptive_execution"] = OBJECTIVE_CONTRACT_ID
+    target_version: Literal["v2.2.0"] = TARGET_VERSION
+    release_stage: Literal["goal_intelligence_platform"] = "goal_intelligence_platform"
+    objective_contract_id: Literal["zeus.v2.2.0.goal_intelligence_platform"] = OBJECTIVE_CONTRACT_ID
     scenario: GoalIntelligenceScenario
     blocked_reasons: tuple[str, ...] = ()
     normalized_objective: str = ""
     objective_id: Optional[str] = None
+    goal_contract_id: Optional[str] = None
+    normalized_goal: str = ""
+    acceptance_criteria: tuple[str, ...] = ()
+    intent_frame: Optional[dict[str, JsonValue]] = None
     interview_questions: tuple[str, ...] = ()
     interview_question_count: int = 0
+    interview_answers: tuple[str, ...] = ()
+    interview_round_count: int = 0
+    proceed_override_used: bool = False
+    residual_assumptions_recorded: bool = False
+    cognitive_provider_used: bool = False
     user_context_model: Optional[dict[str, JsonValue]] = None
     goal_intelligence_contract_available: bool = True
     objective_understanding_runtime_available: bool = True
@@ -101,6 +94,6 @@ class GoalIntelligenceContract(BaseModel):
         return self.model_dump(mode="json")
 
     def with_secret_scan(self) -> GoalIntelligenceContract:
-        serialized = json.dumps(self.to_payload(), sort_keys=True).lower()
-        safe = not any(marker in serialized for marker in SECRET_MARKERS)
+        serialized = json.dumps(self.to_payload(), sort_keys=True)
+        safe = not contains_secret_material(serialized)
         return self.model_copy(update={"no_secret_echo": safe})

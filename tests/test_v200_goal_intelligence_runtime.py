@@ -38,8 +38,8 @@ def test_goal_intelligence_status_composes_existing_safe_runtimes(tmp_path: Path
     payload = result.to_payload()
 
     assert payload["decision"] == "report"
-    assert payload["target_version"] == "v2.0.0"
-    assert payload["objective_contract_id"] == "zeus.v2.0.0.goal_intelligence_adaptive_execution"
+    assert payload["target_version"] == "v2.2.0"
+    assert payload["objective_contract_id"] == "zeus.v2.2.0.goal_intelligence_platform"
     assert payload["goal_intelligence_ready"] is True
     assert payload["objective_understood"] is True
     assert payload["adaptive_replan_ready"] is True
@@ -65,7 +65,7 @@ def test_goal_intelligence_understands_broad_user_objective(tmp_path: Path) -> N
 
     assert payload["decision"] == "report"
     assert payload["objective_understood"] is True
-    assert payload["interview_required"] is True
+    assert payload["interview_required"] is False
     assert payload["normalized_objective"].startswith("Build a parallel coding workflow")
     assert "desired_outcome" in payload["user_context_model"]
     assert payload["user_context_model"]["workflow_shape"] == "parallel_research_and_code"
@@ -83,7 +83,7 @@ def test_goal_intelligence_deep_interview_creates_context_candidate_without_memo
 
     assert payload["decision"] == "report"
     assert payload["deep_interview_ready"] is True
-    assert payload["interview_question_count"] >= 3
+    assert payload["interview_question_count"] >= 1
     assert payload["user_context_update_candidate"] is True
     assert payload["workflow_memory_auto_write"] is False
     assert payload["memory_write_executed"] is False
@@ -94,7 +94,10 @@ def test_goal_intelligence_adaptive_replan_uses_parallel_critic_for_code_and_res
     result = build_goal_intelligence_contract(
         scenario="adaptive-replan",
         home=tmp_path,
-        objective="Implement provider, MCP, gateway, and sandbox live platform slices with independent review.",
+        objective=(
+            "Implement provider, MCP, gateway, and sandbox live platform slices "
+            "with approval, lease, audit evidence, and independent review."
+        ),
         task_count=8,
         requires_code=True,
         requires_research=True,

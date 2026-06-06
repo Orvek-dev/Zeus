@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v2.1.0"><img alt="Version" src="https://img.shields.io/badge/version-2.1.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v2.2.0"><img alt="Version" src="https://img.shields.io/badge/version-2.2.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1435%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1451%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -35,7 +35,7 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is designed to absorb the useful platform shape of Hermes without becoming
-an unconstrained chat loop. The public `v2.1.0` source release builds on the
+an unconstrained chat loop. The public `v2.2.0` source release builds on the
 stable governed live platform boundary with Real Provider Runtime, Real MCP
 Runtime, Real Platform Runtime, Real Execution Runtime, and Real Memory
 Operation Runtime, Real Self Evolution Runtime, and Real Product Platform
@@ -64,7 +64,10 @@ trusted governance record containing the lease, approval, promotion guard, and
 broker evidence target before a handler can execute. Public reference strings
 alone do not authorize dispatch. The broker then records dispatch evidence
 before Zeus reports success or lets a production-ready claim pass the release
-gate.
+gate. v2.2.0 adds the Goal Intelligence Platform: structured intent frames,
+acceptance criteria, slot-driven deep interview loops, governed fake cognitive
+provider validation, work-loop bridge fields, and candidate-only context
+learning.
 Provider, MCP, memory, and sandbox/terminal smoke paths remain governed by
 quarantine, retention, cross-session search default-deny, lease, approval,
 broker dispatch, safe environment, evidence capture, cleanup, and
@@ -108,6 +111,7 @@ zeus release-gated-ulw --target-version v1.8.0 --json
 zeus release-gated-ulw --target-version v1.9.0 --json
 zeus release-gated-ulw --target-version v2.0.0 --json
 zeus release-gated-ulw --target-version v2.1.0 --json
+zeus release-gated-ulw --target-version v2.2.0 --json
 zeus identity-activation-runtime --scenario identity-status --json
 zeus identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json
 zeus identity-activation-runtime --scenario activation-check --objective-id objective.demo --lease-id lease.demo --approval-id approval.demo --credential-binding-ref credential.demo --sandbox-policy-ref sandbox.demo --audit-receipt-ref audit.demo --json
@@ -115,6 +119,7 @@ zeus production-live-platform-runtime --scenario status --json
 zeus production-live-platform-runtime --scenario provider-mcp-smoke --json
 zeus production-live-platform-runtime --scenario platform-execution-boundary --json
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
+zeus goal-intelligence-runtime --scenario deep-interview --objective "Build a local governed workflow." --interview-answer "Complete means CLI JSON includes acceptance criteria and no unsafe live execution." --json
 zeus goal-intelligence-runtime --scenario adaptive-replan --objective "Implement provider, MCP, gateway, and sandbox live platform slices with independent review." --task-count 8 --requires-code --requires-research --json
 zeus goal-intelligence-runtime --scenario ontology-context --objective "Organize what Zeus learned about my coding workflow into ontology context." --json
 zeus stable-release --json
@@ -375,11 +380,11 @@ release, not as proof of broad production readiness.
 
 | Evidence surface | Public-safe signal | Current result |
 | --- | --- | --- |
-| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, Stable Release, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, Zeus Identity Activation Runtime, Production Safe Live Platform Runtime, Goal Intelligence Runtime, Kernel-Throughput Integration Runtime, core language, release version, public docs hygiene, and total architecture surfaces | `1435` public tests passed |
+| Unit and scenario tests | Kernel, objective, provider, tool, transport, workflow, gateway/API, live loop, MCP manager, tool sandbox, research provider, observability, verification, skill-evolution, release-gated ULW, Tool Limbs, Platform Surface, Memory/Ontology, Adaptive Zeus, Live Beta Candidate, Production Foundation, Provider Live API, MCP Live Server, Gateway Live Delivery, Sandbox Terminal Live, Memory Privacy Live, Provider Live Opt-in, Provider Owned Client Live, MCP Owned Client Live, Stable Release, Real Provider Runtime, Real MCP Runtime, Real Platform Runtime, Real Execution Runtime, Real Memory Operation Runtime, Real Self Evolution Runtime, Real Product Platform Runtime, Zeus Identity Activation Runtime, Production Safe Live Platform Runtime, Goal Intelligence Runtime, Kernel-Throughput Integration Runtime, Goal Intelligence Platform, core language, release version, public docs hygiene, and total architecture surfaces | `1451` public tests passed |
 | Final architecture eval | Objective compiled, work loop created, promotion live-disabled, adversarial blocks, core language mapping, no secret echo, state reload | `10/10` checks passed |
 | Total architecture eval | Security planning, research graph, ontology candidates, sandbox workflow, scheduler, fail-closed live blocks, core language mapping, no secret echo, no live surface opened | `9/9` checks passed |
 | Python compile check | `src` and `tests` compile under Python 3.12 local validation | passed |
-| Package build | Editable install, sdist, and wheel build for `zeus-agent==2.1.0` | passed |
+| Package build | Editable install, sdist, and wheel build for `zeus-agent==2.2.0` | passed |
 | GitHub Actions | Python 3.10, 3.11, and 3.12 CI matrix | release-gated after Git publication |
 | Public safety boundary | Local Codex control packs, private planning notes, evidence logs, runtime DBs, and machine-local artifacts excluded | clean public tree |
 
@@ -389,10 +394,10 @@ terminal automation, remote sandbox hard isolation, or third-party production
 validation. Those claims remain blocked until live integrations are wired
 through the authority, lease, evidence, and rollback contracts.
 
-## v2.1.0 Readiness
+## v2.2.0 Readiness
 
-`v2.1.0` is the kernel-throughput integration checkpoint after the v2.0.0 goal
-intelligence boundary. The supported public surface is:
+`v2.2.0` is the Goal Intelligence Platform checkpoint after the v2.1.0
+kernel-throughput integration boundary. The supported public surface is:
 
 - local deterministic CLI scenarios through `zeus`;
 - `release-gated-ulw --target-version v1.0.0 --json` for the sequential
@@ -426,6 +431,9 @@ intelligence boundary. The supported public surface is:
 - `release-gated-ulw --target-version v2.1.0 --json` for the
   kernel-throughput integration checkpoint, where broker dispatch and broker
   evidence are required before production readiness can be claimed;
+- `release-gated-ulw --target-version v2.2.0 --json` for the intent-frame,
+  acceptance-criteria, deep-interview-loop, governed-cognitive-provider, and
+  work-loop bridge checkpoint;
 - `identity-activation-runtime --scenario identity-status --json` for Zeus
   persona identity and call-name contract reporting;
 - `identity-activation-runtime --scenario korean-call-smoke --message "제우스야" --json`
@@ -439,9 +447,11 @@ intelligence boundary. The supported public surface is:
 - `production-live-platform-runtime --scenario platform-execution-boundary --json`
   for gateway/browser/remote-sandbox fail-closed boundary reporting;
 - `goal-intelligence-runtime --scenario understand-objective --json` for
-  objective understanding and user-context candidate reporting;
-- `goal-intelligence-runtime --scenario deep-interview --json` for interview
-  questions without automatic memory writes;
+  structured intent-frame, acceptance-criteria, and user-context candidate
+  reporting;
+- `goal-intelligence-runtime --scenario deep-interview --interview-answer "..." --json`
+  for multi-turn slot-driven interview convergence without automatic memory
+  writes;
 - `goal-intelligence-runtime --scenario adaptive-replan --json` for adaptive
   workflow and critic reporting;
 - `goal-intelligence-runtime --scenario ontology-context --json` for local

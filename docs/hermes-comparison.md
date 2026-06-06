@@ -161,7 +161,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v2.1.0 Boundary
+## Current v2.2.0 Boundary
 
 Implemented public foundation:
 
@@ -240,6 +240,11 @@ Implemented public foundation:
   platform, live, model, MCP, and runtime cockpit aggregation, operator command
   maps, public boundary reports, secret-boundary checks, and no production-live
   claim;
+- governed Goal Intelligence Platform reporting for structured intent frames,
+  acceptance criteria, slot-driven deep interview loops, governed fake
+  cognitive-provider validation, work-loop bridge fields, candidate-only user
+  context and ontology learning, strict objective-understood semantics, and no
+  auto-promotion;
 - governed Stable Release reporting for the public stable platform boundary
   while keeping unrestricted live production execution disabled by default;
 - security planning, research graph, ontology candidate, sandbox workflow, and
@@ -247,10 +252,10 @@ Implemented public foundation:
 - stabilized Zeus Core Language mapped to technical runtime anchors;
 - local database-backed state for runtime/transport/product slices;
 - CLI eval surfaces;
-- 1435 public tests, a 10/10 final architecture eval, and a 9/9 total
+- current public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
-- release-gated ULW status for the v0.6.0 -> v2.0.0 program with
-  v2.0.0 goal intelligence checkpoint reporting;
+- release-gated ULW status for the v0.6.0 -> v2.2.0 program with
+  v2.2.0 goal intelligence platform checkpoint reporting;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.
 

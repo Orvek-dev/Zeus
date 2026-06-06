@@ -23,6 +23,9 @@ def register_wave319_commands(app: typer.Typer) -> None:
         requires_code: bool = typer.Option(False, "--requires-code"),
         requires_research: bool = typer.Option(False, "--requires-research"),
         risk_level: str = typer.Option("normal", "--risk-level"),
+        interview_answer: Optional[list[str]] = typer.Option(None, "--interview-answer"),
+        proceed_override: bool = typer.Option(False, "--proceed-override"),
+        cognitive_provider_output: Optional[str] = typer.Option(None, "--cognitive-provider-output"),
         as_json: bool = typer.Option(False, "--json"),
     ) -> None:
         payload = build_goal_intelligence_contract(
@@ -33,6 +36,9 @@ def register_wave319_commands(app: typer.Typer) -> None:
             requires_code=requires_code,
             requires_research=requires_research,
             risk_level=risk_level,
+            interview_answers=tuple(interview_answer or ()),
+            proceed_override=proceed_override,
+            cognitive_provider_output=cognitive_provider_output,
         ).to_payload()
         _print_payload(payload, as_json=as_json)
 

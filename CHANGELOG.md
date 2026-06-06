@@ -2,6 +2,42 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v2.2.0 - 2026-06-06
+
+### Added
+
+- Goal Intelligence Platform contract with structured `IntentFrame` output:
+  desired outcome, acceptance criteria, constraints, entities, assumptions,
+  unknowns, and confidence.
+- Evidence-based `objective_understood` semantics. Zeus now treats an objective
+  as understood only when acceptance criteria exist, high-impact unknowns are
+  absent, and confidence meets the threshold.
+- Slot-driven interview questions that target missing or low-confidence intent
+  fields instead of returning a fixed generic question set.
+- Deep interview loop inputs for interview answers, proceed override, residual
+  assumptions, round count, and candidate-only context updates.
+- Governed fake cognitive-provider seam that rejects malformed, prompt
+  injection-like, authority-widening, or unsafe live-transport structured output.
+- Work-loop bridge fields: `goal_contract_id`, `normalized_goal`, and
+  `acceptance_criteria`.
+- Release-gated ULW `v2.2.0` checkpoint fields for intent frames, acceptance
+  criteria, deep interview loop, governed cognitive provider, and work-loop
+  bridge readiness.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==2.2.0` for Python packaging and
+  `v2.2.0` for the GitHub release tag.
+- Goal Intelligence Runtime is now the current public goal-intelligence
+  contract version. The v2.0/v2.1 scaffolds remain represented in release-gate
+  history, but the live runtime reports the v2.2 contract shape.
+
+### Notes
+
+- `v2.2.0` still does not open unsafe production external provider, MCP,
+  gateway, browser, terminal, or remote sandbox execution by default. User
+  context and ontology learning remain candidate-only with no auto-promotion.
+
 ## v2.1.0 - 2026-06-06
 
 ### Added

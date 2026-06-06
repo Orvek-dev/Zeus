@@ -31,6 +31,7 @@ _SECRET_LIKE_PREFIXES: Final[tuple[str, ...]] = (
 )
 _SECRET_SPAN_PATTERNS: Final[tuple[tuple[re.Pattern[str], str], ...]] = (
     (re.compile(r"sk-[A-Za-z0-9][A-Za-z0-9._-]*"), "sk-...redacted"),
+    (re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"), "[redacted-secret]"),
     (re.compile(r"ghp_[A-Za-z0-9_]+"), "[redacted-secret]"),
     (re.compile(r"github_pat_[A-Za-z0-9_]+"), "[redacted-secret]"),
     (re.compile(r"glpat-[A-Za-z0-9_-]+"), "[redacted-secret]"),
@@ -113,6 +114,14 @@ def redact_secret_spans(raw_value: str) -> str:
     if redacted != value:
         return redacted
     return redact_secret_like(redacted)
+
+
+def contains_secret_material(raw_value: str) -> bool:
+    value = raw_value.strip()
+    if any(pattern.search(value) is not None for pattern, _replacement in _SECRET_SPAN_PATTERNS):
+        return True
+    lowered = value.lower()
+    return any(lowered.startswith(prefix) for prefix in _SECRET_LIKE_PREFIXES)
 
 
 def credential_report(scopes: list[CredentialScope]) -> CredentialReport:
