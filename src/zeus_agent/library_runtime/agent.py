@@ -22,6 +22,7 @@ from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_con
 from zeus_agent.mcp_live_server_runtime import build_mcp_live_server_contract
 from zeus_agent.production_foundation_runtime import build_production_foundation_contract
 from zeus_agent.production_scale_platform_runtime import build_production_scale_platform_contract
+from zeus_agent.productized_zeus_platform_runtime import build_productized_zeus_platform_contract
 from zeus_agent.provider_live_api_runtime import build_provider_live_api_contract
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionResult
 from zeus_agent.live_credential_injection_runtime import LiveCredentialInjectionRuntime
@@ -1584,6 +1585,18 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             scenario=scenario,
             objective=objective,
             provider_kind=provider_kind,
+            operator_note=operator_note,
+        ).to_payload()
+
+    def productized_platform_runtime(
+        self,
+        *,
+        scenario: str = "status",
+        operator_note: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_productized_zeus_platform_contract(
+            scenario=scenario,
+            home=self.home,
             operator_note=operator_note,
         ).to_payload()
 

@@ -272,7 +272,7 @@ class ReleaseGatedUlwStatus(BaseModel):
     model_status_surface_available: bool = False
     mcp_status_surface_available: bool = False
     runtime_status_surface_available: bool = False
-    operator_command_map_available: bool = False
+    productized_operator_command_map_available: bool = False
     public_boundary_report_available: bool = False
     product_platform_ready: bool = False
     zeus_identity_contract_available: bool = False
@@ -359,6 +359,13 @@ class ReleaseGatedUlwStatus(BaseModel):
     goal_operating_loop_available: bool = False
     governed_live_thin_slice_available: bool = False
     productized_zeus_platform_contract_available: bool = False
+    productized_zeus_platform_runtime_available: bool = False
+    productized_zeus_platform_ready: bool = False
+    zeus_persona_cli_available: bool = False
+    setup_wizard_available: bool = False
+    status_cockpit_available: bool = False
+    operator_command_map_available: bool = False
+    installable_user_journey_available: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -674,7 +681,9 @@ def build_release_gated_ulw_status(
         model_status_surface_available=real_product_platform_contract_available,
         mcp_status_surface_available=real_product_platform_contract_available,
         runtime_status_surface_available=real_product_platform_contract_available,
-        operator_command_map_available=real_product_platform_contract_available,
+        operator_command_map_available=(
+            real_product_platform_contract_available or productized_zeus_platform_available
+        ),
         public_boundary_report_available=real_product_platform_contract_available,
         product_platform_ready=False,
         zeus_identity_contract_available=zeus_identity_contract_available,
@@ -777,6 +786,13 @@ def build_release_gated_ulw_status(
         goal_operating_loop_available=cognitive_provider_activation_available,
         governed_live_thin_slice_available=cognitive_provider_activation_available,
         productized_zeus_platform_contract_available=productized_zeus_platform_available,
+        productized_zeus_platform_runtime_available=productized_zeus_platform_available,
+        productized_zeus_platform_ready=productized_zeus_platform_available,
+        zeus_persona_cli_available=productized_zeus_platform_available,
+        setup_wizard_available=productized_zeus_platform_available,
+        status_cockpit_available=productized_zeus_platform_available,
+        productized_operator_command_map_available=productized_zeus_platform_available,
+        installable_user_journey_available=productized_zeus_platform_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,

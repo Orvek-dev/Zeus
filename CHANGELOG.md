@@ -2,6 +2,36 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v4.0.0 - 2026-06-06
+
+### Added
+
+- Productized Zeus Platform runtime that aggregates the Zeus persona,
+  setup-plan surface, product cockpit, cognitive provider activation, plugin
+  ecosystem, tenant/auth, and candidate-only learning contracts into one
+  installable product checkpoint.
+- `productized-platform` CLI command and Python library facade method for
+  status, persona, setup, cockpit, operator-map, plugin/tenant/learning, and
+  public-boundary scenarios.
+- Release-gated ULW `v4.0.0` checkpoint fields for productized platform
+  readiness, setup wizard availability, status cockpit availability, operator
+  command map availability, and installable user journey availability.
+- Public README and Hermes comparison documentation now describe the v4.0.0
+  productized platform boundary.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==4.0.0` for Python packaging and
+  `v4.0.0` for the GitHub release tag.
+
+### Notes
+
+- `v4.0.0` keeps production live execution disabled by default. External
+  provider execution, remote MCP server execution, external gateway delivery,
+  browser live execution, remote sandbox execution, and unattended execution
+  remain off until governed live adapters satisfy lease, approval, credential,
+  audit, sandbox, cleanup, and release evidence gates.
+
 ## v3.1.0 - 2026-06-06
 
 ### Added
