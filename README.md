@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v4.0.0"><img alt="Version" src="https://img.shields.io/badge/version-4.0.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v4.1.0"><img alt="Version" src="https://img.shields.io/badge/version-4.1.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1472%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1480%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -36,9 +36,9 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is inspired by the platform breadth of Hermes, but it keeps a different
-center of gravity. The public `v4.0.0` release is a local-first, governed
+center of gravity. The public `v4.1.0` release is a local-first, governed
 platform boundary: goal intelligence, cognitive-provider activation,
-productized platform status, provider/MCP/tool/gateway/runtime contracts,
+productized platform status, ObjectiveRun start/status/export, provider/MCP/tool/gateway/runtime contracts,
 memory and ontology surfaces, self-evolution review queues, and release-gated
 evidence checks. Live provider, MCP, web, gateway, browser, plugin, and network
 execution remains designed/prepared/dry-run/future unless a later release wires
@@ -88,7 +88,8 @@ zeus kernel-status
 zeus productized-platform --scenario status --json
 zeus cognitive-provider-activation --scenario fake-provider-intent --objective "Zeus, turn my goal into a governed workflow." --json
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
-zeus release-gated-ulw --target-version v4.0.0 --json
+zeus objective-start --objective "Zeus, turn my goal into an evidence-backed run." --acceptance-criterion objective-run-created --json
+zeus release-gated-ulw --target-version v4.1.0 --json
 ```
 
 For the longer command catalog, see [docs/commands.md](docs/commands.md).
@@ -100,6 +101,7 @@ Zeus turns open-ended work into inspectable execution.
 | Layer | What it means |
 | --- | --- |
 | Objective contract | The user's goal is normalized into acceptance criteria, assumptions, unknowns, and evidence obligations. |
+| Objective run | A started objective becomes a persisted local run with start/status/export surfaces and evidence-based completion arbitration. |
 | Authority gate | Capabilities, paths, credentials, tools, and live surfaces must be explicitly allowed before execution. |
 | Runtime lease | Live-capable work is scoped, temporary, and tied to approval, sandbox, credential, and audit requirements. |
 | Evidence record | Completion is based on observable artifacts, receipts, tests, traces, and reviewable output, not confident language. |
@@ -131,16 +133,16 @@ Hermes remains upstream/reference only. Mercury is the Zeus internal transport p
 
 ## Evidence
 
-The latest public-safe local evidence snapshot was measured on 2026-06-06.
+The latest public-safe local evidence snapshot was measured on 2026-06-09.
 Read these numbers as deterministic local regression evidence for the public
 source release, not as proof of broad production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public unit and scenario suite | `1472` public tests passed |
+| Public unit and scenario suite | `1480` public tests passed |
 | Final architecture eval | `10/10` checks passed |
 | Total architecture eval | `9/9` checks passed |
-| Package build | sdist and wheel build for `zeus-agent==4.0.0` passed |
+| Package build | sdist and wheel build for `zeus-agent==4.1.0` passed |
 | Public safety boundary | Local Codex control packs, private notes, evidence logs, runtime DBs, and machine-local artifacts excluded |
 
 The release does not claim hosted SaaS readiness, production external provider

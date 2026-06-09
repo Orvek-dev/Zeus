@@ -26,7 +26,7 @@ def test_v400_release_gate_reports_productized_platform_checkpoint() -> None:
     assert payload["operator_command_map_available"] is True
     assert payload["productized_operator_command_map_available"] is True
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v4.1.0"
 
 
 def test_status_aggregates_product_surfaces_without_live_side_effects(tmp_path: Path) -> None:

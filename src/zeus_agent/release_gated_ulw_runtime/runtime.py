@@ -58,6 +58,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v3.0.0",
     "v3.1.0",
     "v4.0.0",
+    "v4.1.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -93,6 +94,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v3.0.0": "zeus_stable_live_agent_platform",
     "v3.1.0": "intelligence_to_live_execution_platform",
     "v4.0.0": "productized_zeus_platform",
+    "v4.1.0": "objective_execution_spine",
 }
 
 
@@ -366,6 +368,13 @@ class ReleaseGatedUlwStatus(BaseModel):
     status_cockpit_available: bool = False
     operator_command_map_available: bool = False
     installable_user_journey_available: bool = False
+    objective_execution_spine_contract_available: bool = False
+    objective_run_runtime_available: bool = False
+    objective_run_store_available: bool = False
+    objective_start_status_export_cli_available: bool = False
+    completion_arbiter_bridge_available: bool = False
+    objective_evidence_graph_bridge_available: bool = False
+    objective_execution_spine_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -489,6 +498,9 @@ def build_release_gated_ulw_status(
     )
     productized_zeus_platform_available = (
         normalized_version == "v4.0.0" and "unknown_target_version" not in blocked_reasons
+    )
+    objective_execution_spine_available = (
+        normalized_version == "v4.1.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -793,6 +805,13 @@ def build_release_gated_ulw_status(
         status_cockpit_available=productized_zeus_platform_available,
         productized_operator_command_map_available=productized_zeus_platform_available,
         installable_user_journey_available=productized_zeus_platform_available,
+        objective_execution_spine_contract_available=objective_execution_spine_available,
+        objective_run_runtime_available=objective_execution_spine_available,
+        objective_run_store_available=objective_execution_spine_available,
+        objective_start_status_export_cli_available=objective_execution_spine_available,
+        completion_arbiter_bridge_available=objective_execution_spine_available,
+        objective_evidence_graph_bridge_available=objective_execution_spine_available,
+        objective_execution_spine_ready=objective_execution_spine_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -854,6 +873,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v3.0.0",
         "v3.1.0",
         "v4.0.0",
+        "v4.1.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -875,6 +895,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v4.1.0":
+        return (
+            "objective_run_spine_manual_qa",
+            "objective_start_status_export_cli_manual_qa",
+            "completion_arbiter_evidence_gate_manual_qa",
+            "objective_run_no_live_execution_boundary_review",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v4.0.0":
         return (
             "productized_zeus_platform_manual_qa",

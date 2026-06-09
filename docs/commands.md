@@ -12,7 +12,8 @@ zeus kernel-status
 zeus productized-platform --scenario status --json
 zeus cognitive-provider-activation --scenario fake-provider-intent --objective "Zeus, turn my goal into a governed workflow." --json
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
-zeus release-gated-ulw --target-version v4.0.0 --json
+zeus objective-start --objective "Zeus, turn my goal into an evidence-backed run." --acceptance-criterion objective-run-created --json
+zeus release-gated-ulw --target-version v4.1.0 --json
 ```
 
 ## Product And Goal Intelligence
@@ -31,10 +32,21 @@ zeus cognitive-provider-activation --scenario external-provider-block --json
 zeus cognitive-provider-activation --scenario unsafe-output-block --json
 ```
 
+## Objective Runs
+
+```sh
+zeus objective-start --objective "Zeus, turn this objective into an evidence-backed run." --session-id local-demo --principal-id operator.local --acceptance-criterion objective-run-created --json
+zeus objective-status --run-id <run-id-from-objective-start> --json
+zeus objective-export --run-id <run-id-from-objective-start> --json
+```
+
+Objective runs persist locally under the selected Zeus home. Completion remains
+blocked until each acceptance criterion has matching evidence.
+
 ## Release And Platform Status
 
 ```sh
-zeus release-gated-ulw --target-version v4.0.0 --json
+zeus release-gated-ulw --target-version v4.1.0 --json
 zeus stable-release --json
 zeus production-live-platform-runtime --scenario status --json
 zeus production-live-platform-runtime --scenario provider-mcp-smoke --json

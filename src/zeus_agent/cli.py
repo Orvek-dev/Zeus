@@ -179,6 +179,7 @@ from zeus_agent.model_runtime import (
     provider_budget_payload,
     provider_catalog_payload,
 )
+from zeus_agent.objective_run_runtime import ObjectiveRunRuntime, ObjectiveRunStore
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
 from zeus_agent.plugin_runtime import validate_plugin_manifest
 from zeus_agent.platform_surface_runtime import build_platform_surface_contract
@@ -242,6 +243,47 @@ def status(
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     _print_payload(entry_status_payload(home or default_zeus_home()), as_json=as_json)
+
+
+@app.command("objective-start")
+def objective_start(
+    objective: str = typer.Option(..., "--objective"),
+    session_id: str = typer.Option("default", "--session-id"),
+    principal_id: str = typer.Option("operator.local", "--principal-id"),
+    acceptance_criterion: list[str] = typer.Option([], "--acceptance-criterion"),
+    constraint: list[str] = typer.Option([], "--constraint"),
+    home: Optional[Path] = typer.Option(None, "--home"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    runtime = ObjectiveRunRuntime(ObjectiveRunStore(home or default_zeus_home()))
+    payload = runtime.start(
+        objective=objective,
+        session_id=session_id,
+        principal_id=principal_id,
+        acceptance_criteria=tuple(acceptance_criterion),
+        constraints=tuple(constraint),
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("objective-status")
+def objective_status(
+    run_id: str = typer.Option(..., "--run-id"),
+    home: Optional[Path] = typer.Option(None, "--home"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    runtime = ObjectiveRunRuntime(ObjectiveRunStore(home or default_zeus_home()))
+    _print_payload(runtime.status(run_id).to_payload(), as_json=as_json)
+
+
+@app.command("objective-export")
+def objective_export(
+    run_id: str = typer.Option(..., "--run-id"),
+    home: Optional[Path] = typer.Option(None, "--home"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    runtime = ObjectiveRunRuntime(ObjectiveRunStore(home or default_zeus_home()))
+    _print_payload(runtime.export(run_id).to_payload(), as_json=as_json)
 
 
 @app.command("release-gated-ulw")

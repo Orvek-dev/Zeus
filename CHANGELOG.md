@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v4.1.0 - 2026-06-09
+
+### Added
+
+- ObjectiveRun runtime for turning a compiled objective into a persisted local
+  run with goal contract, current plan, evidence records, and completion
+  summary.
+- `objective-start`, `objective-status`, and `objective-export` CLI commands for
+  local objective run lifecycle inspection.
+- Python library facade methods `ZeusAgent.objective_start(...)`,
+  `ZeusAgent.objective_status(...)`, and `ZeusAgent.objective_export(...)`.
+- Release-gated ULW `v4.1.0` checkpoint fields for objective execution spine
+  availability, ObjectiveRun store availability, CLI availability, completion
+  arbiter bridge, and evidence graph bridge.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==4.1.0` for Python packaging and
+  `v4.1.0` for the GitHub release tag.
+- Public README, Korean README, command catalog, and security boundary now
+  describe the ObjectiveRun spine and the v4.1.0 public boundary.
+
+### Notes
+
+- `v4.1.0` still keeps production live execution disabled by default.
+  ObjectiveRun records local objective execution state and evidence obligations;
+  it does not authorize provider, MCP, gateway, browser, terminal, sandbox, or
+  remote network handlers by itself.
+
 ## v4.0.0 - 2026-06-06
 
 ### Added

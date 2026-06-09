@@ -168,6 +168,7 @@ from zeus_agent.model_cockpit_runtime import ModelCockpitRuntime
 from zeus_agent.model_runtime import provider_catalog_payload
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
 from zeus_agent.objective_runtime import ObjectiveCompiler
+from zeus_agent.objective_run_runtime import ObjectiveRunRuntime, ObjectiveRunStore
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
 from zeus_agent.production_safe_live_platform_runtime import build_production_safe_live_platform_contract
 from zeus_agent.provider_live_optin_runtime import build_provider_live_optin_contract
@@ -237,6 +238,32 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
 
     def compile_objective(self, objective: str) -> dict[str, Any]:
         return ObjectiveCompiler().compile(objective).model_dump(mode="json")
+
+    def objective_start(
+        self,
+        *,
+        objective: str,
+        session_id: str = "default",
+        principal_id: str = "operator.local",
+        acceptance_criteria: tuple[str, ...] = (),
+        constraints: tuple[str, ...] = (),
+    ) -> dict[str, Any]:
+        runtime = ObjectiveRunRuntime(ObjectiveRunStore(self.home))
+        return runtime.start(
+            objective=objective,
+            session_id=session_id,
+            principal_id=principal_id,
+            acceptance_criteria=acceptance_criteria,
+            constraints=constraints,
+        ).to_payload()
+
+    def objective_status(self, *, run_id: str) -> dict[str, Any]:
+        runtime = ObjectiveRunRuntime(ObjectiveRunStore(self.home))
+        return runtime.status(run_id=run_id).to_payload()
+
+    def objective_export(self, *, run_id: str) -> dict[str, Any]:
+        runtime = ObjectiveRunRuntime(ObjectiveRunStore(self.home))
+        return runtime.export(run_id=run_id).to_payload()
 
     def workflow_compile(
         self,
