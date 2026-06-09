@@ -13,7 +13,8 @@ zeus productized-platform --scenario status --json
 zeus cognitive-provider-activation --scenario fake-provider-intent --objective "Zeus, turn my goal into a governed workflow." --json
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
 zeus objective-start --objective "Zeus, turn my goal into an evidence-backed run." --acceptance-criterion objective-run-created --json
-zeus release-gated-ulw --target-version v4.1.0 --json
+zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
+zeus release-gated-ulw --target-version v4.5.0 --json
 ```
 
 ## Product And Goal Intelligence
@@ -46,7 +47,7 @@ blocked until each acceptance criterion has matching evidence.
 ## Release And Platform Status
 
 ```sh
-zeus release-gated-ulw --target-version v4.1.0 --json
+zeus release-gated-ulw --target-version v4.5.0 --json
 zeus stable-release --json
 zeus production-live-platform-runtime --scenario status --json
 zeus production-live-platform-runtime --scenario provider-mcp-smoke --json
@@ -57,6 +58,17 @@ zeus platform-runtime --scenario gateway-loopback-smoke --json
 zeus platform-runtime --scenario session-secret-boundary --json
 zeus platform-runtime --scenario batch-acp-smoke --json
 ```
+
+## Governed Live Slice
+
+```sh
+zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
+zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --objective-run-id run-v450 --lease-ref lease://v210/provider-local-smoke --approval-ref approval://v210/provider-local-smoke --promotion-guard-ref promotion-guard://v210/provider-local-smoke --broker-evidence-ref broker-evidence://v210/provider-local-smoke --credential-scope credential.local-smoke --sandbox-policy-ref sandbox://local/default-deny-egress --audit-receipt-ref audit://v450/provider-local-smoke --json
+```
+
+The first command explains the missing authority requirements. The second
+command exercises the trusted local loopback smoke path; it still does not
+claim production live execution.
 
 ## Provider And MCP Boundaries
 

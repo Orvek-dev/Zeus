@@ -20,7 +20,7 @@ def test_v410_release_gate_reports_objective_execution_spine_checkpoint() -> Non
     assert payload["network_opened"] is False
     assert payload["handler_executed"] is False
     assert payload["live_production_claimed"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v4.5.0"
 
 
 def test_v410_requires_objective_run_evidence_before_release() -> None:

@@ -24,11 +24,12 @@ migration, scale targets, and release gates.
 The scope does not claim that the current checkout already implements every live
 surface described here. Each surface remains target, dry-run, beta, or
 production-ready according to the implementation evidence produced later.
-The public v4.1.0 boundary remains governed local-first:
+The public v4.5.0 boundary remains governed local-first:
 designed/prepared/dry-run/future for production live-capable surfaces unless a
 specific surface has separate production evidence and release approval. The
 implemented boundary includes ObjectiveRun start/status/export for persisted
-local run state and evidence-based completion summaries, live-beta-candidate and production-foundation
+local run state and evidence-based completion summaries, Governed Live Slice
+authority UX for missing live-capable requirements, live-beta-candidate and production-foundation
 contracts for local smoke, readiness, identity/auth, approval, lease,
 credential, secret, audit, sandbox, rollback, and review evidence; Provider
 Live API loopback smoke; MCP Live Server loopback smoke and prompt-injection
@@ -204,7 +205,7 @@ Hermes official docs describe these practical live surfaces:
 
 ## Current Zeus Baseline
 
-Measured in the public v4.1.0 release tree:
+Measured in the public v4.5.0 release tree:
 
 | Area | Current Zeus |
 | --- | ---: |

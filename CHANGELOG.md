@@ -2,6 +2,32 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v4.5.0 - 2026-06-09
+
+### Added
+
+- Governed Live Slice runtime that wraps the existing governed live dispatcher
+  with operator-facing missing-requirement UX.
+- `governed-live-slice` CLI command and Python library facade method
+  `ZeusAgent.governed_live_slice(...)`.
+- Release-gated ULW `v4.5.0` checkpoint fields for governed live slice,
+  authority UX, live preflight requirement map, and trusted loopback smoke
+  availability.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==4.5.0` for Python packaging and
+  `v4.5.0` for the GitHub release tag.
+- Public README, Korean README, command catalog, security boundary, and live
+  architecture documentation now describe the Governed Live Slice boundary.
+
+### Notes
+
+- `v4.5.0` allows only the trusted local loopback smoke path through the
+  existing broker evidence route. It still does not enable production external
+  provider, MCP, gateway, browser, terminal, sandbox, or remote network
+  execution by default.
+
 ## v4.1.0 - 2026-06-09
 
 ### Added

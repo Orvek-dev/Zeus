@@ -59,6 +59,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v3.1.0",
     "v4.0.0",
     "v4.1.0",
+    "v4.5.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -95,6 +96,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v3.1.0": "intelligence_to_live_execution_platform",
     "v4.0.0": "productized_zeus_platform",
     "v4.1.0": "objective_execution_spine",
+    "v4.5.0": "governed_live_slice_authority_ux",
 }
 
 
@@ -375,6 +377,11 @@ class ReleaseGatedUlwStatus(BaseModel):
     completion_arbiter_bridge_available: bool = False
     objective_evidence_graph_bridge_available: bool = False
     objective_execution_spine_ready: bool = False
+    governed_live_slice_contract_available: bool = False
+    authority_ux_runtime_available: bool = False
+    live_preflight_requirement_map_available: bool = False
+    trusted_loopback_live_smoke_available: bool = False
+    governed_live_slice_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -501,6 +508,9 @@ def build_release_gated_ulw_status(
     )
     objective_execution_spine_available = (
         normalized_version == "v4.1.0" and "unknown_target_version" not in blocked_reasons
+    )
+    governed_live_slice_available = (
+        normalized_version == "v4.5.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -812,6 +822,11 @@ def build_release_gated_ulw_status(
         completion_arbiter_bridge_available=objective_execution_spine_available,
         objective_evidence_graph_bridge_available=objective_execution_spine_available,
         objective_execution_spine_ready=objective_execution_spine_available,
+        governed_live_slice_contract_available=governed_live_slice_available,
+        authority_ux_runtime_available=governed_live_slice_available,
+        live_preflight_requirement_map_available=governed_live_slice_available,
+        trusted_loopback_live_smoke_available=governed_live_slice_available,
+        governed_live_slice_ready=governed_live_slice_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -874,6 +889,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v3.1.0",
         "v4.0.0",
         "v4.1.0",
+        "v4.5.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -895,6 +911,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v4.5.0":
+        return (
+            "governed_live_slice_manual_qa",
+            "authority_ux_missing_requirements_manual_qa",
+            "trusted_loopback_live_smoke_manual_qa",
+            "raw_secret_no_echo_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v4.1.0":
         return (
             "objective_run_spine_manual_qa",

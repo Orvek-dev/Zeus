@@ -169,6 +169,7 @@ from zeus_agent.doctor_runtime import doctor_report
 from zeus_agent.entry_runtime import ZeusChatRuntime, default_zeus_home, entry_status_payload
 from zeus_agent.eval import run_golden_journeys
 from zeus_agent.gateway_runtime import gateway_adapter_catalog_payload
+from zeus_agent.governed_live_slice_runtime import build_governed_live_slice
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.live_beta_candidate_runtime import parse_live_beta_candidate_scenario
 from zeus_agent.memory_graph_runtime import MemoryGraphStore
@@ -284,6 +285,39 @@ def objective_export(
 ) -> None:
     runtime = ObjectiveRunRuntime(ObjectiveRunStore(home or default_zeus_home()))
     _print_payload(runtime.export(run_id).to_payload(), as_json=as_json)
+
+
+@app.command("governed-live-slice")
+def governed_live_slice(
+    surface: str = typer.Option("provider", "--surface"),
+    capability_id: str = typer.Option("provider.local-smoke", "--capability-id"),
+    scenario: str = typer.Option("local-smoke", "--scenario"),
+    objective_run_id: Optional[str] = typer.Option(None, "--objective-run-id"),
+    lease_ref: Optional[str] = typer.Option(None, "--lease-ref"),
+    approval_ref: Optional[str] = typer.Option(None, "--approval-ref"),
+    promotion_guard_ref: Optional[str] = typer.Option(None, "--promotion-guard-ref"),
+    broker_evidence_ref: Optional[str] = typer.Option(None, "--broker-evidence-ref"),
+    credential_scope: Optional[str] = typer.Option(None, "--credential-scope"),
+    sandbox_policy_ref: Optional[str] = typer.Option(None, "--sandbox-policy-ref"),
+    audit_receipt_ref: Optional[str] = typer.Option(None, "--audit-receipt-ref"),
+    home: Optional[Path] = typer.Option(None, "--home"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    _ = home or default_zeus_home()
+    payload = build_governed_live_slice(
+        surface=surface,
+        capability_id=capability_id,
+        scenario=scenario,
+        objective_run_id=objective_run_id,
+        lease_ref=lease_ref,
+        approval_ref=approval_ref,
+        promotion_guard_ref=promotion_guard_ref,
+        broker_evidence_ref=broker_evidence_ref,
+        credential_scope=credential_scope,
+        sandbox_policy_ref=sandbox_policy_ref,
+        audit_receipt_ref=audit_receipt_ref,
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
 
 
 @app.command("release-gated-ulw")

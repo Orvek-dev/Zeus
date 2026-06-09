@@ -16,6 +16,7 @@ from zeus_agent.gateway_live_delivery_runtime import build_gateway_live_delivery
 from zeus_agent.gateway_pairing_runtime import GatewayPairingRuntime
 from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.goal_intelligence_runtime import build_goal_intelligence_contract
+from zeus_agent.governed_live_slice_runtime import build_governed_live_slice
 from zeus_agent.installable_live_platform_runtime import build_installable_live_platform_contract
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
@@ -264,6 +265,37 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
     def objective_export(self, *, run_id: str) -> dict[str, Any]:
         runtime = ObjectiveRunRuntime(ObjectiveRunStore(self.home))
         return runtime.export(run_id=run_id).to_payload()
+
+    def governed_live_slice(
+        self,
+        *,
+        surface: str = "provider",
+        capability_id: str = "provider.local-smoke",
+        scenario: str = "local-smoke",
+        objective_run_id: Optional[str] = None,
+        lease_ref: Optional[str] = None,
+        approval_ref: Optional[str] = None,
+        promotion_guard_ref: Optional[str] = None,
+        broker_evidence_ref: Optional[str] = None,
+        credential_scope: Optional[str] = None,
+        sandbox_policy_ref: Optional[str] = None,
+        audit_receipt_ref: Optional[str] = None,
+        raw_credential: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_governed_live_slice(
+            surface=surface,
+            capability_id=capability_id,
+            scenario=scenario,
+            objective_run_id=objective_run_id,
+            lease_ref=lease_ref,
+            approval_ref=approval_ref,
+            promotion_guard_ref=promotion_guard_ref,
+            broker_evidence_ref=broker_evidence_ref,
+            credential_scope=credential_scope,
+            sandbox_policy_ref=sandbox_policy_ref,
+            audit_receipt_ref=audit_receipt_ref,
+            raw_credential=raw_credential,
+        ).to_payload()
 
     def workflow_compile(
         self,
