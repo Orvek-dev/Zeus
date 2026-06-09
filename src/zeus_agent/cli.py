@@ -169,6 +169,7 @@ from zeus_agent.doctor_runtime import doctor_report
 from zeus_agent.entry_runtime import ZeusChatRuntime, default_zeus_home, entry_status_payload
 from zeus_agent.eval import run_golden_journeys
 from zeus_agent.gateway_runtime import gateway_adapter_catalog_payload
+from zeus_agent.governed_live_connector_platform_runtime import build_governed_live_connector_platform
 from zeus_agent.governed_live_slice_runtime import build_governed_live_slice
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.live_beta_candidate_runtime import parse_live_beta_candidate_scenario
@@ -347,6 +348,19 @@ def governed_live_slice(
         credential_scope=credential_scope,
         sandbox_policy_ref=sandbox_policy_ref,
         audit_receipt_ref=audit_receipt_ref,
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
+
+
+@app.command("governed-live-connectors")
+def governed_live_connectors(
+    scenario: str = typer.Option("status", "--scenario"),
+    home: Optional[Path] = typer.Option(None, "--home"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_governed_live_connector_platform(
+        home=home or default_zeus_home(),
+        scenario=scenario,
     ).to_payload()
     _print_payload(payload, as_json=as_json)
 

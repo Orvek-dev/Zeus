@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v5.5.0"><img alt="Version" src="https://img.shields.io/badge/version-5.5.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v5.8.0"><img alt="Version" src="https://img.shields.io/badge/version-5.8.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
@@ -36,11 +36,12 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is inspired by the platform breadth of Hermes, but it keeps a different
-center of gravity. The public `v5.5.0` release is a local-first, governed
+center of gravity. The public `v5.8.0` release is a local-first, governed
 platform boundary: goal intelligence, cognitive-provider activation,
 Objective Compiler Workflow UX, dynamic workflow DAG planning, productized
 platform status, ObjectiveRun start/status/export, Governed Live Slice
-authority UX, Live Platform Beta status, provider/MCP/tool/gateway/runtime contracts,
+authority UX, Governed Live Connector Platform, Live Platform Beta status,
+provider/MCP/tool/gateway/runtime contracts,
 memory and ontology surfaces, self-evolution review queues, and release-gated
 evidence checks. Live provider, MCP, web, gateway, browser, plugin, and network
 execution remains designed/prepared/dry-run/future unless a later release wires
@@ -92,9 +93,10 @@ zeus cognitive-provider-activation --scenario fake-provider-intent --objective "
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
 zeus objective-start --objective "Zeus, turn my goal into an evidence-backed run." --acceptance-criterion objective-run-created --json
 zeus objective-compile-workflow --objective "Zeus, compile this goal into a governed workflow." --requires-code --task-count 4 --json
+zeus governed-live-connectors --scenario trusted-local-smoke --json
 zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
 zeus live-platform-beta --scenario status --json
-zeus release-gated-ulw --target-version v5.5.0 --json
+zeus release-gated-ulw --target-version v5.8.0 --json
 ```
 
 For the longer command catalog, see [docs/commands.md](docs/commands.md).
@@ -108,6 +110,7 @@ Zeus turns open-ended work into inspectable execution.
 | Objective contract | The user's goal is normalized into acceptance criteria, assumptions, unknowns, and evidence obligations. |
 | Objective run | A started objective becomes a persisted local run with start/status/export surfaces and evidence-based completion arbitration. |
 | Objective Compiler Workflow | A goal is compiled into an intent frame, interview questions when needed, a workflow DAG, authority requirements, and an evidence plan. |
+| Governed Live Connector Platform | Provider, MCP, gateway, and local sandbox connector smokes are checked through the same objective, lease, approval, broker-evidence, credential, sandbox, and audit requirements. |
 | Governed live slice | Live-capable work explains missing objective, lease, approval, broker evidence, credential, sandbox, and audit requirements before a handler can run. |
 | Live platform beta | Productized beta status aggregates persona, setup/status cockpit, ObjectiveRun, authority UX, CLI, Python library, and public production-live boundary. |
 | Authority gate | Capabilities, paths, credentials, tools, and live surfaces must be explicitly allowed before execution. |

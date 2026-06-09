@@ -24,6 +24,9 @@ class LiveCapabilityRegistry:
             raise KeyError(capability_id)
         return capability
 
+    def list_capabilities(self) -> tuple[LiveCapability, ...]:
+        return self._capabilities
+
     def to_capability_graph(self) -> CapabilityGraph:
         descriptors = [
             CapabilityDescriptor(
@@ -66,5 +69,21 @@ def default_live_capability_registry() -> LiveCapabilityRegistry:
                 broker_evidence_ref="broker-evidence://v210/provider-local-smoke",
                 credential_scope="credential.local-smoke",
             ),
+            _local_smoke_capability("mcp.local-smoke", "mcp"),
+            _local_smoke_capability("gateway.loopback-smoke", "gateway"),
+            _local_smoke_capability("local-sandbox.local-smoke", "local-sandbox"),
         ),
+    )
+
+
+def _local_smoke_capability(capability_id: str, provider: str) -> LiveCapability:
+    return LiveCapability(
+        capability_id=capability_id,
+        provider=provider,
+        scenario="local-smoke",
+        lease_ref="lease://v580/{0}".format(capability_id),
+        approval_ref="approval://v580/{0}".format(capability_id),
+        promotion_guard_ref="promotion-guard://v580/{0}".format(capability_id),
+        broker_evidence_ref="broker-evidence://v580/{0}".format(capability_id),
+        credential_scope="credential.{0}".format(capability_id),
     )

@@ -176,13 +176,23 @@ def _promotion_request(request: GovernedLiveRequest) -> LiveTransportPromotionRe
     return LiveTransportPromotionRequest(
         promotion_id=request.promotion_guard_ref or "promotion-guard.missing",
         capability_id=request.capability_id,
-        transport_kind="provider",
+        transport_kind=_transport_kind(request.provider),
         idempotency_key="v210-{0}".format(request.scenario.replace("-", ".")),
         retry_policy=RetryPolicy(max_attempts=1, backoff_seconds=0),
         rollback_plan=RollbackPlan(command="noop", target=request.capability_id),
         credential_scope=request.credential_scope,
         network_host=request.network_host,
     )
+
+
+def _transport_kind(provider: str) -> str:
+    if provider == "mcp":
+        return "mcp"
+    if provider == "gateway":
+        return "api"
+    if provider == "local-sandbox":
+        return "plugin"
+    return "provider"
 
 
 def _local_smoke_handler(payload: dict) -> dict:

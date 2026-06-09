@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v5.8.0 - 2026-06-09
+
+### Added
+
+- Governed Live Connector Platform runtime that aggregates provider, MCP,
+  gateway, and local sandbox connector preflight status through the same
+  objective, lease, approval, promotion guard, broker evidence, credential
+  scope, sandbox policy, and audit receipt requirements.
+- Default governed live capability registry entries for MCP local smoke,
+  gateway loopback smoke, and local sandbox smoke while preserving the provider
+  local-smoke compatibility refs.
+- `governed-live-connectors` CLI command and Python library facade method
+  `ZeusAgent.governed_live_connectors(...)`.
+- Release-gated ULW `v5.8.0` checkpoint fields for connector activation,
+  broker-evidence requirements, and production-live boundary review.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==5.8.0` for Python packaging and
+  `v5.8.0` for the GitHub release tag.
+- Public README and Korean README now include the Governed Live Connector
+  Platform command and boundary.
+
+### Notes
+
+- `v5.8.0` allows trusted local smoke connector checks through broker evidence.
+  It still keeps external provider, remote MCP, remote sandbox, browser live
+  navigation, and production gateway delivery disabled by default.
+
 ## v5.5.0 - 2026-06-09
 
 ### Added

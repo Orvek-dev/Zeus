@@ -119,7 +119,5 @@ def trusted_record_for_capability(capability: LiveCapability) -> TrustedLiveGove
 def default_live_governance_trust_store() -> LiveGovernanceTrustStore:
     registry = default_live_capability_registry()
     return LiveGovernanceTrustStore(
-        (
-            trusted_record_for_capability(registry.require("provider.local-smoke")),
-        ),
+        tuple(trusted_record_for_capability(capability) for capability in registry.list_capabilities()),
     )
