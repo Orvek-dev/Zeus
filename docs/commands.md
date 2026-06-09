@@ -14,7 +14,8 @@ zeus cognitive-provider-activation --scenario fake-provider-intent --objective "
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
 zeus objective-start --objective "Zeus, turn my goal into an evidence-backed run." --acceptance-criterion objective-run-created --json
 zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
-zeus release-gated-ulw --target-version v4.5.0 --json
+zeus live-platform-beta --scenario status --json
+zeus release-gated-ulw --target-version v5.0.0 --json
 ```
 
 ## Product And Goal Intelligence
@@ -47,7 +48,7 @@ blocked until each acceptance criterion has matching evidence.
 ## Release And Platform Status
 
 ```sh
-zeus release-gated-ulw --target-version v4.5.0 --json
+zeus release-gated-ulw --target-version v5.0.0 --json
 zeus stable-release --json
 zeus production-live-platform-runtime --scenario status --json
 zeus production-live-platform-runtime --scenario provider-mcp-smoke --json
@@ -69,6 +70,18 @@ zeus governed-live-slice --surface provider --capability-id provider.local-smoke
 The first command explains the missing authority requirements. The second
 command exercises the trusted local loopback smoke path; it still does not
 claim production live execution.
+
+## Live Platform Beta
+
+```sh
+zeus live-platform-beta --scenario status --json
+zeus live-platform-beta --scenario operator-demo --json
+zeus live-platform-beta --scenario public-boundary --json
+```
+
+The beta surface aggregates the productized persona/status cockpit, ObjectiveRun
+spine, governed live authority UX, CLI/Python surfaces, and public production
+boundary in one local command family.
 
 ## Provider And MCP Boundaries
 

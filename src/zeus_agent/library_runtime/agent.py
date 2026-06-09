@@ -20,6 +20,7 @@ from zeus_agent.governed_live_slice_runtime import build_governed_live_slice
 from zeus_agent.installable_live_platform_runtime import build_installable_live_platform_contract
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
+from zeus_agent.live_platform_beta_runtime import build_live_platform_beta
 from zeus_agent.mcp_live_server_runtime import build_mcp_live_server_contract
 from zeus_agent.production_foundation_runtime import build_production_foundation_contract
 from zeus_agent.production_scale_platform_runtime import build_production_scale_platform_contract
@@ -296,6 +297,9 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
             audit_receipt_ref=audit_receipt_ref,
             raw_credential=raw_credential,
         ).to_payload()
+
+    def live_platform_beta(self, *, scenario: str = "status") -> dict[str, Any]:
+        return build_live_platform_beta(home=self.home, scenario=scenario).to_payload()
 
     def workflow_compile(
         self,

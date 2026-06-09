@@ -60,6 +60,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v4.0.0",
     "v4.1.0",
     "v4.5.0",
+    "v5.0.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -97,6 +98,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v4.0.0": "productized_zeus_platform",
     "v4.1.0": "objective_execution_spine",
     "v4.5.0": "governed_live_slice_authority_ux",
+    "v5.0.0": "productized_live_platform_beta",
 }
 
 
@@ -382,6 +384,11 @@ class ReleaseGatedUlwStatus(BaseModel):
     live_preflight_requirement_map_available: bool = False
     trusted_loopback_live_smoke_available: bool = False
     governed_live_slice_ready: bool = False
+    productized_live_platform_beta_contract_available: bool = False
+    objective_to_live_beta_journey_available: bool = False
+    authority_ux_beta_available: bool = False
+    public_beta_boundary_available: bool = False
+    productized_live_platform_beta_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -511,6 +518,9 @@ def build_release_gated_ulw_status(
     )
     governed_live_slice_available = (
         normalized_version == "v4.5.0" and "unknown_target_version" not in blocked_reasons
+    )
+    productized_live_platform_beta_available = (
+        normalized_version == "v5.0.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -827,6 +837,11 @@ def build_release_gated_ulw_status(
         live_preflight_requirement_map_available=governed_live_slice_available,
         trusted_loopback_live_smoke_available=governed_live_slice_available,
         governed_live_slice_ready=governed_live_slice_available,
+        productized_live_platform_beta_contract_available=productized_live_platform_beta_available,
+        objective_to_live_beta_journey_available=productized_live_platform_beta_available,
+        authority_ux_beta_available=productized_live_platform_beta_available,
+        public_beta_boundary_available=productized_live_platform_beta_available,
+        productized_live_platform_beta_ready=productized_live_platform_beta_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -890,6 +905,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v4.0.0",
         "v4.1.0",
         "v4.5.0",
+        "v5.0.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -911,6 +927,17 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v5.0.0":
+        return (
+            "live_platform_beta_status_manual_qa",
+            "objective_to_live_beta_operator_journey_manual_qa",
+            "public_beta_boundary_manual_qa",
+            "cli_library_beta_surface_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v4.5.0":
         return (
             "governed_live_slice_manual_qa",

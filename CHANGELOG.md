@@ -2,6 +2,31 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v5.0.0 - 2026-06-09
+
+### Added
+
+- Live Platform Beta runtime that aggregates productized status, Zeus persona,
+  setup/status cockpit readiness, ObjectiveRun spine, governed live authority
+  UX, CLI/Python surfaces, operator journey commands, and public beta boundary.
+- `live-platform-beta` CLI command and Python library facade method
+  `ZeusAgent.live_platform_beta(...)`.
+- Release-gated ULW `v5.0.0` checkpoint fields for productized live platform
+  beta, objective-to-live journey, authority UX beta, and public beta boundary.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==5.0.0` for Python packaging and
+  `v5.0.0` for the GitHub release tag.
+- Public README, Korean README, command catalog, security boundary, and live
+  architecture documentation now describe the v5.0.0 beta product surface.
+
+### Notes
+
+- `v5.0.0` is installable and usable as a governed local beta surface for
+  objective runs, authority UX, persona/status, and public-boundary inspection.
+  It still does not enable unrestricted production live execution by default.
+
 ## v4.5.0 - 2026-06-09
 
 ### Added

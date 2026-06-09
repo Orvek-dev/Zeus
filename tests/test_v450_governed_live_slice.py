@@ -22,7 +22,7 @@ def test_v450_release_gate_reports_governed_live_slice_checkpoint() -> None:
     assert payload["trusted_loopback_live_smoke_available"] is True
     assert payload["governed_live_slice_ready"] is True
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v5.0.0"
 
 
 def test_governed_live_slice_blocks_missing_authority_with_operator_steps() -> None:

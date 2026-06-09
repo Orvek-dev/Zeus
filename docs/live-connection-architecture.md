@@ -4,7 +4,7 @@ This document defines the target architecture for wiring real external AI APIs,
 MCP servers, tools, gateway delivery, web research, browser or terminal
 automation, and remote sandboxes into Zeus.
 
-The current public `v4.5.0` boundary does not claim these live integrations are
+The current public `v5.0.0` boundary does not claim these live integrations are
 production-active. It establishes the stable governed live platform release gate
 and the dry-run/live beta contract slices those integrations must pass through
 before production live execution or promotion is enabled.
@@ -238,18 +238,21 @@ Every live connection type should pass these gates:
 | Automation gate | Cron/headless work that bypasses approval or authority |
 | Review gate | Live integration shipped without independent security/runtime review |
 
-## Current v4.5.0 Governed Boundary
+## Current v5.0.0 Governed Boundary
 
-`v4.5.0` includes the accumulated governed local surfaces from the v0.6.0
-through v4.5.0 release program:
+`v5.0.0` includes the accumulated governed local surfaces from the v0.6.0
+through v5.0.0 release program:
 
 - deterministic total architecture CLI/eval surfaces;
-- release-gated ULW status for the v0.6.0 -> v4.5.0 program;
+- release-gated ULW status for the v0.6.0 -> v5.0.0 program;
 - ObjectiveRun start/status/export surfaces for persisted local run state,
   goal contracts, evidence records, and evidence-based completion summaries;
 - Governed Live Slice authority UX for missing objective, lease, approval,
   broker evidence, credential scope, sandbox policy, and audit receipt
   requirements before live-capable dispatch;
+- Live Platform Beta status and operator journey aggregation for persona,
+  setup/status cockpit, ObjectiveRun, authority UX, CLI/Python, and public
+  production-live boundary inspection;
 - Real Provider Runtime status, governed local deterministic provider smoke,
   controlled external provider receipt validation, budget/timeout gates, audit,
   redaction, and no-production-claim reporting;

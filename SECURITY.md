@@ -11,15 +11,16 @@ Zeus is governed and local-first by default.
 - Tool, connector, transport, gateway, and live provider paths should pass through authority, lease, and evidence boundaries before execution.
 - Dry-run and live-capable paths should remain distinguishable in code and review.
 
-## Current v4.5.0 Boundary
+## Current v5.0.0 Boundary
 
-`v4.5.0` keeps Zeus local-first and governed by default. The public package exposes
+`v5.0.0` keeps Zeus local-first and governed by default. The public package exposes
 productized status, goal intelligence, cognitive-provider activation, provider/MCP/tool
 runtime contracts, memory/ontology surfaces, self-evolution review queues, and
 ObjectiveRun start/status/export surfaces. It also exposes the Governed Live Slice
 authority UX for missing objective, lease, approval, broker-evidence,
-credential-scope, sandbox-policy, and audit-receipt requirements, but it does not
-enable unrestricted production live execution.
+credential-scope, sandbox-policy, and audit-receipt requirements, plus the Live
+Platform Beta aggregate status/operator journey, but it does not enable unrestricted
+production live execution.
 
 Governed live-capable work must resolve to trusted authority, lease, approval,
 credential-scope, sandbox, audit, and evidence records before a handler can execute or a

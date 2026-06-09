@@ -107,10 +107,10 @@ Zeus should eventually support the same broad platform categories:
 - skill creation and skill reuse;
 - trajectory and eval surfaces.
 
-The public `v4.5.0` code does not claim all live surfaces are
+The public `v5.0.0` code does not claim all live surfaces are
 production-active. It establishes the accumulated governed local contracts,
 dry-run checks, live-beta slices, productized platform status, ObjectiveRun
-start/status/export, Governed Live Slice authority UX, Goal
+start/status/export, Governed Live Slice authority UX, Live Platform Beta, Goal
 Intelligence, Cognitive Provider Activation, installable platform surfaces,
 production-scale policy contracts, provider/MCP/gateway/runtime reporting, and
 live connection design those surfaces should pass through before any
@@ -126,7 +126,7 @@ production-ready live claim is allowed.
 | Safety posture | Tool approval, command checks, profile isolation, session/gateway authorization, backend availability | Capability grants, path grants, side-effect labels, runtime leases, fail-closed dispatch, no-secret-echo, and evidence-backed completion |
 | Self-improvement | Agent learning loop creates and improves skills from experience | Skill proposals are generated but cannot self-promote, widen authority, enable live transport, or bypass evidence gates |
 | Completion claim | Agent reports progress through conversation and visible tool execution | Completion is blocked unless evidence and verification obligations support the objective |
-| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v4.5.0 is a governed local-first platform boundary with Goal Intelligence, Cognitive Provider Activation, ObjectiveRun start/status/export, Governed Live Slice authority UX, productized status, provider/MCP/gateway/runtime contracts, memory/ontology surfaces, self-evolution review queues, loopback/dry-run/live-beta reporting, and stabilized Zeus Core Language; production live integrations remain behind the same authority, lease, approval, sandbox, audit, evidence, rollback, and promotion boundary |
+| Live capability | Mature live ecosystem with many providers, gateways, tools, MCP, cron, and terminal/browser backends | v5.0.0 is a governed local-first beta platform boundary with Goal Intelligence, Cognitive Provider Activation, ObjectiveRun start/status/export, Governed Live Slice authority UX, Live Platform Beta status, productized status, provider/MCP/gateway/runtime contracts, memory/ontology surfaces, self-evolution review queues, loopback/dry-run/live-beta reporting, and stabilized Zeus Core Language; production live integrations remain behind the same authority, lease, approval, sandbox, audit, evidence, rollback, and promotion boundary |
 
 Zeus should not simply put a Hermes-like runtime inside an "agent layer" and
 call it done. Some runtime concerns should sit outside the agent loop:
@@ -159,7 +159,7 @@ meaningful it must also answer stricter questions:
 Hermes provides the platform breadth. Zeus adds a stronger governance spine for
 objective-oriented work.
 
-## Current v4.5.0 Boundary
+## Current v5.0.0 Boundary
 
 Implemented public foundation:
 
@@ -268,6 +268,9 @@ Implemented public foundation:
 - governed live slice authority UX for missing objective, lease, approval,
   broker evidence, credential scope, sandbox policy, and audit receipt
   requirements before live-capable dispatch;
+- governed Live Platform Beta reporting for persona/status cockpit,
+  ObjectiveRun, authority UX, CLI/Python surfaces, operator journey commands,
+  and public beta boundary inspection;
 - governed Stable Release reporting for the public stable platform boundary
   while keeping unrestricted live production execution disabled by default;
 - security planning, research graph, ontology candidate, sandbox workflow, and
@@ -277,8 +280,8 @@ Implemented public foundation:
 - CLI eval surfaces;
 - current public tests, a 10/10 final architecture eval, and a 9/9 total
   architecture eval;
-- release-gated ULW status for the v0.6.0 -> v4.5.0 program with
-  v4.5.0 governed live slice checkpoint reporting;
+- release-gated ULW status for the v0.6.0 -> v5.0.0 program with
+  v5.0.0 productized live platform beta checkpoint reporting;
 - live connection architecture for future provider, MCP, web, gateway, browser,
   terminal, and sandbox adapters.
 
