@@ -61,6 +61,9 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v4.1.0",
     "v4.5.0",
     "v5.0.0",
+    "v5.5.0",
+    "v5.8.0",
+    "v6.0.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -99,6 +102,9 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v4.1.0": "objective_execution_spine",
     "v4.5.0": "governed_live_slice_authority_ux",
     "v5.0.0": "productized_live_platform_beta",
+    "v5.5.0": "objective_compiler_dynamic_workflow",
+    "v5.8.0": "governed_live_connector_platform",
+    "v6.0.0": "higher_order_zeus_agent_os",
 }
 
 
@@ -389,6 +395,27 @@ class ReleaseGatedUlwStatus(BaseModel):
     authority_ux_beta_available: bool = False
     public_beta_boundary_available: bool = False
     productized_live_platform_beta_ready: bool = False
+    objective_compiler_ux_available: bool = False
+    dynamic_workflow_runtime_available: bool = False
+    workflow_dag_available: bool = False
+    evidence_plan_available: bool = False
+    deep_interview_contract_available: bool = False
+    repair_replan_ux_available: bool = False
+    objective_compiler_workflow_ready: bool = False
+    governed_live_connector_platform_available: bool = False
+    provider_connector_activation_available: bool = False
+    mcp_connector_activation_available: bool = False
+    gateway_loopback_connector_available: bool = False
+    local_sandbox_connector_available: bool = False
+    connector_broker_evidence_required: bool = False
+    governed_live_connector_platform_ready: bool = False
+    higher_order_agent_os_available: bool = False
+    zeus_tui_cockpit_available: bool = False
+    recursive_improvement_review_available: bool = False
+    plugin_ecosystem_skeleton_available: bool = False
+    remote_sandbox_contract_available: bool = False
+    tenant_auth_contract_available: bool = False
+    higher_order_agent_os_ready: bool = False
     production_ready: bool = False
     workflow_self_modification: bool = False
     workflow_memory_auto_write: bool = False
@@ -521,6 +548,15 @@ def build_release_gated_ulw_status(
     )
     productized_live_platform_beta_available = (
         normalized_version == "v5.0.0" and "unknown_target_version" not in blocked_reasons
+    )
+    objective_compiler_workflow_available = (
+        normalized_version == "v5.5.0" and "unknown_target_version" not in blocked_reasons
+    )
+    governed_live_connector_platform_available = (
+        normalized_version == "v5.8.0" and "unknown_target_version" not in blocked_reasons
+    )
+    higher_order_agent_os_available = (
+        normalized_version == "v6.0.0" and "unknown_target_version" not in blocked_reasons
     )
     fatal_blocked_reasons = tuple(
         reason for reason in blocked_reasons if reason != "broker_evidence_required"
@@ -842,6 +878,27 @@ def build_release_gated_ulw_status(
         authority_ux_beta_available=productized_live_platform_beta_available,
         public_beta_boundary_available=productized_live_platform_beta_available,
         productized_live_platform_beta_ready=productized_live_platform_beta_available,
+        objective_compiler_ux_available=objective_compiler_workflow_available,
+        dynamic_workflow_runtime_available=objective_compiler_workflow_available,
+        workflow_dag_available=objective_compiler_workflow_available,
+        evidence_plan_available=objective_compiler_workflow_available,
+        deep_interview_contract_available=objective_compiler_workflow_available,
+        repair_replan_ux_available=objective_compiler_workflow_available,
+        objective_compiler_workflow_ready=objective_compiler_workflow_available,
+        governed_live_connector_platform_available=governed_live_connector_platform_available,
+        provider_connector_activation_available=governed_live_connector_platform_available,
+        mcp_connector_activation_available=governed_live_connector_platform_available,
+        gateway_loopback_connector_available=governed_live_connector_platform_available,
+        local_sandbox_connector_available=governed_live_connector_platform_available,
+        connector_broker_evidence_required=governed_live_connector_platform_available,
+        governed_live_connector_platform_ready=governed_live_connector_platform_available,
+        higher_order_agent_os_available=higher_order_agent_os_available,
+        zeus_tui_cockpit_available=higher_order_agent_os_available,
+        recursive_improvement_review_available=higher_order_agent_os_available,
+        plugin_ecosystem_skeleton_available=higher_order_agent_os_available,
+        remote_sandbox_contract_available=higher_order_agent_os_available,
+        tenant_auth_contract_available=higher_order_agent_os_available,
+        higher_order_agent_os_ready=higher_order_agent_os_available,
         production_ready=False,
         workflow_self_modification=False,
         workflow_memory_auto_write=False,
@@ -906,6 +963,9 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v4.1.0",
         "v4.5.0",
         "v5.0.0",
+        "v5.5.0",
+        "v5.8.0",
+        "v6.0.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -927,6 +987,41 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v6.0.0":
+        return (
+            "higher_order_agent_os_status_manual_qa",
+            "zeus_tui_cockpit_manual_qa",
+            "recursive_improvement_review_manual_qa",
+            "plugin_remote_sandbox_tenant_contract_manual_qa",
+            "docs_public_boundary_sync",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
+    if target_version == "v5.8.0":
+        return (
+            "governed_live_connector_status_manual_qa",
+            "provider_mcp_gateway_sandbox_connector_manual_qa",
+            "broker_evidence_required_manual_qa",
+            "credential_secret_boundary_manual_qa",
+            "live_connector_public_boundary_review",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
+    if target_version == "v5.5.0":
+        return (
+            "objective_compiler_workflow_manual_qa",
+            "deep_interview_gap_manual_qa",
+            "workflow_dag_evidence_plan_manual_qa",
+            "objective_compiler_cli_library_manual_qa",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v5.0.0":
         return (
             "live_platform_beta_status_manual_qa",

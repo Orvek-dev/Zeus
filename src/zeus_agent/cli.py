@@ -181,6 +181,7 @@ from zeus_agent.model_runtime import (
     provider_budget_payload,
     provider_catalog_payload,
 )
+from zeus_agent.objective_compiler_ux_runtime import build_objective_compiler_workflow
 from zeus_agent.objective_run_runtime import ObjectiveRunRuntime, ObjectiveRunStore
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
 from zeus_agent.plugin_runtime import validate_plugin_manifest
@@ -286,6 +287,35 @@ def objective_export(
 ) -> None:
     runtime = ObjectiveRunRuntime(ObjectiveRunStore(home or default_zeus_home()))
     _print_payload(runtime.export(run_id).to_payload(), as_json=as_json)
+
+
+@app.command("objective-compile-workflow")
+def objective_compile_workflow(
+    objective: str = typer.Option(..., "--objective"),
+    session_id: str = typer.Option("default", "--session-id"),
+    principal_id: str = typer.Option("operator.local", "--principal-id"),
+    task_count: int = typer.Option(1, "--task-count"),
+    requires_code: bool = typer.Option(False, "--requires-code"),
+    requires_research: bool = typer.Option(False, "--requires-research"),
+    risk_level: str = typer.Option("normal", "--risk-level"),
+    interview_answer: list[str] = typer.Option([], "--interview-answer"),
+    cognitive_provider_output: Optional[str] = typer.Option(None, "--cognitive-provider-output"),
+    home: Optional[Path] = typer.Option(None, "--home"),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    payload = build_objective_compiler_workflow(
+        home=home or default_zeus_home(),
+        objective=objective,
+        session_id=session_id,
+        principal_id=principal_id,
+        task_count=task_count,
+        requires_code=requires_code,
+        requires_research=requires_research,
+        risk_level=risk_level,
+        interview_answers=tuple(interview_answer),
+        cognitive_provider_output=cognitive_provider_output,
+    ).to_payload()
+    _print_payload(payload, as_json=as_json)
 
 
 @app.command("governed-live-slice")

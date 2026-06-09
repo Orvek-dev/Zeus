@@ -27,8 +27,9 @@ Zeus의 중심    = objective contract + authority gate + evidence + promotion r
 ```
 
 Zeus는 Hermes의 넓은 플랫폼 형태에서 배울 것은 흡수하되, 중심축은 다르게
-잡습니다. 공개 `v5.0.0` 릴리스는 local-first governed platform boundary입니다.
-Goal Intelligence, Cognitive Provider Activation, Productized Platform status,
+잡습니다. 공개 `v5.5.0` 릴리스는 local-first governed platform boundary입니다.
+Goal Intelligence, Cognitive Provider Activation, Objective Compiler Workflow UX,
+Dynamic Workflow DAG planning, Productized Platform status,
 ObjectiveRun start/status/export, Governed Live Slice authority UX,
 Live Platform Beta status, provider/MCP/tool/gateway/runtime 계약,
 memory/ontology surface, self-evolution review queue, release-gated evidence check를 제공합니다. 다만 live provider,
@@ -83,9 +84,10 @@ zeus productized-platform --scenario status --json
 zeus cognitive-provider-activation --scenario fake-provider-intent --objective "제우스야, 내 목적을 governed workflow로 정리해줘." --json
 zeus goal-intelligence-runtime --scenario understand-objective --objective "병렬 작업자를 쓰는 리서치 기반 코딩 워크플로우를 만들어줘." --task-count 6 --requires-code --requires-research --json
 zeus objective-start --objective "제우스야, 내 목적을 evidence-backed run으로 정리해줘." --acceptance-criterion objective-run-created --json
+zeus objective-compile-workflow --objective "제우스야, 이 목적을 governed workflow로 컴파일해줘." --requires-code --task-count 4 --json
 zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
 zeus live-platform-beta --scenario status --json
-zeus release-gated-ulw --target-version v5.0.0 --json
+zeus release-gated-ulw --target-version v5.5.0 --json
 ```
 
 더 긴 명령 목록은 [docs/commands.md](docs/commands.md)를 보세요.
@@ -98,6 +100,7 @@ Zeus는 열린 요청을 검수 가능한 실행으로 바꿉니다.
 | --- | --- |
 | Objective contract | 사용자의 목적을 acceptance criteria, assumption, unknown, evidence obligation으로 정리합니다. |
 | Objective run | 시작된 목적을 local run으로 저장하고 start/status/export와 evidence 기반 완료 판정을 제공합니다. |
+| Objective Compiler Workflow | 목적을 intent frame, 필요한 인터뷰 질문, workflow DAG, authority requirement, evidence plan으로 컴파일합니다. |
 | Governed live slice | live-capable 작업 전 objective, lease, approval, broker evidence, credential, sandbox, audit 요구사항 누락을 설명하고 차단합니다. |
 | Live platform beta | persona, setup/status cockpit, ObjectiveRun, authority UX, CLI, Python library, public production-live boundary를 beta 상태로 집계합니다. |
 | Authority gate | capability, path, credential, tool, live surface가 허용된 경우에만 실행됩니다. |

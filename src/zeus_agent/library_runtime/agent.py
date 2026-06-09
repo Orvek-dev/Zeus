@@ -169,6 +169,7 @@ from zeus_agent.mcp_owned_client_live_runtime import build_mcp_owned_client_live
 from zeus_agent.model_cockpit_runtime import ModelCockpitRuntime
 from zeus_agent.model_runtime import provider_catalog_payload
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
+from zeus_agent.objective_compiler_ux_runtime import build_objective_compiler_workflow
 from zeus_agent.objective_runtime import ObjectiveCompiler
 from zeus_agent.objective_run_runtime import ObjectiveRunRuntime, ObjectiveRunStore
 from zeus_agent.orchestration_runtime import DynamicWorkflowCompiler, WorkflowCompileRequest
@@ -266,6 +267,32 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
     def objective_export(self, *, run_id: str) -> dict[str, Any]:
         runtime = ObjectiveRunRuntime(ObjectiveRunStore(self.home))
         return runtime.export(run_id=run_id).to_payload()
+
+    def objective_compile_workflow(
+        self,
+        *,
+        objective: str,
+        session_id: str = "default",
+        principal_id: str = "operator.local",
+        task_count: int = 1,
+        requires_code: bool = False,
+        requires_research: bool = False,
+        risk_level: str = "normal",
+        interview_answers: tuple[str, ...] = (),
+        cognitive_provider_output: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return build_objective_compiler_workflow(
+            home=self.home,
+            objective=objective,
+            session_id=session_id,
+            principal_id=principal_id,
+            task_count=task_count,
+            requires_code=requires_code,
+            requires_research=requires_research,
+            risk_level=risk_level,
+            interview_answers=interview_answers,
+            cognitive_provider_output=cognitive_provider_output,
+        ).to_payload()
 
     def governed_live_slice(
         self,

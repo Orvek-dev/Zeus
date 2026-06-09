@@ -2,6 +2,32 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v5.5.0 - 2026-06-09
+
+### Added
+
+- Objective Compiler Workflow runtime that joins goal intelligence, ObjectiveRun,
+  dynamic workflow planning, interview-gap UX, authority requirements, and
+  evidence planning into one side-effect-free compile surface.
+- `objective-compile-workflow` CLI command and Python library facade method
+  `ZeusAgent.objective_compile_workflow(...)`.
+- Release-gated ULW `v5.5.0` checkpoint fields for Objective Compiler UX,
+  Dynamic Workflow Runtime, workflow DAG, evidence plan, deep-interview
+  contract, and repair/replan UX.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==5.5.0` for Python packaging and
+  `v5.5.0` for the GitHub release tag.
+- Public README and Korean README now include the Objective Compiler Workflow
+  command and product boundary.
+
+### Notes
+
+- `v5.5.0` compiles clear objectives into workflow DAG and evidence plans, and
+  asks focused interview questions for vague objectives. It still does not
+  enable unrestricted production live execution by default.
+
 ## v5.0.0 - 2026-06-09
 
 ### Added

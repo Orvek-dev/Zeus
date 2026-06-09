@@ -23,7 +23,7 @@ def test_v500_release_gate_reports_productized_live_platform_beta() -> None:
     assert payload["public_beta_boundary_available"] is True
     assert payload["productized_live_platform_beta_ready"] is True
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v5.5.0"
 
 
 def test_live_platform_beta_status_aggregates_installable_operator_journey(tmp_path: Path) -> None:
