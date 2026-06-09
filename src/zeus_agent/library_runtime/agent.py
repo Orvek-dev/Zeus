@@ -18,6 +18,7 @@ from zeus_agent.gateway_settings_runtime import GatewaySettingsRuntime
 from zeus_agent.goal_intelligence_runtime import build_goal_intelligence_contract
 from zeus_agent.governed_live_connector_platform_runtime import build_governed_live_connector_platform
 from zeus_agent.governed_live_slice_runtime import build_governed_live_slice
+from zeus_agent.higher_order_agent_os_runtime import build_higher_order_agent_os
 from zeus_agent.installable_live_platform_runtime import build_installable_live_platform_contract
 from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActivationRuntime
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
@@ -328,6 +329,12 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
 
     def governed_live_connectors(self, *, scenario: str = "status") -> dict[str, Any]:
         return build_governed_live_connector_platform(
+            home=self.home,
+            scenario=scenario,
+        ).to_payload()
+
+    def higher_order_agent_os(self, *, scenario: str = "status") -> dict[str, Any]:
+        return build_higher_order_agent_os(
             home=self.home,
             scenario=scenario,
         ).to_payload()

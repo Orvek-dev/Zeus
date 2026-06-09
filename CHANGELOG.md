@@ -2,6 +2,35 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v6.0.0 - 2026-06-09
+
+### Added
+
+- Higher-Order Agent OS runtime that aggregates Zeus persona, Objective
+  Compiler Workflow, governed live connectors, TUI cockpit contract, recursive
+  improvement review, plugin skeleton, remote sandbox contract, tenant/auth
+  contract, eval dashboard contract, persistent audit contract, and public
+  production boundary.
+- `higher-order-agent-os` CLI command and Python library facade method
+  `ZeusAgent.higher_order_agent_os(...)`.
+- Release-gated ULW `v6.0.0` checkpoint fields for the Agent OS product
+  surface, TUI cockpit, recursive improvement review, plugin ecosystem
+  skeleton, remote sandbox contract, and tenant/auth contract.
+
+### Changed
+
+- Version metadata is aligned to `zeus-agent==6.0.0` for Python packaging and
+  `v6.0.0` for the GitHub release tag.
+- Public README and Korean README now describe the Higher-Order Agent OS
+  surface and operator cockpit command.
+
+### Notes
+
+- `v6.0.0` is the usable local-first Agent OS surface for trying Zeus as a
+  governed, purpose-centered platform. Remote sandbox, multi-user hosted mode,
+  unattended execution, unrestricted production live execution, and automatic
+  memory promotion remain disabled by default.
+
 ## v5.8.0 - 2026-06-09
 
 ### Added
