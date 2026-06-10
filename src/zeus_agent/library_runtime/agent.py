@@ -5,6 +5,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import Any, Optional
 
+from pydantic import ValidationError
+
 from zeus_agent.approval_cockpit_runtime import ApprovalCockpitRuntime
 from zeus_agent.approval_receipt_runtime import ApprovalReceiptResult
 from zeus_agent.approval_receipt_runtime import ApprovalReceiptRuntime
@@ -24,6 +26,7 @@ from zeus_agent.live_beta_runtime import LiveBetaActivationRequest, LiveBetaActi
 from zeus_agent.live_beta_candidate_runtime import build_live_beta_candidate_contract
 from zeus_agent.live_platform_beta_runtime import build_live_platform_beta
 from zeus_agent.mcp_live_server_runtime import build_mcp_live_server_contract
+from zeus_agent.objective_card_runtime import ObjectiveFrameInput, compile_from_frame
 from zeus_agent.production_foundation_runtime import build_production_foundation_contract
 from zeus_agent.production_scale_platform_runtime import build_production_scale_platform_contract
 from zeus_agent.productized_zeus_platform_runtime import build_productized_zeus_platform_contract
@@ -243,6 +246,53 @@ class ZeusAgent(GrowthFacadeMixin, LiveResearchFacadeMixin):
 
     def compile_objective(self, objective: str) -> dict[str, Any]:
         return ObjectiveCompiler().compile(objective).model_dump(mode="json")
+
+    def objective_run(
+        self,
+        frame: dict[str, Any],
+        *,
+        approve_gates: tuple[str, ...] = (),
+    ) -> dict[str, Any]:
+        """Run a governed objective end-to-end: frame → card → execute → evidence.
+
+        This is the assembled spine as a library call. A side-effecting plan
+        suspends at its gate; pass ``approve_gates`` to approve and resume.
+        """
+        from zeus_agent.governed_objective_runtime import GovernedObjectiveOrchestrator
+        from zeus_agent.objective_card_runtime import ObjectiveFrameInput
+
+        try:
+            parsed = ObjectiveFrameInput.model_validate(frame)
+        except ValidationError as exc:
+            return {
+                "stage": "blocked",
+                "blocked_reasons": ["malformed_objective_frame"],
+                "error": str(exc),
+            }
+        orch = GovernedObjectiveOrchestrator(home=self.home)
+        result = orch.compile_and_run(parsed)
+        if result.stage == "waiting_approval" and approve_gates and result.run_id is not None:
+            result = orch.resume(result.run_id, approved_gates=approve_gates)
+        return result.to_payload()
+
+    def objective_card(self, frame: dict[str, Any]) -> dict[str, Any]:
+        """Compile a cognitive-layer frame into a governed objective card.
+
+        ``frame`` is the LLM's structured read of an utterance (normalized
+        objective, triage, unknowns, candidate workflows). Compilation is pure:
+        Zeus derives the questions, verified plan, cost, and approval staging
+        deterministically. A malformed frame fails closed.
+        """
+        try:
+            parsed = ObjectiveFrameInput.model_validate(frame)
+        except ValidationError as exc:
+            return {
+                "decision": "blocked",
+                "blocked_reasons": ["malformed_objective_frame"],
+                "error": str(exc),
+                "no_secret_echo": True,
+            }
+        return compile_from_frame(parsed).to_payload()
 
     def objective_start(
         self,

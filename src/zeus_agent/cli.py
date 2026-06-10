@@ -15,6 +15,10 @@ from zeus_agent.acp_runtime import handle_acp_message
 from zeus_agent.adaptive_zeus_runtime import build_adaptive_zeus_contract
 from zeus_agent.api_runtime import run_api_server
 from zeus_agent.batch_runtime import run_objective_batch
+from zeus_agent.cli_objective import register_objective_commands
+from zeus_agent.cli_objective_card import register_objective_card_commands
+from zeus_agent.cli_objective_run import register_objective_run_commands
+from zeus_agent.cli_welcome import register_welcome_commands
 from zeus_agent.cli_wave3 import register_wave3_commands
 from zeus_agent.cli_wave4 import register_wave4_commands
 from zeus_agent.cli_wave5 import register_wave5_commands
@@ -210,8 +214,24 @@ app = typer.Typer(
 )
 
 
+def _version_callback(value: bool) -> None:
+    if value:
+        from zeus_agent import __version__
+
+        typer.echo("zeus-agent {0}".format(__version__))
+        raise typer.Exit()
+
+
 @app.callback()
-def main() -> None:
+def main(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        callback=_version_callback,
+        is_eager=True,
+        help="Show the installed zeus-agent version and exit.",
+    ),
+) -> None:
     return None
 
 
@@ -1161,3 +1181,7 @@ register_live_research_workflow_commands(app)
 register_g006_commands(app)
 register_total_commands(app)
 register_final_commands(app)
+register_objective_card_commands(app)
+register_objective_commands(app)
+register_objective_run_commands(app)
+register_welcome_commands(app)

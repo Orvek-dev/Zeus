@@ -19,6 +19,7 @@ from .planning import PlanCandidate, PlanTournament
 from .policy import TrustDecisionEngine, TrustPolicyOutcome
 from .skill_manifest import SkillManifest
 from .trust_ledger import GrantProposal, TrustLedger, TrustStat
+from .trust_stat_store import SQLiteTrustStatStore
 
 __all__ = [
     "ActionRisk",
@@ -35,6 +36,7 @@ __all__ = [
     "PlanTournament",
     "Reversibility",
     "SQLiteEvidenceLedger",
+    "SQLiteTrustStatStore",
     "SkillManifest",
     "TrustDecision",
     "TrustDecisionEngine",

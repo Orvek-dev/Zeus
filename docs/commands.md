@@ -36,6 +36,9 @@ zeus cognitive-provider-activation --scenario fake-provider-intent --json
 zeus cognitive-provider-activation --scenario external-provider-block --json
 zeus cognitive-provider-activation --scenario unsafe-output-block --json
 zeus objective-compile-workflow --objective "Zeus, compile this goal into a governed workflow." --requires-code --task-count 4 --json
+zeus objective-card --demo blog --json
+zeus objective-card --demo tidy --json
+zeus objective-card --frame-json '{"normalized_objective": "Summarize a doc", "triage": "oneshot", "required_criteria": ["summary"], "candidates": [{"candidate_id": "summarize", "nodes": [{"node_id": "read", "kind": "llm_generic", "produces_criteria": ["summary"]}, {"node_id": "check", "kind": "verification", "verifies_criteria": ["summary"]}], "edges": [{"src": "read", "dst": "check"}]}]}' --json
 zeus higher-order-agent-os --scenario status --json
 zeus higher-order-agent-os --scenario operator-cockpit --json
 zeus higher-order-agent-os --scenario public-boundary --json
