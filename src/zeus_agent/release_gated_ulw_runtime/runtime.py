@@ -64,6 +64,7 @@ _PROGRAM_ORDER: Final[tuple[str, ...]] = (
     "v5.5.0",
     "v5.8.0",
     "v6.0.0",
+    "v6.1.0",
 )
 _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v0.6.0": "live_spine",
@@ -105,6 +106,7 @@ _STAGE_BY_VERSION: Final[dict[str, str]] = {
     "v5.5.0": "objective_compiler_dynamic_workflow",
     "v5.8.0": "governed_live_connector_platform",
     "v6.0.0": "higher_order_zeus_agent_os",
+    "v6.1.0": "trust_loop_refoundation",
 }
 
 
@@ -966,6 +968,7 @@ def _blocked_reasons(*, target_version: str, raw_secret_marker_detected: bool) -
         "v5.5.0",
         "v5.8.0",
         "v6.0.0",
+        "v6.1.0",
     }:
         reasons.append("prior_release_checkpoint_required")
     if target_version == "v2.1.0":
@@ -987,6 +990,19 @@ def _next_version(target_version: str) -> Optional[str]:
 
 
 def _required_checkpoint_evidence(target_version: str) -> tuple[str, ...]:
+    if target_version == "v6.1.0":
+        return (
+            "trust_loop_runtime_spine_tests",
+            "hash_chained_evidence_ledger_tests",
+            "approval_queue_undo_and_policy_tests",
+            "plan_tournament_and_trust_ledger_tests",
+            "entry_chat_provider_trust_loop_retrofit_tests",
+            "docs_public_boundary_sync",
+            "red_green_tests_captured",
+            "manual_qa_evidence_captured",
+            "independent_review_approved",
+            "github_release_checkpoint_complete",
+        )
     if target_version == "v6.0.0":
         return (
             "higher_order_agent_os_status_manual_qa",

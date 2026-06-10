@@ -1,0 +1,15 @@
+services:
+  zeus:
+    image: zeus-agent:6.1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zeus-agent
+    command: ["sleep", "infinity"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - zeus_home:/home/zeus/.zeus
+
+volumes:
+  zeus_home:

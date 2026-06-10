@@ -13,9 +13,12 @@ zeus productized-platform --scenario status --json
 zeus cognitive-provider-activation --scenario fake-provider-intent --objective "Zeus, turn my goal into a governed workflow." --json
 zeus goal-intelligence-runtime --scenario understand-objective --objective "Build a research backed coding workflow with parallel workers." --task-count 6 --requires-code --requires-research --json
 zeus objective-start --objective "Zeus, turn my goal into an evidence-backed run." --acceptance-criterion objective-run-created --json
+zeus objective-compile-workflow --objective "Zeus, compile this goal into a governed workflow." --requires-code --task-count 4 --json
+zeus governed-live-connectors --scenario trusted-local-smoke --json
+zeus higher-order-agent-os --scenario operator-cockpit --json
 zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
 zeus live-platform-beta --scenario status --json
-zeus release-gated-ulw --target-version v5.0.0 --json
+zeus release-gated-ulw --target-version v6.1.0 --json
 ```
 
 ## Product And Goal Intelligence
@@ -32,6 +35,10 @@ zeus goal-intelligence-runtime --scenario adaptive-replan --objective "Implement
 zeus cognitive-provider-activation --scenario fake-provider-intent --json
 zeus cognitive-provider-activation --scenario external-provider-block --json
 zeus cognitive-provider-activation --scenario unsafe-output-block --json
+zeus objective-compile-workflow --objective "Zeus, compile this goal into a governed workflow." --requires-code --task-count 4 --json
+zeus higher-order-agent-os --scenario status --json
+zeus higher-order-agent-os --scenario operator-cockpit --json
+zeus higher-order-agent-os --scenario public-boundary --json
 ```
 
 ## Objective Runs
@@ -48,7 +55,7 @@ blocked until each acceptance criterion has matching evidence.
 ## Release And Platform Status
 
 ```sh
-zeus release-gated-ulw --target-version v5.0.0 --json
+zeus release-gated-ulw --target-version v6.1.0 --json
 zeus stable-release --json
 zeus production-live-platform-runtime --scenario status --json
 zeus production-live-platform-runtime --scenario provider-mcp-smoke --json
@@ -70,6 +77,28 @@ zeus governed-live-slice --surface provider --capability-id provider.local-smoke
 The first command explains the missing authority requirements. The second
 command exercises the trusted local loopback smoke path; it still does not
 claim production live execution.
+
+## Governed Live Connectors
+
+```sh
+zeus governed-live-connectors --scenario status --json
+zeus governed-live-connectors --scenario trusted-local-smoke --json
+zeus governed-live-connectors --scenario public-boundary --json
+```
+
+This surface checks provider, MCP, gateway, and local sandbox connector smoke
+paths through the same governed objective, lease, approval, broker evidence,
+credential, sandbox, and audit requirements.
+
+## Docker And OrbStack
+
+```sh
+docker compose build zeus
+docker compose up -d zeus
+docker exec zeus-agent zeus higher-order-agent-os --scenario status --json
+```
+
+See [Docker And OrbStack](docker.md) for the full local container flow.
 
 ## Live Platform Beta
 

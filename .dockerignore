@@ -1,0 +1,14 @@
+.git
+.pytest_cache
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+dist
+build
+*.egg-info
+harness
+*.log
+objective-runs.json

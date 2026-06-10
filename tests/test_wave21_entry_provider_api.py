@@ -5,9 +5,12 @@ import threading
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
+from pytest import MonkeyPatch
+from pydantic import JsonValue
 
 from typer.testing import CliRunner
 
+import zeus_agent.entry_runtime.live_provider as live_provider
 from zeus_agent.api_runtime import make_api_handler
 from zeus_agent.cli import app
 from zeus_agent.doctor_runtime import doctor_report
@@ -87,6 +90,66 @@ def test_chat_runtime_records_session_and_redacts_secret(tmp_path: Path) -> None
     assert result.raw_secret_echoed is False
     assert "raw-secret-value" not in serialized
     assert "[redacted-secret]" in serialized
+
+
+def test_chat_runtime_uses_openai_live_only_when_explicitly_enabled(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    class _FakeResponse:
+        status = 200
+
+        def __enter__(self) -> "_FakeResponse":
+            return self
+
+        def __exit__(self, *_args) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return json.dumps(
+                {
+                    "id": "chatcmpl-test",
+                    "choices": [
+                        {
+                            "message": {
+                                "role": "assistant",
+                                "content": "ZEUS_OPENAI_TEST_OK",
+                            },
+                        },
+                    ],
+                },
+            ).encode("utf-8")
+
+    captured = {}
+
+    def _fake_urlopen(request, timeout: int) -> _FakeResponse:
+        captured["timeout"] = timeout
+        captured["request"] = request
+        return _FakeResponse()
+
+    monkeypatch.setenv("ZEUS_ENABLE_OPENAI_LIVE_CHAT", "1")
+    monkeypatch.setenv("ZEUS_OPENAI_API_KEY", "sk-test-secret-value")
+    monkeypatch.setattr(live_provider, "urlopen", _fake_urlopen)
+
+    ZeusChatRuntime(tmp_path).run_turn(message="hello", session_id="fallback", provider_id="fake")
+    result = ZeusChatRuntime(tmp_path).run_turn(
+        message="hello Zeus",
+        session_id="openai",
+        provider_id="openai",
+    )
+    exported = ZeusChatRuntime(tmp_path).session_payload("openai")
+    serialized = json.dumps(exported, sort_keys=True)
+
+    assert result.provider_id == "openai"
+    assert result.assistant_message.startswith("ZEUS_OPENAI_TEST_OK")
+    assert "[provider: openai/gpt-4.1" in result.assistant_message
+    assert result.trust_receipt_id == "trust.receipt.entry_chat_openai"
+    assert result.trust_evidence_record_id is not None
+    assert result.broker_evidence_bound is True
+    assert result.handler_executed is True
+    assert captured["timeout"] == 30
+    assert "sk-test-secret-value" not in serialized
+    assert exported["raw_secret_exported"] is False
 
 
 def test_session_store_search_export_and_import(tmp_path: Path) -> None:
@@ -184,12 +247,12 @@ def test_cli_wave21_entry_commands_are_available(tmp_path: Path) -> None:
     assert json.loads(status.stdout)["session_count"] == 1
 
 
-def _get_json(url: str) -> dict[str, object]:
+def _get_json(url: str) -> dict[str, JsonValue]:
     with urllib.request.urlopen(url, timeout=5) as response:
         return json.loads(response.read().decode("utf-8"))
 
 
-def _post_json(url: str, payload: dict[str, object]) -> dict[str, object]:
+def _post_json(url: str, payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
         url,

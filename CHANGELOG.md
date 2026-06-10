@@ -2,6 +2,36 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v6.1.0 - 2026-06-10
+
+### Added
+
+- Trust Loop runtime package with a governed execution spine, 4-tier
+  AUTO/NOTIFY/ASK/DENY authority decisions, action reversibility, approval
+  envelopes, undo proof, hash-chained SQLite evidence ledger, decision
+  receipts, approval queue, plan tournament, progressive trust proposal ledger,
+  and skill manifest capability enforcement.
+- Focused v6.1.0 red/green tests for unknown capability denial, irreversible
+  approval gating, reversible in-scope execution through `CapabilityBroker`,
+  tainted medium-risk escalation, ledger tamper detection, approval/undo proof,
+  plan tournament selection, trust proposal review, skill manifest blocking,
+  and release-gated checkpoint recognition.
+
+### Changed
+
+- Dogfood OpenAI chat execution now goes through the Trust Loop dispatcher before
+  opening network execution. The direct chat-runtime HTTP call was removed.
+- Version metadata is aligned to `zeus-agent==6.1.0` for Python packaging and
+  `v6.1.0` for the GitHub release tag.
+- Release-gated ULW now recognizes `v6.1.0` as the Trust Loop refoundation
+  checkpoint and requires Trust Loop evidence before release.
+
+### Notes
+
+- `v6.1.0` is a refoundation release. It does not claim unrestricted production
+  live execution. Broader MCP, gateway, browser, plugin, and remote sandbox
+  surfaces still need the same Trust Loop retrofit before they should be opened.
+
 ## v6.0.0 - 2026-06-09
 
 ### Added

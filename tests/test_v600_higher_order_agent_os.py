@@ -25,7 +25,7 @@ def test_v600_release_gate_reports_higher_order_agent_os_checkpoint() -> None:
     assert payload["tenant_auth_contract_available"] is True
     assert payload["higher_order_agent_os_ready"] is True
     assert payload["production_ready"] is False
-    assert payload["next_version"] is None
+    assert payload["next_version"] == "v6.1.0"
 
 
 def test_higher_order_agent_os_status_aggregates_objective_and_connector_surfaces(tmp_path: Path) -> None:

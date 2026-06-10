@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from zeus_agent.entry_runtime.live_provider import openai_chat_reply_through_trust_loop
 from zeus_agent.model_runtime.provider_catalog import get_provider_profile
 from zeus_agent.model_settings_runtime import ModelSettingsRuntime
 from zeus_agent.security.credentials import redact_secret_spans
@@ -24,6 +25,10 @@ class ChatTurnResult:
     objective_mode_active: bool
     live_production_claimed: bool
     raw_secret_echoed: bool
+    trust_receipt_id: str | None = None
+    trust_evidence_record_id: str | None = None
+    broker_evidence_bound: bool = False
+    handler_executed: bool = False
 
     def to_payload(self) -> dict[str, object]:
         return {
@@ -36,6 +41,10 @@ class ChatTurnResult:
             "objective_mode_active": self.objective_mode_active,
             "live_production_claimed": self.live_production_claimed,
             "raw_secret_echoed": self.raw_secret_echoed,
+            "trust_receipt_id": self.trust_receipt_id,
+            "trust_evidence_record_id": self.trust_evidence_record_id,
+            "broker_evidence_bound": self.broker_evidence_bound,
+            "handler_executed": self.handler_executed,
         }
 
 
@@ -55,10 +64,14 @@ class ZeusChatRuntime:
         normalized = redact_secret_spans(message.strip())
         if normalized == "":
             raise ValueError("empty_message")
-        preference = ModelSettingsRuntime(self.home).show() if provider_id is None else None
+        preference = ModelSettingsRuntime(self.home).show()
         selected_provider_id = provider_id if provider_id is not None else preference.provider_id
         provider = get_provider_profile(selected_provider_id)
-        selected_model_id = provider.default_model if preference is None else preference.model_id
+        selected_model_id = (
+            preference.model_id
+            if preference.provider_id == provider.provider_id
+            else provider.default_model
+        )
         session = self.store.ensure_session(
             session_id=session_id,
             profile=profile,
@@ -70,7 +83,20 @@ class ZeusChatRuntime:
             role="user",
             content=normalized,
         )
-        assistant = _assistant_reply(normalized, provider.display_name)
+        live_reply = (
+            openai_chat_reply_through_trust_loop(
+                home=self.home,
+                message=normalized,
+                model_id=selected_model_id,
+            )
+            if provider.provider_id == "openai"
+            else None
+        )
+        assistant = (
+            _assistant_reply(normalized, provider.display_name)
+            if live_reply is None
+            else live_reply.assistant_message
+        )
         self.store.append_message(
             session_id=session.session_id,
             role="assistant",
@@ -86,6 +112,10 @@ class ZeusChatRuntime:
             objective_mode_active=profile in {"work", "live", "strict"},
             live_production_claimed=False,
             raw_secret_echoed=message.strip() != normalized and message.strip() in assistant,
+            trust_receipt_id=None if live_reply is None else live_reply.trust_receipt_id,
+            trust_evidence_record_id=None if live_reply is None else live_reply.trust_evidence_record_id,
+            broker_evidence_bound=False if live_reply is None else live_reply.broker_evidence_bound,
+            handler_executed=False if live_reply is None else live_reply.handler_executed,
         )
 
     def session_payload(self, session_id: str) -> dict[str, object]:

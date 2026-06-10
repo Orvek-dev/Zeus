@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v6.0.0"><img alt="Version" src="https://img.shields.io/badge/version-6.0.0-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases/tag/v6.1.0"><img alt="Version" src="https://img.shields.io/badge/version-6.1.0-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-runtime-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1490%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1516%20passed-1f883d">
   <img alt="Hermes inspired" src="https://img.shields.io/badge/Hermes--inspired-governed%20runtime-8250df">
 </p>
 
@@ -36,16 +36,24 @@ Zeus control model  = objective contracts + authority gates + evidence + promoti
 ```
 
 Zeus is inspired by the platform breadth of Hermes, but it keeps a different
-center of gravity. The public `v6.0.0` release is a local-first, governed
+center of gravity. The public `v6.1.0` release is a local-first, governed
 platform boundary: goal intelligence, cognitive-provider activation,
 Objective Compiler Workflow UX, dynamic workflow DAG planning, productized
 platform status, ObjectiveRun start/status/export, Governed Live Slice
 authority UX, Governed Live Connector Platform, Higher-Order Agent OS status,
 Live Platform Beta status, provider/MCP/tool/gateway/runtime contracts,
 memory and ontology surfaces, self-evolution review queues, and release-gated
-evidence checks. Live provider, MCP, web, gateway, browser, plugin, and network
-execution remains designed/prepared/dry-run/future unless a later release wires
-it through authority, leases, approval, sandboxing, evidence, and promotion.
+evidence checks.
+
+`v6.1.0` adds the Trust Loop refoundation spine: action reversibility,
+AUTO/NOTIFY/ASK/DENY authority decisions, approval envelopes, undo proof,
+hash-chained evidence ledger, decision receipts, approval queue, plan
+tournament, progressive trust proposals, and skill manifest enforcement. The
+dogfood OpenAI chat path now goes through that Trust Loop before it can open
+network execution. Broader MCP, gateway, browser, plugin, and remote sandbox
+production execution remains gated until each surface is retrofitted through
+the same spine. Until that retrofit is evidenced, those surfaces remain
+designed/prepared/dry-run/future rather than active production-live execution.
 
 ## Why I Built Zeus
 
@@ -97,7 +105,7 @@ zeus governed-live-connectors --scenario trusted-local-smoke --json
 zeus higher-order-agent-os --scenario operator-cockpit --json
 zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
 zeus live-platform-beta --scenario status --json
-zeus release-gated-ulw --target-version v6.0.0 --json
+zeus release-gated-ulw --target-version v6.1.0 --json
 ```
 
 For the longer command catalog, see [docs/commands.md](docs/commands.md).
@@ -152,10 +160,10 @@ source release, not as proof of broad production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public unit and scenario suite | `1490` public tests passed |
+| Public unit and scenario suite | `1516` public tests passed |
 | Final architecture eval | `10/10` checks passed |
 | Total architecture eval | `9/9` checks passed |
-| Package build | sdist and wheel build for `zeus-agent==5.0.0` passed |
+| Package build | sdist and wheel build for `zeus-agent==6.1.0` passed |
 | Public safety boundary | Local Codex control packs, private notes, evidence logs, runtime DBs, and machine-local artifacts excluded |
 
 The release does not claim hosted SaaS readiness, production external provider
@@ -170,6 +178,7 @@ through the authority, lease, evidence, and rollback contracts.
 | --- | --- |
 | [한국어 README](README.ko.md) | Korean overview, reason for Zeus, quickstart, and document guide |
 | [Commands](docs/commands.md) | Practical CLI command catalog for the public local surfaces |
+| [Docker And OrbStack](docs/docker.md) | Local Docker/OrbStack build, run, smoke-check, and volume instructions |
 | [Hermes comparison](docs/hermes-comparison.md) | Hermes baseline architecture, Zeus architecture, and why Zeus keeps a governed kernel/runtime split |
 | [Live connection architecture](docs/live-connection-architecture.md) | Target design for real AI API, MCP, tool, gateway, web, browser, terminal, and sandbox connections |
 | [Hermes-grade platform master design](docs/hermes-grade-platform-master-design.md) | Long-form target product, UX, architecture, security, and roadmap contract |
