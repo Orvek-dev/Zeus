@@ -81,3 +81,55 @@ def grant_covers(
     if path is None:
         return False
     return any(path == allowed or path.startswith(allowed.rstrip("/") + "/") for allowed in grant.narrowed_paths)
+
+
+class GrantStore:
+    """Standing grants for a session, consulted by decide() step 4.
+
+    ``once`` grants are consumed by the lookup that uses them; ``session`` and
+    ``narrower`` grants stand until expiry. Hard-risk actions never match.
+    """
+
+    def __init__(self) -> None:
+        self._grants: dict[str, ApprovalGrant] = {}
+
+    def add(self, grant: ApprovalGrant) -> None:
+        self._grants[grant.grant_id] = grant
+
+    def get(self, grant_id: str) -> Optional[ApprovalGrant]:
+        return self._grants.get(grant_id)
+
+    def all(self) -> tuple[ApprovalGrant, ...]:
+        return tuple(self._grants.values())
+
+    def consume(self, grant_id: str) -> None:
+        """Burn a ``once`` grant after it covered an action; standing scopes
+        are unaffected."""
+        grant = self._grants.get(grant_id)
+        if grant is not None and grant.scope is GrantScope.once:
+            self._grants[grant_id] = grant.model_copy(update={"consumed": True})
+
+    def covering(
+        self,
+        *,
+        capability_id: str,
+        now_epoch: int,
+        session_id: Optional[str] = None,
+        path: Optional[str] = None,
+        hard_risk: bool = False,
+        consume: bool = True,
+    ) -> Optional[ApprovalGrant]:
+        for grant_id, grant in self._grants.items():
+            if not grant_covers(
+                grant,
+                capability_id=capability_id,
+                now_epoch=now_epoch,
+                session_id=session_id,
+                path=path,
+                hard_risk=hard_risk,
+            ):
+                continue
+            if grant.scope is GrantScope.once and consume:
+                self._grants[grant_id] = grant.model_copy(update={"consumed": True})
+            return grant
+        return None

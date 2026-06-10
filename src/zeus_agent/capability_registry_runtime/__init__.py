@@ -29,9 +29,11 @@ from .registry import (
     reconcile_schema,
     synthesis_catalog,
 )
+from .store import CapabilityStore
 
 __all__ = [
     "CapabilityRecord",
+    "CapabilityStore",
     "CapabilityStatus",
     "CapabilityTrust",
     "CatalogEntry",

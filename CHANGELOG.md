@@ -2,6 +2,84 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-alpha.1 - 2026-06-11
+
+### Refoundation
+
+Zeus is re-founded as a **local-first governance control plane** that external
+agent platforms (Claude Code today; hermes-agent and OpenClaw planned) plug
+into through gates. Versioning is reset to `v1.0.0-alpha.N`: from here, a
+MAJOR version is only earned when one host integration passes a pinned
+conformance suite at ≥95% plus a 7-day real-traffic soak with zero bypasses.
+
+### Added
+
+- **Decision API v1** (`decision_api_runtime`): the frozen two-endpoint
+  contract — `decide(DecisionRequest) → DecisionResponse` (decision-only, a
+  receipt for every decision including DENY) and `record(receipt_id,
+  ExecutionOutcome)` (host executes, Zeus records). Decision/execution split:
+  on hook surfaces Zeus never executes the host's tool.
+- **Least-authority compiler** (`authority_compiler_runtime`): objective frame
+  → `AuthorityEnvelope` via capability resolution, dependency-closure
+  provenance (untraced capability requests are excluded — opportunistic scope
+  is structurally impossible), per-capability tiers (auto / ask_first /
+  always_ask), an EXPLICIT lock list of adjacent-dangerous siblings, taint
+  overlay, VoI-thresholded questions, burn-after-use and usage-based shrink,
+  and subagent attenuation via `derive_for_child`.
+- **Taint / information-flow engine** (`taint_runtime`): session labels
+  (untrusted / private / public) with provenance, lethal-trifecta predicates
+  (untrusted→external-sink forces ASK; private→unapproved-host DENIES;
+  credential+send escalates one tier), and the anti-Goodhart rule that an
+  agent's own ledger reads re-taint the session.
+- **Governors** (`governor_runtime`): pre-call budget hard stops (run /
+  objective / fleet scopes → DENY), sliding-window rate limits (→ ASK), and
+  loop iteration caps with state-hash no-progress detection (→ ASK).
+- **Flight recorder** (`trust_loop_runtime.flight_recorder`): new ledger kinds
+  (`execution_outcome`, `rollback_receipt`, `gate_observation`,
+  `ledger_read`), `caused_by` causal edges with a `why()` chain walker, and a
+  governed-coverage metric.
+- **Governed ledger access** (`trust_loop_runtime.ledger_access`): console
+  principals read everything; agent principals read only their own session,
+  masked of policy internals, with the read itself appended to the ledger and
+  the returned data tagged untrusted.
+- **Credential broker vault** (`credential_broker_runtime`):
+  `secret-proof://<scope>` refs resolve through a vault backend (env-var
+  default) and release sealed credentials at the egress point only, on an
+  allowed decision for an approved host — never to the agent.
+- **Gate 0 — Claude Code hooks** (`adapters/claude_code_hook`): PreToolUse →
+  `decide()` with a static tool→capability map (Bash routed by deterministic
+  command-risk classification), PostToolUse → `record()`, persisted session
+  taint and standing grants, gate observations for the coverage metric, and
+  **approval card v1** (what / blast radius / reversible / why / precedent +
+  graded once/session/narrower/reject answers). A side-effecting action with
+  no plain-language template auto-escalates to ASK.
+- **Product CLI** (`zeus`): init · connect · hook · decide · record · approve ·
+  approvals · ledger · status, with the entire legacy platform surface and the
+  demoted executor parked under `zeus dev`.
+- **ACS-manifest read compatibility** (`acs_compat_runtime`): a thin loader
+  mapping external agent-capability-spec interception points onto Zeus
+  capability ids.
+- **Conformance starter suite**: the first 12 governed scenarios that seed the
+  ~40-scenario per-host suite gating future major versions.
+- `THIRD_PARTY_NOTICES.md`.
+
+### Changed
+
+- The objective-run executor line (M1–M5) is demoted from product critical
+  path to a conformance harness and `zeus dev` fallback, preserved on the
+  `harness/executor-conformance` branch.
+- `zeus` now opens the control-plane verbs; the previous CLI surface is
+  reachable as `zeus dev …`.
+
+### Pre-refoundation history
+
+Everything below this entry (v0.1.0 through v6.1.0) is the pre-refoundation
+exploration line: a standalone agent-platform attempt whose surviving organs
+(trust loop spine, capability registry, graded approvals, objective risk/VoI,
+authority kernel, evidence ledger) became the control plane's kernel. Old
+tags remain valid history; their version numbers do not imply control-plane
+maturity.
+
 ## v6.1.0 - 2026-06-10
 
 ### Added

@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from .approval_queue import ApprovalQueue, ParkedAction
 from .dispatcher import GovernedExecutionDispatcher
+from .flight_recorder import (
+    CoverageReport,
+    ExecutionOutcome,
+    ExecutionStatus,
+    FlightRecorder,
+)
 from .ledger import LedgerEvent, SQLiteEvidenceLedger
+from .ledger_access import GovernedLedgerReader, LedgerPrincipalKind, LedgerReadResult
 from .models import (
     ActionRisk,
     ApprovalEnvelope,
@@ -27,10 +34,17 @@ __all__ = [
     "ApprovalQueue",
     "BudgetEnvelope",
     "ChainVerification",
+    "CoverageReport",
     "DecisionReceipt",
+    "ExecutionOutcome",
+    "ExecutionStatus",
+    "FlightRecorder",
+    "GovernedLedgerReader",
     "GrantProposal",
     "GovernedExecutionDispatcher",
     "LedgerEvent",
+    "LedgerPrincipalKind",
+    "LedgerReadResult",
     "ParkedAction",
     "PlanCandidate",
     "PlanTournament",

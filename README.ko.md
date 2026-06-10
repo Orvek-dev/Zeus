@@ -2,177 +2,205 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/zeus-symbol-transparent-white-tight.png">
     <source media="(prefers-color-scheme: light)" srcset="./assets/zeus-symbol-transparent-black-tight.png">
-    <img src="./assets/zeus-symbol-transparent-black-tight.png" width="360" alt="Zeus: goal-oriented AI agent" />
+    <img src="./assets/zeus-symbol-transparent-black-tight.png" width="360" alt="Zeus: AI 에이전트 거버넌스 컨트롤 플레인" />
   </picture>
 </p>
 
 <p align="center">
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.1-2ea44f"></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
+  <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
+</p>
+
+<p align="center">
   <a href="./README.md">English</a> ·
-  <a href="#zeus-agent">한국어</a> ·
+  <a href="#zeus">한국어</a> ·
   <a href="#왜-zeus를-만들었나">왜 Zeus를 만들었나</a> ·
-  <a href="#quickstart">Quickstart</a> ·
+  <a href="#quickstart-10분">Quickstart</a> ·
   <a href="#문서">문서</a>
 </p>
 
-# Zeus Agent
+# Zeus
 
-Zeus는 목적 지향형 AI 에이전트 런타임입니다. Zeus의 중심은 단순히
-에이전트가 더 많이 행동하게 만드는 것이 아닙니다. 사용자의 목적을
-정확하게 이해하고, 통제된 권한 안에서 움직이며, 자신이 한 일을
-기록하고, 완료 판단을 증거로 설명할 수 있게 만드는 것입니다.
+Zeus는 **AI 에이전트를 위한 로컬 우선(local-first) 거버넌스 컨트롤
+플레인**입니다. 또 하나의 에이전트가 아닙니다. 실제 작업은 기존 에이전트
+플랫폼 — 지금은 Claude Code, 앞으로 hermes-agent와 OpenClaw — 이 그대로
+수행하고, 그 플랫폼이 게이트를 통해 Zeus에 연결됩니다. Zeus는 무엇이
+실행되어도 되는지 결정하고, 실제로 무슨 일이 있었는지 기록하며, 깨끗한
+실적을 "덜 묻는 자율성"으로 바꿔 줍니다.
 
 ```text
-Hermes식 범용성 = provider + tool + session + gateway + MCP + skill
-Zeus의 중심    = objective contract + authority gate + evidence + promotion review
+호스트 에이전트 (Claude Code / hermes / OpenClaw)
+      │  모든 도구 호출, 실행 직전
+      ▼
+Zeus decide(주체, 능력, 인자, 컨텍스트)
+      → auto | notify | ask | deny  + 영수증 + 의무사항
+      ▼
+호스트가 자신의 도구를 직접 실행 → record(영수증, 결과)
+      → 해시 체인 원장 · 신뢰 적립 · 거버넌스 커버리지
 ```
 
-Zeus는 Hermes의 넓은 플랫폼 형태에서 배울 것은 흡수하되, 중심축은 다르게
-잡습니다. 공개 `v6.1.0` 릴리스는 local-first governed platform boundary입니다.
-Goal Intelligence, Cognitive Provider Activation, Objective Compiler Workflow UX,
-Dynamic Workflow DAG planning, Productized Platform status,
-ObjectiveRun start/status/export, Governed Live Slice authority UX,
-Governed Live Connector Platform, Higher-Order Agent OS status,
-Live Platform Beta status,
-provider/MCP/tool/gateway/runtime 계약,
-memory/ontology surface, self-evolution review queue, release-gated evidence check를 제공합니다.
+전체 제품이 하나의 계약 위에 서 있습니다. `decide()`는 결정만 하고(훅
+표면에서 Zeus는 호스트의 도구를 절대 대신 실행하지 않습니다), `record()`가
+호스트의 실행 결과를 결정 영수증에 묶습니다. 그 계약 둘레에 커널 장기들이
+있습니다.
 
-`v6.1.0`에서는 Trust Loop refoundation spine이 추가됐습니다. action
-reversibility, AUTO/NOTIFY/ASK/DENY 권한 판단, approval envelope, undo proof,
-hash-chained evidence ledger, decision receipt, approval queue, plan tournament,
-progressive trust proposal, skill manifest enforcement가 들어갔습니다. dogfood용
-OpenAI chat 경로도 이제 네트워크 실행 전에 Trust Loop를 통과합니다. 다만 더
-넓은 MCP, gateway, browser, plugin, remote sandbox production execution은 각
-surface가 같은 spine으로 retrofit되기 전까지 계속 gated 상태입니다.
+- **최소권한 컴파일러** — 목표(objective)를 `AuthorityEnvelope`로 컴파일:
+  티어가 매겨진 허용 능력(auto / ask-first / always-ask), 목표에서 유도되지
+  않은 인접-위험 능력의 **명시적 잠금 목록**, 예산, 물어볼 가치가 있는
+  질문(VoI). 목표 절로 추적되지 않는 능력은 봉투에 들어가지 못합니다 —
+  "하는 김에"가 구조적으로 불가능합니다.
+- **테인트 엔진** — 세션이 정보 흐름 라벨(untrusted / private)을 갖습니다.
+  신뢰할 수 없는 데이터가 외부 싱크에 닿으면 강제 질문, 비밀 데이터가
+  승인되지 않은 호스트로 향하면 즉시 거부, 에이전트가 자기 원장을 읽으면
+  세션이 다시 오염됩니다(anti-Goodhart).
+- **거버너** — 예산·호출 빈도·루프 한계를 사후 경고가 아니라 **호출 전**에
+  강제합니다.
+- **플라이트 리코더** — 거부를 포함한 모든 결정이 해시 체인 SQLite 원장에
+  영수증을 남기고, 실행 결과가 `caused_by`로 연결되어 "왜 이런 일이
+  일어났나"가 체인 추적 한 번이 됩니다.
+- **단계별 승인** — 승인은 예/아니오가 아니라 이번만 · 이 세션 · 더 좁게 ·
+  거절입니다. 상시 그랜트가 반복 질문을 잠재우고, 고위험 행동은 어떤
+  그랜트로도 사전 허가되지 않습니다.
+- **자격증명 브로커** — 에이전트는 `secret-proof://` 참조로만 계획하고 원시
+  키를 절대 쥐지 않습니다. 봉인된 비밀은 허용된 결정 + 승인된 호스트일 때
+  송신 지점에서만 풀립니다.
+
+북극성 지표는 **주당 질문 횟수(asks/week)** 입니다. 영원히 잔소리하거나
+모두 도장만 찍는 거버넌스가 아니라, 자율성을 벌어 내려가는 거버넌스입니다.
 
 ## 왜 Zeus를 만들었나
 
-나는 또 하나의 똑똑한 범용 AI 에이전트를 만들고 싶어서 Zeus를 만든 것이
-아닙니다.
+또 하나의 똑똑한 범용 AI 에이전트가 필요해서 만든 것이 아닙니다.
 
-AI 에이전트가 발전할수록, 에이전트가 실제로 일을 제대로 하고 있는지
-확인하고 검수하는 부담도 같이 커졌습니다. 에이전트는 그럴듯하게 말하고,
-도구를 실행하고, 계획을 만들고, 계속 움직일 수 있습니다. 하지만 사용자는
-여전히 물어야 합니다. 무엇을 했는가? 왜 그렇게 했는가? 그 작업을 할
-권한이 있었는가? 처음의 목적을 실제로 만족했는가? 그 결과를 증거로
-추적할 수 있는가?
+에이전트가 유능해질수록, 그들이 정말 옳은 일을 했는지 확인하는 일은 오히려
+늘어납니다. 자신 있게 말하고, 도구를 돌리고, 계획을 만들며 계속 움직이지만
+사용자는 여전히 물어야 합니다. 무엇을 했지? 왜 했지? 그럴 권한이 있었나?
+원래 목표는 충족됐나? 결과를 증거로 되짚을 수 있나?
 
-나는 이 지점이 문제라고 생각했습니다.
+저는 그것이 진짜 문제라고 생각합니다 — 그리고 그것은 에이전트의 문제가
+아니라 **컨트롤 플레인의 문제**입니다. 에이전트는 알아서 좋아집니다. 빠져
+있는 것은 어떤 에이전트가 일하든 권한·예산·정보 흐름·증거를 일정하게
+유지해 주는 층입니다. 호스트 플랫폼이 강해질수록 그 층은 더 중요해집니다.
 
-내가 생각하는 이상적인 에이전트는 단순히 범용적이고, 자기개선이 가능하고,
-똑똑한 에이전트가 아닙니다. 사용자의 목적을 정확하게 이해하고, 통제된
-권한과 안전한 규칙 안에서 움직이며, 자신이 한 일을 기록하고, 왜 그런
-결정을 했는지 드러내고, 결과를 증거로 증명할 수 있어야 합니다.
+Zeus는 그 층으로 만들어졌습니다. 무슨 일이 있었는지, 어떤 권한을 썼는지,
+어떤 증거를 모았는지, 왜 일이 끝났다고 볼 수 있는지를 보여 줄 수 없다면,
+끝난 척해서는 안 됩니다.
 
-Zeus는 이 생각에서 시작됐습니다.
+## Quickstart (10분)
 
-목표는 단순히 계속 행동하는 에이전트를 만드는 것이 아닙니다. 사용자의
-목적을 끝까지 밀고 나가되, 그 과정이 추적 가능하고, 통제 가능하고,
-검수 가능해야 합니다. 에이전트가 무엇을 했는지, 어떤 권한을 사용했는지,
-어떤 증거를 남겼는지, 왜 완료라고 판단했는지 보여줄 수 없다면, Zeus는
-그 일을 완료했다고 말해서는 안 됩니다.
-
-## Quickstart
-
-Python 3.10 이상에서 실행합니다.
+Python 3.10+ 기준, 새로 클론한 디렉터리에서:
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -U pip
+python3 -m venv .venv && source .venv/bin/activate
 python -m pip install -e ".[dev]"
-python -m pytest -q
 ```
 
-처음 확인할 만한 로컬 표면은 아래 정도면 충분합니다.
+**1. 로컬 컨트롤 플레인 초기화** (~/.zeus/control-plane: 원장·신뢰
+카운트·그랜트·세션 테인트):
 
 ```sh
-zeus kernel-status
-zeus productized-platform --scenario status --json
-zeus cognitive-provider-activation --scenario fake-provider-intent --objective "제우스야, 내 목적을 governed workflow로 정리해줘." --json
-zeus goal-intelligence-runtime --scenario understand-objective --objective "병렬 작업자를 쓰는 리서치 기반 코딩 워크플로우를 만들어줘." --task-count 6 --requires-code --requires-research --json
-zeus objective-start --objective "제우스야, 내 목적을 evidence-backed run으로 정리해줘." --acceptance-criterion objective-run-created --json
-zeus objective-compile-workflow --objective "제우스야, 이 목적을 governed workflow로 컴파일해줘." --requires-code --task-count 4 --json
-zeus governed-live-connectors --scenario trusted-local-smoke --json
-zeus higher-order-agent-os --scenario operator-cockpit --json
-zeus governed-live-slice --surface provider --capability-id provider.local-smoke --scenario local-smoke --json
-zeus live-platform-beta --scenario status --json
-zeus release-gated-ulw --target-version v6.1.0 --json
+zeus init
 ```
 
-더 긴 명령 목록은 [docs/commands.md](docs/commands.md)를 보세요.
+**2. 첫 게이트 연결 — Claude Code 훅.** 프로젝트 디렉터리에서:
+
+```sh
+zeus connect claude-code --write   # .claude/settings.json에 PreToolUse/PostToolUse 훅 병합
+```
+
+**3. Claude Code에서 평소처럼 작업합니다.** 읽기는 조용히 통과하고, 첫 파일
+수정이나 위험한 명령에서 다섯 가지 답 — 무엇을 / 어디까지(blast radius) /
+되돌릴 수 있나 / 왜 / 전례 — 이 담긴 승인 카드가 뜹니다.
+
+**4. 같은 질문에 두 번 답하지 마세요.** 신뢰하는 것은 면허를 내 주면 됩니다:
+
+```sh
+zeus approve fs.write --scope session --session-id <세션>   # 이 세션 동안
+zeus approve fs.write --scope narrower --path /work/project # 이 경로만, 상시
+```
+
+**5. 에이전트가 실제로 무엇을 했는지 확인:**
+
+```sh
+zeus status                          # 결정 분포, 질문 수, 거버넌스 커버리지, 체인 무결성
+zeus ledger --tail 20                # 최근 영수증
+zeus ledger --why trust.ev.000042    # 한 행동 뒤의 인과 체인
+```
+
+훅 표면이 없는 호스트는 계약을 직접 호출합니다. `zeus decide`가
+`DecisionRequest` JSON을 읽어 결정+영수증을 출력하고, `zeus record`가 결과를
+묶습니다. 기존 플랫폼 표면 전체(그리고 컨포먼스 하니스로 강등된
+objective-run 실행기)는 `zeus dev` 아래에 있습니다 —
+[docs/commands.md](docs/commands.md)의 각 명령 앞에 `dev`를 붙이면 됩니다.
 
 ## Zeus가 하는 일
 
-Zeus는 열린 요청을 검수 가능한 실행으로 바꿉니다.
-
-| 계층 | 의미 |
+| 층 | 의미 |
 | --- | --- |
-| Objective contract | 사용자의 목적을 acceptance criteria, assumption, unknown, evidence obligation으로 정리합니다. |
-| Objective run | 시작된 목적을 local run으로 저장하고 start/status/export와 evidence 기반 완료 판정을 제공합니다. |
-| Objective Compiler Workflow | 목적을 intent frame, 필요한 인터뷰 질문, workflow DAG, authority requirement, evidence plan으로 컴파일합니다. |
-| Governed Live Connector Platform | provider, MCP, gateway, local sandbox connector smoke를 같은 objective, lease, approval, broker evidence, credential, sandbox, audit 요구사항으로 검수합니다. |
-| Higher-Order Agent OS | persona, Objective Compiler, governed connector, TUI cockpit contract, recursive improvement review, plugin skeleton, remote sandbox contract, tenant/auth contract, public production boundary를 하나의 제품 표면으로 보고합니다. |
-| Governed live slice | live-capable 작업 전 objective, lease, approval, broker evidence, credential, sandbox, audit 요구사항 누락을 설명하고 차단합니다. |
-| Live platform beta | persona, setup/status cockpit, ObjectiveRun, authority UX, CLI, Python library, public production-live boundary를 beta 상태로 집계합니다. |
-| Authority gate | capability, path, credential, tool, live surface가 허용된 경우에만 실행됩니다. |
-| Runtime lease | live-capable 작업은 임시 권한, 승인, sandbox, credential, audit 요구사항에 묶입니다. |
-| Evidence record | 완료 판단은 말투가 아니라 artifact, receipt, test, trace, reviewable output에 기반합니다. |
-| Promotion review | memory, ontology, workflow pattern, skill, rule은 검토 전까지 candidate-only 상태로 남습니다. |
-| Public boundary | 무엇이 준비됐고, 무엇이 차단됐고, 무엇이 dry-run/future인지 과장 없이 보고합니다. |
+| Decision API v1 | 모든 게이트가 쓰는 단일 동결 계약. `decide()`가 auto/notify/ask/deny + 영수증 + 의무사항을 반환하고, `record()`가 호스트의 실행 결과를 그 영수증에 묶는다. |
+| 권한 봉투 | 최소권한 컴파일러가 목표 프레임을 티어별 허용 능력, 명시적 잠금 목록, 예산, 물을 가치가 있는 질문으로 바꾸고 — 다음 제안은 실제 사용분으로 줄인다. |
+| 게이트 0: Claude Code 훅 | PreToolUse → decide, PostToolUse → record. 정적 도구→능력 매핑, 셸 명령은 결정적 위험 분류 후 판정. |
+| 승인 카드 | ask 결정은 다섯 답(무엇/어디에/되돌리기/왜/전례)과 단계별 응답(이번만/이 세션/더 좁게/거절)으로 렌더링된다. 평어 설명 템플릿이 없으면 자동 실행도 없다. |
+| 테인트 흐름 | untrusted/private 라벨이 세션 단위로 지속되며 매 결정마다 치명적 3요소 규칙을 검사한다. |
+| 거버너 | 호출 전 예산 하드스톱(run/objective/fleet), 능력별 속도 윈도, 루프 반복 상한 + 무진전 감지. |
+| 플라이트 리코더 | 인과 간선이 달린 해시 체인 영수증, 통제된 원장 읽기(에이전트 뷰는 세션 한정·마스킹·감사·재오염), 커버리지 지표. |
+| 신뢰 적립 | 실제 영수증이 능력별 신뢰를 만든다. 깨끗한 실적은 위험을 완화하고 범위를 줄이며, MCP 도구의 스키마가 바뀌면 즉시 재격리된다. |
+| 컨포먼스 | 호스트별 고정 시나리오 스위트(스타터 12 → 약 40)가 메이저 버전의 유일한 관문: 95% 이상 + 7일 무우회 소크. |
+| 공개 경계 | Zeus는 무엇이 거버넌스 아래 있고, 무엇이 우회됐고, 무엇이 designed/prepared/dry-run/future인지 그대로 보고한다. |
 
 ## Zeus Core Language
 
-Zeus의 제품 언어는 12개 핵심 축으로 제한합니다. 기술 runtime 이름은
-그대로 유지되고, 제품 이름이 runtime module을 대체하지 않습니다.
+Zeus 코어 언어는 정확히 12개의 제품 도메인 기둥으로 구성됩니다. 기술 런타임
+식별자는 보존되며, 제품 도메인 라벨이 런타임 모듈 이름을 바꾸지 않습니다.
 
 | Product name | Technical anchor |
 | --- | --- |
-| Zeus Kernel | `objective_runtime`, `verification_runtime`, evidence/authority center |
+| Zeus Kernel | `objective_runtime`, `verification_runtime`, evidence/authority 센터 |
 | Athena | `objective_runtime` |
 | Thunderbolt | `runtime_lease` |
-| Aegis | `security_runtime`, lease, sandbox policy |
-| Mercury | `transport_runtime`, `connector_runtime`, MCP/API/gateway routing |
-| Apollo | `model_runtime`, `provider_runtime`, eval boundaries |
+| Aegis | `security_runtime`, lease, sandbox 정책 |
+| Mercury | `transport_runtime`, `connector_runtime`, MCP/API/gateway 라우팅 |
+| Apollo | `model_runtime`, `provider_runtime`, eval 경계 |
 | Hephaestus | `tool_runtime` |
 | Poseidon | `gateway_runtime` |
 | Artemis | `research_runtime` |
-| Demeter | `ontology_runtime`, durable state |
-| Olympus | `orchestration_runtime`, work-loop coordination |
+| Demeter | `ontology_runtime`, 영속 상태 |
+| Olympus | `orchestration_runtime`, work-loop 조정 |
 | Prometheus | `skill_evolution` |
 
-Hermes는 upstream/reference입니다. Mercury는 Zeus 내부 transport 제품명입니다.
+Hermes는 업스트림/참조 전용입니다. Mercury는 Zeus 내부 전송 제품명입니다.
 
 ## Evidence
 
-최신 공개 안전 검증 스냅샷은 2026-06-09 기준입니다. 이 숫자는 public source
-release의 deterministic local regression evidence이며, production readiness를
-증명하는 것은 아닙니다.
+최신 공개 안전 로컬 증거 스냅샷은 2026-06-11에 측정되었습니다. 이 수치는
+공개 소스 릴리스의 결정적 로컬 회귀 증거이지, 광범위한 프로덕션 준비의
+증명이 아닙니다.
 
-| Evidence surface | Current result |
+| 증거 표면 | 현재 결과 |
 | --- | --- |
-| Public unit and scenario suite | `1516` public tests passed |
-| Final architecture eval | `10/10` checks passed |
-| Total architecture eval | `9/9` checks passed |
-| Package build | `zeus-agent==6.1.0` sdist/wheel build passed |
+| 공개 단위·시나리오 스위트 | `1791`개 공개 테스트 통과 |
+| 컨포먼스 스타터 스위트 | `12/12` 거버넌스 시나리오 통과 |
+| 패키지 메타데이터 | `zeus-agent==1.0.0a1` (알파 리셋; 메이저는 컨포먼스 게이트) |
 
-이 릴리스는 hosted SaaS readiness, production external provider execution,
-production MCP catalog, unattended gateway operation, browser/terminal
-automation, remote sandbox hard isolation, third-party production validation을
-claim하지 않습니다.
+알파는 호스팅 SaaS 준비, 프로덕션 외부 프로바이더 실행, 프로덕션 MCP
+카탈로그, 무인 게이트웨이 운영, 브라우저·터미널 자동화, 원격 샌드박스 강한
+격리, 제3자 프로덕션 검증을 주장하지 않습니다. `v2.0.0`은 하나의 실제
+호스트 통합이 고정된 컨포먼스 스위트를 95% 이상 + 7일 실트래픽 무우회
+소크로 통과할 때에만 출시됩니다.
 
 ## 문서
 
 | 문서 | 목적 |
 | --- | --- |
-| [English README](README.md) | 영어 canonical README |
-| [한국어 문서 안내](docs/ko.md) | 공개 문서의 한국어 안내와 읽는 순서 |
-| [Commands](docs/commands.md) | public local surface용 CLI 명령 카탈로그 |
-| [Docker And OrbStack](docs/docker.md) | 로컬 Docker/OrbStack 빌드, 실행, smoke check, volume 안내 |
-| [Hermes comparison](docs/hermes-comparison.md) | Hermes와 Zeus의 아키텍처 차이 |
-| [Live connection architecture](docs/live-connection-architecture.md) | real AI API, MCP, tool, gateway, browser, terminal, sandbox 연결 설계 |
-| [Security policy](SECURITY.md) | 공개 보안 posture와 governed live boundary |
-| [Changelog](CHANGELOG.md) | 릴리스 히스토리 |
+| [English README](README.md) | 영문 개요, 만든 이유, 퀵스타트, 문서 안내 |
+| [Commands](docs/commands.md) | 레거시 CLI 카탈로그 (`zeus dev` 아래로 이동) |
+| [Docker And OrbStack](docs/docker.md) | 로컬 Docker/OrbStack 빌드·실행·스모크 체크 |
+| [Hermes comparison](docs/hermes-comparison.md) | Hermes 기준 아키텍처와 Zeus의 거버넌스 커널/런타임 분리 이유 |
+| [Security policy](SECURITY.md) | 공개 보안 태세와 현재 거버넌스 라이브 경계 |
+| [Changelog](CHANGELOG.md) | 릴리스 역사 (재창립 이전 라인 포함) |
 
 ## License
 
-Zeus는 MIT License로 공개됩니다. [LICENSE](LICENSE)를 확인하세요.
+Zeus는 MIT 라이선스로 배포됩니다. [LICENSE](LICENSE)를 참고하세요.

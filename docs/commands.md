@@ -5,6 +5,11 @@
 This catalog collects practical local commands for the public Zeus surfaces.
 The README intentionally keeps only the first-run commands.
 
+> **v1.0.0-alpha note:** `zeus` now opens the control-plane product verbs
+> (`init`, `connect`, `hook`, `decide`, `record`, `approve`, `approvals`,
+> `ledger`, `status`). Every command in this catalog moved under the `zeus
+> dev` namespace — run `zeus dev <command>` instead of `zeus <command>`.
+
 ## First Run
 
 ```sh

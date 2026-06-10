@@ -10,8 +10,9 @@ from __future__ import annotations
 from .grants import (
     ApprovalGrant,
     GrantScope,
+    GrantStore,
     grant_covers,
     issue_grant,
 )
 
-__all__ = ["ApprovalGrant", "GrantScope", "grant_covers", "issue_grant"]
+__all__ = ["ApprovalGrant", "GrantScope", "GrantStore", "grant_covers", "issue_grant"]
