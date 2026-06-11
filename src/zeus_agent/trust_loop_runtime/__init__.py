@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .approval_queue import ApprovalQueue, ParkedAction
+from .approval_queue import ApprovalQueue, ParkedAction, SQLiteApprovalQueue
 from .dispatcher import GovernedExecutionDispatcher
 from .flight_recorder import (
     CoverageReport,
@@ -25,6 +25,7 @@ from .models import (
 from .planning import PlanCandidate, PlanTournament
 from .policy import TrustDecisionEngine, TrustPolicyOutcome
 from .skill_manifest import SkillManifest
+from .state_store import SQLiteControlPlaneStore
 from .trust_ledger import GrantProposal, TrustLedger, TrustStat
 from .trust_stat_store import SQLiteTrustStatStore
 
@@ -49,6 +50,8 @@ __all__ = [
     "PlanCandidate",
     "PlanTournament",
     "Reversibility",
+    "SQLiteApprovalQueue",
+    "SQLiteControlPlaneStore",
     "SQLiteEvidenceLedger",
     "SQLiteTrustStatStore",
     "SkillManifest",

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
-from typing import Final, Optional
+from typing import Callable, Final, Optional
 
 from pydantic import JsonValue
 
@@ -119,6 +119,8 @@ class ZeusDecisionEngine:
         trust_stats: Optional[SQLiteTrustStatStore] = None,
         policy_profile: TrustPolicyProfile = TrustPolicyProfile.cautious,
         approved_hosts: tuple[str, ...] = (),
+        seq_counter: Optional[Callable[[], int]] = None,
+        explainability: Optional[Callable[[CapabilityRecord], bool]] = None,
     ) -> None:
         self.recorder = recorder
         self.capabilities = capabilities if capabilities is not None else CapabilityStore()
@@ -130,7 +132,16 @@ class ZeusDecisionEngine:
         self.trust_stats = trust_stats
         self._policy = TrustDecisionEngine(policy_profile)
         self._approved_hosts = approved_hosts
+        # seq_counter (e.g. SQLiteControlPlaneStore.next_counter) keeps action
+        # ids unique across one-decision-per-process gates; the in-memory
+        # fallback only serves a single engine lifetime.
+        self._seq_counter = seq_counter
         self._decision_seq = 0
+        # explainability(record) -> bool: can this capability be described in a
+        # vetted plain-language card? Injected (not imported) to avoid the cycle
+        # with consequence_runtime. None → the rule is off (e.g. bare engine in
+        # a unit test); every product gate wires it in build_engine().
+        self._explainability = explainability
 
     # ------------------------------------------------------------------ decide
     def decide(self, request: DecisionRequest, *, now: Optional[datetime] = None) -> DecisionResponse:
@@ -155,6 +166,16 @@ class ZeusDecisionEngine:
         if envelope is not None and envelope.locked(request.capability_id) is not None:
             return self._finalize(
                 request, args, TrustDecision.DENY, "capability_lock_listed",
+                envelope=envelope, record=record,
+            )
+
+        # 2.5 hard boundary the gate already failed (egress ring, etc.). Same
+        # class as quarantine — a wall, not a judgement — so the same
+        # pre-decision short-circuit: the receipt records the DENY truthfully
+        # and no gate ever mutates an AUTO response after the fact.
+        if request.context.boundary_violation is not None:
+            return self._finalize(
+                request, args, TrustDecision.DENY, request.context.boundary_violation,
                 envelope=envelope, record=record,
             )
 
@@ -211,6 +232,14 @@ class ZeusDecisionEngine:
             tier_grant = envelope.grant_for(request.capability_id)
             if tier_grant is None:
                 if record.side_effect is not SideEffectClass.none:
+                    # GAP-4: a CHILD principal can never widen its parent's
+                    # envelope — out-of-envelope for a subagent is DENY, while
+                    # the coordinator itself may still escalate via ASK.
+                    if request.context.parent_principal_id is not None:
+                        return self._finalize(
+                            request, args, TrustDecision.DENY, "child_out_of_envelope",
+                            envelope=envelope, record=record,
+                        )
                     decision, reason = TrustDecision.ASK, "capability_not_in_envelope"
             elif (
                 scope_violation := _scope_violation(tier_grant, path=path, network_host=network_host)
@@ -227,13 +256,16 @@ class ZeusDecisionEngine:
         if assessment.forced_decision is TrustDecision.ASK and decision is not TrustDecision.DENY:
             decision, reason, downgradable = TrustDecision.ASK, assessment.reasons[0], False
 
-        # 6. pre-call governors (budget DENY, rate/loop ASK).
+        # 6. pre-call governors (budget DENY; deadman/novelty/rate/loop ASK).
         verdict = self.governors.precall(
             capability_id=request.capability_id,
             requested_units=request.requested_units,
             run_id=request.run_id,
             objective_id=request.context.objective_id,
             state_hash=request.context.state_hash,
+            network_host=network_host,
+            recipient=_text_or_none(args.get("recipient")),
+            side_effecting=record.side_effect is not SideEffectClass.none,
             now=timestamp,
         )
         if not verdict.allowed and verdict.forced_decision is not None:
@@ -241,8 +273,35 @@ class ZeusDecisionEngine:
             if forced is TrustDecision.DENY or decision is not TrustDecision.DENY:
                 decision, reason, downgradable = forced, verdict.reason, False
 
-        # 4b. license downgrade: a covering grant turns a soft ASK into AUTO.
-        if decision is TrustDecision.ASK and downgradable and grant is not None and not hard_risk:
+        # 6.5 explainability gate. A side-effecting action Zeus cannot describe
+        # in a vetted plain-language card must never resolve to AUTO/NOTIFY —
+        # not on an envelope auto-tier (escalated here) and not via a standing
+        # license (guarded in 4b below, so the grant is never burned for it).
+        # Enforced inside decide() so the receipt is the truth of the final
+        # action, never a post-hoc gate mutation. Read-class capabilities are
+        # always explainable → no ask-storm.
+        explainable = (
+            self._explainability is None
+            or record.side_effect is SideEffectClass.none
+            or self._explainability(record)
+        )
+        if decision in {TrustDecision.AUTO, TrustDecision.NOTIFY} and not explainable:
+            decision, reason, downgradable = (
+                TrustDecision.ASK,
+                "no_plain_language_template",
+                False,
+            )
+
+        # 4b. license downgrade: a covering grant turns a soft ASK into AUTO —
+        # but only for an explainable action. An unexplained consequence card
+        # can't be silently licensed away (and the grant is left unconsumed).
+        if (
+            decision is TrustDecision.ASK
+            and downgradable
+            and grant is not None
+            and not hard_risk
+            and explainable
+        ):
             decision, reason = TrustDecision.AUTO, "covered_by_grant_{0}".format(grant.scope.value)
             self.grants.consume(grant.grant_id)
 
@@ -314,11 +373,13 @@ class ZeusDecisionEngine:
         network_host: Optional[str],
     ) -> TrustLoopAction:
         max_units = envelope.budget_per_run_units if envelope is not None and envelope.budget_per_run_units > 0 else 1_000_000
-        self._decision_seq += 1
+        if self._seq_counter is not None:
+            seq = self._seq_counter()
+        else:
+            self._decision_seq += 1
+            seq = self._decision_seq
         return TrustLoopAction(
-            action_id="decision.{0}.{1:04d}".format(
-                request.run_id.replace(".", "_"), self._decision_seq
-            ),
+            action_id="decision.{0}.{1:04d}".format(request.run_id.replace(".", "_"), seq),
             run_id=request.run_id,
             goal_contract_id=request.context.objective_id or "adhoc.objective",
             criterion_id="decision-api.v1",
@@ -398,10 +459,7 @@ class ZeusDecisionEngine:
         return tuple(obligations)
 
     def _decision_record(self, receipt_id: str) -> Optional[dict[str, JsonValue]]:
-        for record in self.recorder.ledger.records():
-            if str(record["record_id"]) == receipt_id:
-                return record
-        return None
+        return self.recorder.ledger.record_by_id(receipt_id)
 
 
 def _scope_violation(

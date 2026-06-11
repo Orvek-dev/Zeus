@@ -8,7 +8,7 @@ from typer.testing import CliRunner
 from zeus_agent import __version__
 from zeus_agent.cli_main import app
 
-runner = CliRunner(mix_stderr=False)
+runner = CliRunner()
 
 
 def test_version_flag() -> None:

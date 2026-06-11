@@ -172,3 +172,15 @@ def test_agent_cannot_see_ledger_read_meta_records(tmp_path: Path) -> None:
     )
     kinds = {str(record["kind"]) for record in second.records}
     assert "ledger_read" not in kinds
+
+
+def test_record_by_id_point_lookup_hit_and_miss(tmp_path: Path) -> None:
+    recorder = _recorder(tmp_path)
+    decision = recorder.record_decision(
+        run_id=RUN, payload={"capability_id": "fs.read", "session_id": "s1"}
+    )
+    found = recorder.ledger.record_by_id(decision.record_id)
+    assert found is not None
+    assert str(found["record_id"]) == decision.record_id
+    assert str(found["kind"]) == "decision_receipt"
+    assert recorder.ledger.record_by_id("trust.ev.999999") is None

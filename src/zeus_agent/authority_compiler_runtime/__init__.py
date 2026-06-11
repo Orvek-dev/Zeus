@@ -16,6 +16,7 @@ from .compiler import (
     compile_envelope,
     shrink_proposal,
 )
+from .sqlite_store import SQLiteEnvelopeStore
 from .models import (
     AuthorityEnvelope,
     CapabilityRequest,
@@ -28,6 +29,7 @@ from .models import (
 
 __all__ = [
     "AuthorityEnvelope",
+    "SQLiteEnvelopeStore",
     "CapabilityRequest",
     "CompileResult",
     "EnvelopeStore",

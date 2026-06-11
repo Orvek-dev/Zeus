@@ -21,7 +21,7 @@ from zeus_agent.trust_loop_runtime import (
     TrustDecision,
 )
 
-from .card import can_explain, render_card
+from .card import render_card
 from .mapping import MappedCall, map_tool_call
 from .state import ControlPlaneState
 
@@ -57,18 +57,12 @@ class ClaudeCodeGate:
             args=mapped.args,
             context=DecisionContext(host=HostKind.claude_code, surface=GateSurface.hook),
         )
+        # Explainability ("no plain-language template → cannot run silently")
+        # is enforced INSIDE decide() now, so the receipt is the truth of the
+        # final action — the gate no longer mutates the response after the fact.
+        # (Grant burns persist via the write-through store in build_engine —
+        # every gate gets that, not just this one.)
         response = self.engine.decide(request)
-        record = self.engine.capabilities.get(mapped.capability_id)
-
-        # Can't explain it in plain language → can't run it silently.
-        if (
-            response.decision in {TrustDecision.AUTO, TrustDecision.NOTIFY}
-            and record is not None
-            and not can_explain(record)
-        ):
-            response = response.model_copy(
-                update={"decision": TrustDecision.ASK, "reason": "no_plain_language_template"}
-            )
 
         self._stamp_taint(session_id, mapped, response, cwd)
         self.engine.recorder.record_gate_observation(

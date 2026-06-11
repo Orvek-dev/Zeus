@@ -97,6 +97,31 @@ def test_session_grant_silences_repeat_edit_asks(tmp_path: Path) -> None:
     assert "covered_by_grant_session" in str(output["zeus"])
 
 
+def test_once_grant_burns_across_hook_processes(tmp_path: Path) -> None:
+    """"approve once" must mean once even though each hook call is a fresh
+    process: the burned grant has to survive to disk, not just in memory."""
+    home = tmp_path / "zeus-home"
+    ControlPlaneState(home).add_grant(
+        issue_grant(
+            grant_id="grant.fs-write.once",
+            capability_id="fs.write",
+            scope=GrantScope.once,
+            session_id=SESSION,
+        )
+    )
+    first = ClaudeCodeGate(ControlPlaneState(home)).handle_pre(
+        _payload("Edit", {"file_path": "/work/project/main.py"})
+    )
+    assert _decision(first) == "allow"
+    assert "covered_by_grant_once" in str(first["zeus"])
+
+    # a SECOND fresh process must NOT re-honor the spent once-grant
+    second = ClaudeCodeGate(ControlPlaneState(home)).handle_pre(
+        _payload("Edit", {"file_path": "/work/project/main.py"})
+    )
+    assert _decision(second) == "ask", "a once-grant must not survive its first use"
+
+
 def test_dangerous_bash_still_asks_despite_grant(tmp_path: Path) -> None:
     state = ControlPlaneState(tmp_path / "zeus-home")
     state.add_grant(
@@ -116,7 +141,13 @@ def test_web_fetch_then_external_send_is_blocked_by_taint(tmp_path: Path) -> Non
     home = tmp_path / "zeus-home"
     gate = ClaudeCodeGate(ControlPlaneState(home))
     fetch = gate.handle_pre(_payload("WebFetch", {"url": "https://evil.example.com/x"}))
-    assert _decision(fetch) == "allow"  # read is fine, but the session is now tainted
+    # P7 novelty: the FIRST contact with a brand-new host asks once...
+    assert _decision(fetch) == "ask"
+    assert fetch["zeus"]["reason"].startswith("novelty_first_seen_network_host")
+    # ...and is learned: the same host no longer reads as novel, so the fetch
+    # itself is allowed — but the session is now tainted by the foreign read.
+    second_fetch = gate.handle_pre(_payload("WebFetch", {"url": "https://evil.example.com/y"}))
+    assert _decision(second_fetch) == "allow"
 
     # A NEW process (fresh gate) must still see the taint: it is persisted.
     second = ClaudeCodeGate(ControlPlaneState(home))

@@ -56,6 +56,11 @@ class DecisionContext(BaseModel):
     observed_taint: tuple[str, ...] = ()
     parent_principal_id: Optional[str] = None
     state_hash: Optional[str] = None
+    # A hard boundary the gate already failed BEFORE decide() ran (e.g. an
+    # egress ring violation). The ring is a wall, not a judgement: when set,
+    # decide() short-circuits to DENY so the receipt is the truth of the final
+    # action — never a post-hoc mutation of an AUTO response.
+    boundary_violation: Optional[str] = None
 
 
 class DecisionRequest(BaseModel):

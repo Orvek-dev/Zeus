@@ -6,7 +6,6 @@ from typing import Final, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from zeus_agent.objective_runtime import ObjectiveCompiler
 from zeus_agent.goal_intelligence_runtime.policy import unsafe_policy_reasons
 
 _MODEL_CONFIG: Final = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True, strict=True)

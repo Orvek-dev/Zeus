@@ -41,3 +41,6 @@ templates/
 *.jsonl
 artifacts/
 evidence/
+
+# Local MCP/browser session artifacts
+.playwright-mcp/

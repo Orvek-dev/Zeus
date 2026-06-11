@@ -50,13 +50,6 @@ def what_template_for(capability_id: str) -> Optional[str]:
     return None
 
 
-def can_explain(record: CapabilityRecord) -> bool:
-    """No plain-language template → cannot auto-run a side-effecting action."""
-    if record.side_effect is SideEffectClass.none:
-        return True
-    return what_template_for(record.capability_id) is not None
-
-
 def render_card(
     *,
     capability_id: str,

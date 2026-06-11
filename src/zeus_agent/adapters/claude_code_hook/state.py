@@ -4,11 +4,15 @@ import json
 from pathlib import Path
 from typing import Optional
 
+from zeus_agent.capability_registry_runtime import CapabilityStore
 from zeus_agent.decision_api_runtime import ZeusDecisionEngine
+from zeus_agent.governor_runtime import GovernorBank, NoveltyGovernor
 from zeus_agent.graded_approval_runtime import ApprovalGrant, GrantStore
 from zeus_agent.taint_runtime import SessionTaintTracker, TaintLabel
 from zeus_agent.trust_loop_runtime import (
     FlightRecorder,
+    SQLiteApprovalQueue,
+    SQLiteControlPlaneStore,
     SQLiteEvidenceLedger,
     SQLiteTrustStatStore,
 )
@@ -20,9 +24,10 @@ class ControlPlaneState:
     """Durable control-plane state under ``<home>/control-plane``.
 
     A hook process lives for one decision, so everything that must outlive it
-    (ledger, trust counts, session taint, standing grants, pending receipts)
-    is file-backed here. Governors stay in-process — they protect loops inside
-    one engine lifetime.
+    (ledger, trust counts, session taint, standing grants, pending receipts,
+    budget counters, the approval queue, the decision sequence) is file-backed
+    here. Only the rate/loop governors stay in-process: they guard a single
+    engine's loop; cross-process loop governance is the P7 organ.
     """
 
     def __init__(self, home: Path) -> None:
@@ -30,19 +35,47 @@ class ControlPlaneState:
         self.root.mkdir(parents=True, exist_ok=True)
         self.ledger_path = self.root / "ledger.sqlite3"
         self.trust_path = self.root / "trust.sqlite3"
+        self.state_path = self.root / "state.sqlite3"
         self.taint_path = self.root / "taint.json"
         self.grants_path = self.root / "grants.json"
         self.pending_path = self.root / "pending.json"
 
     # ----------------------------------------------------------------- engine
-    def build_engine(self) -> ZeusDecisionEngine:
+    def build_engine(self, *, capabilities: Optional[CapabilityStore] = None) -> ZeusDecisionEngine:
+        """One control plane, many gates: every gate shares this home but
+        brings its own static capability table (per-surface doctrine)."""
+        from zeus_agent.authority_compiler_runtime import SQLiteEnvelopeStore
+        from zeus_agent.capability_registry_runtime import CapabilityRecord
+        from zeus_agent.consequence_runtime import explain
+
         recorder = FlightRecorder(SQLiteEvidenceLedger(self.ledger_path))
+        store = SQLiteControlPlaneStore(self.state_path)
+        capability_store = capabilities if capabilities is not None else seed_capability_store()
+        # persisted records (policy-pack never-do locks, MCP/skill quarantine,
+        # reviewed classifications) override the static seed at EVERY gate.
+        for _capability_id, raw in store.capability_all():
+            try:
+                capability_store.register(CapabilityRecord.model_validate_json(raw))
+            except ValueError:
+                continue
         engine = ZeusDecisionEngine(
             recorder=recorder,
-            capabilities=seed_capability_store(),
+            capabilities=capability_store,
+            envelopes=SQLiteEnvelopeStore(store),
             taint=self.load_taint(),
+            governors=GovernorBank(
+                _governor_config(store),
+                budget_store=store,
+                novelty=NoveltyGovernor(store),
+                force_ask_reason=store.kv_get("governor.force_ask_reason") or None,
+            ),
             grants=self.load_grants(),
+            queue=SQLiteApprovalQueue(store),
             trust_stats=SQLiteTrustStatStore(self.trust_path),
+            seq_counter=lambda: store.next_counter("decision_seq"),
+            # explainable-or-escalated, enforced inside decide() so the receipt
+            # is the truth — every gate built here inherits the rule.
+            explainability=lambda record: explain(record) is not None,
         )
         return engine
 
@@ -69,10 +102,14 @@ class ControlPlaneState:
 
     # ----------------------------------------------------------------- grants
     def load_grants(self) -> GrantStore:
-        store = GrantStore()
+        """A WRITE-THROUGH store: every gate process lives for one decision, so
+        a grant burned in memory only (engine step 4b consume) would re-fire at
+        the next process — "approve once" must mean once at EVERY gate, not
+        just the one that remembered to persist."""
+        store = _WriteThroughGrantStore(self.save_grants)
         for raw in self._read_json(self.grants_path, []):
             try:
-                store.add(ApprovalGrant.model_validate(raw))
+                store.seed(ApprovalGrant.model_validate(raw))
             except ValueError:
                 continue
         return store
@@ -100,12 +137,56 @@ class ControlPlaneState:
 
     # ------------------------------------------------------------------ files
     def _read_json(self, path: Path, default):
-        if not path.exists():
-            return default
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            return default
+        return _read_json_file(path, default)
 
     def _write_json(self, path: Path, data) -> None:
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+class _WriteThroughGrantStore(GrantStore):
+    """GrantStore that persists every mutation. `seed()` loads from disk
+    without re-saving; `add()`/`consume()` write through immediately so a
+    burned once-grant is dead for every later gate process."""
+
+    def __init__(self, save) -> None:
+        super().__init__()
+        self._save = save
+
+    def seed(self, grant: ApprovalGrant) -> None:
+        super().add(grant)
+
+    def add(self, grant: ApprovalGrant) -> None:
+        super().add(grant)
+        self._save(self)
+
+    def consume(self, grant_id: str) -> None:
+        super().consume(grant_id)
+        self._save(self)
+
+
+def _governor_config(store: SQLiteControlPlaneStore):
+    """Governor knobs set by policy packs / NL rules live in the kv table."""
+    from zeus_agent.governor_runtime import GovernorBankConfig
+
+    def _int_of(name: str, default: int) -> int:
+        raw = store.kv_get(name)
+        return int(raw) if raw is not None and raw.isdigit() and int(raw) > 0 else default
+
+    defaults = GovernorBankConfig()
+    return GovernorBankConfig(
+        rate_max_calls=_int_of("governor.rate_max_calls", defaults.rate_max_calls),
+        rate_window_seconds=_int_of("governor.rate_window_seconds", defaults.rate_window_seconds),
+        loop_max_iterations=_int_of("governor.loop_max_iterations", defaults.loop_max_iterations),
+        loop_no_progress_limit=_int_of(
+            "governor.loop_no_progress_limit", defaults.loop_no_progress_limit
+        ),
+    )
+
+
+def _read_json_file(path: Path, default):
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return default

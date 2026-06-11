@@ -4,7 +4,7 @@ import json
 from enum import Enum
 from typing import Final, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, JsonValue, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator
 
 from .ledger import LedgerEvent, SQLiteEvidenceLedger
 from .models import require_text
@@ -151,7 +151,6 @@ class FlightRecorder:
 
     def why(self, record_id: str) -> tuple[dict[str, JsonValue], ...]:
         """Walk the causal chain: the record, then everything that caused it."""
-        by_id = {str(record["record_id"]): record for record in self.ledger.records()}
         chain: list[dict[str, JsonValue]] = []
         seen: set[str] = set()
         frontier = [require_text(record_id, "record_id")]
@@ -160,7 +159,7 @@ class FlightRecorder:
             if current in seen:
                 continue
             seen.add(current)
-            record = by_id.get(current)
+            record = self.ledger.record_by_id(current)
             if record is None:
                 continue
             chain.append(record)

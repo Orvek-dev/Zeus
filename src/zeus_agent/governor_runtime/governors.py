@@ -8,6 +8,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 from zeus_agent.trust_loop_runtime import TrustDecision
+from zeus_agent.trust_loop_runtime.state_store import SQLiteControlPlaneStore
 
 
 class BudgetScope(str, Enum):
@@ -38,22 +39,38 @@ class BudgetGovernor:
     wallet is not a judgement call.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, *, store: Optional[SQLiteControlPlaneStore] = None) -> None:
+        # With a store, counters survive process exit (GAP-1) — one decision
+        # per hook process must still add up to a real, enforced budget.
+        self._store = store
         self._limits: dict[tuple[str, str], int] = {}
         self._spent: dict[tuple[str, str], int] = {}
 
     def set_limit(self, scope: BudgetScope, scope_id: str, max_units: int) -> None:
         if max_units < 0:
             raise ValueError("budget_limit_negative")
+        if self._store is not None:
+            self._store.set_budget_limit(scope.value, scope_id, max_units)
+            return
         self._limits[(scope.value, scope_id)] = max_units
+
+    def limit(self, scope: BudgetScope, scope_id: str) -> Optional[int]:
+        if self._store is not None:
+            return self._store.budget_limit(scope.value, scope_id)
+        return self._limits.get((scope.value, scope_id))
 
     def charge(self, scope: BudgetScope, scope_id: str, units: int) -> None:
         if units < 0:
             raise ValueError("budget_charge_negative")
+        if self._store is not None:
+            self._store.add_budget_spend(scope.value, scope_id, units)
+            return
         key = (scope.value, scope_id)
         self._spent[key] = self._spent.get(key, 0) + units
 
     def spent(self, scope: BudgetScope, scope_id: str) -> int:
+        if self._store is not None:
+            return self._store.budget_spent(scope.value, scope_id)
         return self._spent.get((scope.value, scope_id), 0)
 
     def precall(
@@ -69,7 +86,7 @@ class BudgetGovernor:
         if objective_id is not None:
             scopes.append((BudgetScope.objective, objective_id))
         for scope, scope_id in scopes:
-            limit = self._limits.get((scope.value, scope_id))
+            limit = self.limit(scope, scope_id)
             if limit is None:
                 continue
             if self.spent(scope, scope_id) + max(requested_units, 0) > limit:
@@ -159,6 +176,42 @@ class LoopGovernor:
         return _OK
 
 
+class NoveltyGovernor:
+    """First-seen escalation (P7): a brand-new network host or recipient is
+    worth one human look, then it is learned. Persistent, so a fresh process
+    cannot be used to re-novelty an old destination."""
+
+    def __init__(self, store: SQLiteControlPlaneStore) -> None:
+        self._store = store
+
+    def learn(self, kind: str, value: str) -> None:
+        """Pre-learn an operator-approved value so it never reads as novel
+        (e.g. egress-ring hosts: the human already wrote them down)."""
+        self._store.novelty_first_seen(kind, value)
+
+    def precall(
+        self,
+        *,
+        network_host: Optional[str] = None,
+        recipient: Optional[str] = None,
+    ) -> GovernorVerdict:
+        if network_host is not None and self._store.novelty_first_seen(
+            "network_host", network_host
+        ):
+            return GovernorVerdict(
+                allowed=False,
+                forced_decision=TrustDecision.ASK,
+                reason="novelty_first_seen_network_host",
+            )
+        if recipient is not None and self._store.novelty_first_seen("recipient", recipient):
+            return GovernorVerdict(
+                allowed=False,
+                forced_decision=TrustDecision.ASK,
+                reason="novelty_first_seen_recipient",
+            )
+        return _OK
+
+
 class GovernorBankConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
@@ -175,9 +228,16 @@ class GovernorBank:
     strictest verdict wins when several governors trip at once.
     """
 
-    def __init__(self, config: Optional[GovernorBankConfig] = None) -> None:
+    def __init__(
+        self,
+        config: Optional[GovernorBankConfig] = None,
+        *,
+        budget_store: Optional[SQLiteControlPlaneStore] = None,
+        novelty: Optional[NoveltyGovernor] = None,
+        force_ask_reason: Optional[str] = None,
+    ) -> None:
         cfg = config if config is not None else GovernorBankConfig()
-        self.budget = BudgetGovernor()
+        self.budget = BudgetGovernor(store=budget_store)
         self.rate = RateGovernor(
             max_calls=cfg.rate_max_calls,
             window_seconds=cfg.rate_window_seconds,
@@ -186,6 +246,10 @@ class GovernorBank:
             max_iterations=cfg.loop_max_iterations,
             no_progress_limit=cfg.loop_no_progress_limit,
         )
+        self.novelty = novelty
+        # set by the dead-man switch: an unacked digest demotes autonomy, so
+        # every side-effecting call asks until the human resurfaces.
+        self.force_ask_reason = force_ask_reason
 
     def precall(
         self,
@@ -195,6 +259,9 @@ class GovernorBank:
         run_id: Optional[str] = None,
         objective_id: Optional[str] = None,
         state_hash: Optional[str] = None,
+        network_host: Optional[str] = None,
+        recipient: Optional[str] = None,
+        side_effecting: bool = True,
         now: Optional[datetime] = None,
     ) -> GovernorVerdict:
         budget = self.budget.precall(
@@ -204,6 +271,16 @@ class GovernorBank:
         )
         if not budget.allowed:
             return budget
+        if self.force_ask_reason is not None and side_effecting:
+            return GovernorVerdict(
+                allowed=False,
+                forced_decision=TrustDecision.ASK,
+                reason=self.force_ask_reason,
+            )
+        if self.novelty is not None:
+            novelty = self.novelty.precall(network_host=network_host, recipient=recipient)
+            if not novelty.allowed:
+                return novelty
         rate = self.rate.precall(capability_id, now=now)
         if not rate.allowed:
             return rate

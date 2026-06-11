@@ -1,43 +1,43 @@
 # Security Policy
 
-Zeus is governed and local-first by default.
+Zeus is a local-first governance control plane. The host agent executes its
+own tools; Zeus decides, records, approves, and blocks at the gates.
 
 ## Defaults
 
 - No remote telemetry is enabled by the package.
-- Local runtime state should stay outside source control.
-- Provider credentials should be referenced by environment variable or external secret manager name, never copied into configs, tests, logs, or evidence.
-- Secret-looking values are redacted in runtime surfaces that handle credential-like text.
-- Tool, connector, transport, gateway, and live provider paths should pass through authority, lease, and evidence boundaries before execution.
-- Dry-run and live-capable paths should remain distinguishable in code and review.
+- Local runtime state (`~/.zeus/control-plane`: ledger, trust counts, grants,
+  taint, queue) stays outside source control.
+- Provider credentials stay on the host side; the proxy forwards auth headers
+  and never persists them. The credential broker injects key material only at
+  the egress point, on an allowed decision — agents hold references, not keys.
+- Secret-looking values are redacted before they reach the ledger; the memory
+  gate stores candidates redacted (poisoned candidates keep only a hash and a
+  redacted preview), verified by a byte-level storage test.
+- The `/zeus` decision API requires HMAC pairing and is never zero-confirm. A
+  non-loopback `/v1` bind refuses to start without issued tokens
+  (`zeus pair --issue-v1-token`, TTL + revocation) or an explicit unsafe flag;
+  a valid token's registration — not spoofable headers — decides identity.
+- Approvals are TTL fail-closed end to end: an expired parked action can never
+  resolve as approved, and a burned "once" grant stays burned for every later
+  process at every gate.
 
-## Current v5.0.0 Boundary
+## Current v1.0.0-alpha Boundary
 
-`v5.0.0` keeps Zeus local-first and governed by default. The public package exposes
-productized status, goal intelligence, cognitive-provider activation, provider/MCP/tool
-runtime contracts, memory/ontology surfaces, self-evolution review queues, and
-ObjectiveRun start/status/export surfaces. It also exposes the Governed Live Slice
-authority UX for missing objective, lease, approval, broker-evidence,
-credential-scope, sandbox-policy, and audit-receipt requirements, plus the Live
-Platform Beta aggregate status/operator journey, but it does not enable unrestricted
-production live execution.
+The final action returned to a host always equals the final decision receipt
+in the hash-chained ledger (the receipt-coherence contract), and 88 frozen
+conformance scenarios cover the four gates, governance UX, loop governance,
+host adapters, hygiene modes, and remote safety.
 
-Governed live-capable work must resolve to trusted authority, lease, approval,
-credential-scope, sandbox, audit, and evidence records before a handler can execute or a
-production-ready claim can pass. Public reference strings alone do not authorize
-dispatch. Raw credential material is blocked or redacted before public output.
-
-This release still does not claim production external provider execution, remote MCP
-production execution, hosted API daemon readiness, external gateway/webhook production
-execution, browser live execution, remote sandbox execution, unrestricted production live
-readiness, unattended execution, self-modifying workflows, automatic memory writes from
-ordinary agent turns, ontology promotion, learned-rule promotion, active rule writes,
-active skill writes, workflow pattern promotion, or hard-isolated remote execution by
-itself.
-
-Before production use, live MCP tools, external AI APIs, browser/terminal automation, cron workers, remote sandboxes, networked gateways, and memory/ontology promotion paths should be wired through explicit authority grants, runtime leases, credential-scope binding, retention policy, human approval when needed, sandbox egress policy, audit evidence, and rollback behavior.
-
-See [docs/live-connection-architecture.md](docs/live-connection-architecture.md) for the target live connection design.
+That conformance is **synthetic** — contracts frozen against simulated hosts.
+This alpha does not claim: validated parity with a pinned real hermes-agent or
+OpenClaw build (those gate `v2.0.0` / `v3.0.0`, each requiring ≥95% plus a
+7-day zero-bypass soak measured by instrumentation outside Zeus), OS-level
+egress enforcement (the ring decides in-process and emits sandbox-runtime
+profiles; the srt wrapper is the next milestone), hosted SaaS readiness,
+browser automation, unattended production operation, or third-party
+production validation. Cognition organs (memory write gate, skill quarantine)
+are default-OFF.
 
 ## Reporting
 

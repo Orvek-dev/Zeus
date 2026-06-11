@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Literal
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from .models import TrustLoopAction, require_text
+from .state_store import QueueRow, SQLiteControlPlaneStore
 
 ParkedActionStatus = Literal["pending", "approved", "rejected", "expired", "superseded"]
 
@@ -55,6 +56,78 @@ class ApprovalQueue:
             refreshed.append(_expire_if_needed(parked, now=now))
         self._actions = {parked.parked_action_id: parked for parked in refreshed}
         return tuple(parked for parked in refreshed if parked.status == "pending")
+
+
+class SQLiteApprovalQueue(ApprovalQueue):
+    """Approval queue over the shared control-plane store (GAP-1).
+
+    Each gate invocation is its own process; an ASK parked by one process must
+    be visible to the console and to every later process, and a park must
+    survive until a human resolves it or its TTL expires.
+    """
+
+    def __init__(self, store: SQLiteControlPlaneStore) -> None:
+        self._store = store
+
+    def park(self, action: TrustLoopAction, *, ttl_seconds: int = 600) -> ParkedAction:
+        created_at = datetime.now(timezone.utc)
+        parked = ParkedAction(
+            parked_action_id=_parked_action_id(
+                action, self._store.next_counter("parked_action_seq")
+            ),
+            action=action,
+            created_at=created_at,
+            expires_at=created_at + timedelta(seconds=ttl_seconds),
+        )
+        self._store.queue_park(
+            parked_action_id=parked.parked_action_id,
+            action_id=action.action_id,
+            action_json=action.model_dump_json(),
+            created_at=parked.created_at.isoformat(),
+            expires_at=parked.expires_at.isoformat(),
+        )
+        return parked
+
+    def get(self, parked_action_id: str) -> ParkedAction:
+        row = self._store.queue_row(parked_action_id)
+        if row is None:
+            raise KeyError(parked_action_id)
+        return _row_to_parked(row)
+
+    def pending(self, *, now: datetime) -> tuple[ParkedAction, ...]:
+        self._store.queue_expire_due(now.isoformat())
+        return tuple(_row_to_parked(row) for row in self._store.queue_rows(status="pending"))
+
+    def resolve(
+        self, parked_action_id: str, *, approved: bool, now: datetime | None = None
+    ) -> ParkedAction:
+        """Operator verdict on a parked ASK (async surfaces resolve here).
+
+        TTL is fail-closed HERE, not only in pending(): a park past its expiry
+        can never become approved, even if nothing swept it to expired yet —
+        an approval that raced the deadline must not authorize anything."""
+        current = self.get(parked_action_id)
+        timestamp = now if now is not None else datetime.now(timezone.utc)
+        expired = _expire_if_needed(current, now=timestamp)
+        if expired.status != current.status:
+            self._store.queue_set_status(parked_action_id, "expired")
+            return expired
+        if current.status != "pending":
+            return current
+        status: ParkedActionStatus = "approved" if approved else "rejected"
+        self._store.queue_set_status(parked_action_id, status)
+        return current.model_copy(update={"status": status})
+
+
+def _row_to_parked(row: QueueRow) -> ParkedAction:
+    parked_action_id, _action_id, action_json, status, created_at, expires_at = row
+    return ParkedAction(
+        parked_action_id=parked_action_id,
+        action=TrustLoopAction.model_validate_json(action_json),
+        status=cast(ParkedActionStatus, status),
+        created_at=datetime.fromisoformat(created_at),
+        expires_at=datetime.fromisoformat(expires_at),
+    )
 
 
 def _expire_if_needed(parked: ParkedAction, *, now: datetime) -> ParkedAction:

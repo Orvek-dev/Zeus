@@ -7,6 +7,7 @@ from .governors import (
     GovernorBankConfig,
     GovernorVerdict,
     LoopGovernor,
+    NoveltyGovernor,
     RateGovernor,
 )
 
@@ -17,5 +18,6 @@ __all__ = [
     "GovernorBankConfig",
     "GovernorVerdict",
     "LoopGovernor",
+    "NoveltyGovernor",
     "RateGovernor",
 ]

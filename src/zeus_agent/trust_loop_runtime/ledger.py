@@ -6,6 +6,7 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 from pydantic import JsonValue
 
@@ -71,6 +72,17 @@ class SQLiteEvidenceLedger:
                 ),
             )
         return LedgerEvent(seq=seq, record_id=record_id, entry_hash=entry_hash)
+
+    def record_by_id(self, record_id: str) -> Optional[dict[str, JsonValue]]:
+        """Point lookup via the UNIQUE index on record_id — never a full scan."""
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT seq, record_id, created_at, kind, run_id, "
+                "prev_hash, payload_hash, entry_hash, payload_json "
+                "FROM trust_events WHERE record_id = ?",
+                (record_id,),
+            ).fetchone()
+        return _row_to_record(row) if row is not None else None
 
     def records(self) -> list[dict[str, JsonValue]]:
         with self._connect() as connection:

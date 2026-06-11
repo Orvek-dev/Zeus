@@ -63,6 +63,64 @@ conformance suite at ≥95% plus a 7-day real-traffic soak with zero bypasses.
   ~40-scenario per-host suite gating future major versions.
 - `THIRD_PARTY_NOTICES.md`.
 
+### Added — the four gates and hardening (same alpha, public push)
+
+- **Gate 1 — LLM proxy** (`proxy_runtime`, `wallet_runtime`): OpenAI-compatible
+  `/v1` server. Ingress budget enforcement (429 before the provider is
+  called), per-objective micro-USD cost attribution, governed quota-aware
+  model switching, hang watchdog. Egress tool_call interception: streamed
+  fragments buffered whole, denied calls stripped and replaced with a block
+  notice so the model re-plans; oversized buffers fail closed. Secret-hygiene
+  policy modes `count | redact | block | ask` — redact masks spans even
+  across SSE chunk boundaries (rolling window); block/ask buffer the whole
+  stream (bounded, overflow fails closed) and withhold/park on findings;
+  every body mutation leaves its own receipt.
+- **Gate 2 — MCP gateway** (`mcp_gateway_runtime`): downstream tools import as
+  quarantined, review activates, schema rug-pull re-quarantines, injection
+  findings in descriptions or results taint the session, per-tool budgets.
+- **Gate 3 — zeusd Decision API** (`zeusd_runtime`, `pairing_runtime`):
+  `POST /zeus/decide·record` + `GET /zeus/brief` over the proxy port, HMAC
+  pairing (never zero-confirm). **hermes adapter**: blocking `pre_tool_call`
+  gate with attenuated child principals — an out-of-envelope subagent is
+  DENIED. **OpenClaw adapter**: exec approval relay (allow/deny immediately,
+  dangerous commands park until the operator answers) with a durable
+  parked→request mapping that survives relay restarts.
+- **Gate 4 — egress ring** (`egress_runtime`): host/path ring checked BEFORE
+  policy — a ring violation enters `decide()` as a boundary violation and
+  becomes a truthful DENY receipt. Key-only-at-egress credential injection,
+  recorded as an outcome. Emits sandbox-runtime (srt) profiles from the ring.
+- **Final-action receipt contract (P11)**: the invariant "the final action
+  returned to the host equals the final receipt in the ledger", enforced
+  inside `decide()` (boundary-violation short-circuit + injected
+  explainability step — an unexplainable side-effecting action can neither
+  run silently nor be covered by a standing license). Post-hoc gate mutations
+  deleted; pinned by a dedicated receipt-coherence conformance suite plus a
+  template-coverage invariant.
+- **Governance UX** (`consequence_runtime`, `policy_pack_runtime`,
+  `digest_runtime`, `nl_policy_runtime`): Korean plain-language consequence
+  cards; signed policy packs and NL rules where the policy change itself is
+  governed and ledgered; weekly digest with license meter and a dead-man
+  switch (an unacknowledged digest demotes autonomy).
+- **Loop governance** (`loop_runtime`, `NoveltyGovernor`): standing lease
+  renewal, quiet hours, drift report, and persistent first-seen
+  host/recipient escalation.
+- **Cognition organs, default-OFF** (`memory_gate_runtime`,
+  `skill_quarantine_runtime`): memory writes land as redacted candidates
+  (a DENY stores nothing; tainted/injected candidates keep only a hash and a
+  redacted preview and can never be promoted — proven by a byte-level SQLite
+  scan); skills install quarantined, hash-pinned, injection-scanned.
+- **Remote safety**: non-loopback `/v1` binds refuse to start without issued
+  tokens (`zeus pair --issue-v1-token`, TTL + revocation; the token's
+  registration — not spoofable headers — decides identity) or an explicit
+  unsafe flag.
+- **Hardening from three external review rounds**: durable once-grant burns
+  at EVERY gate (write-through grant store), TTL fail-closed approval
+  resolution end to end (an expired park can never resolve approved),
+  bounded hygiene stream buffering, `/v1` token lifecycle.
+- **Conformance**: 88 frozen scenarios across gates 0–4, governance UX, loop
+  governance, both host adapters, hygiene modes, remote safety, and receipt
+  coherence. Suite: 1880 tests, ruff clean. `CONNECTING.md`.
+
 ### Changed
 
 - The objective-run executor line (M1–M5) is demoted from product critical
