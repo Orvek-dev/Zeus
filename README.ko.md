@@ -11,7 +11,7 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1880%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1881%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -190,7 +190,7 @@ Claude Code · hermes-agent · OpenClaw 연결 안내는
 
 | 증거 표면 | 현재 결과 |
 | --- | --- |
-| 공개 단위·시나리오 스위트 | `1880`개 테스트 통과 |
+| 공개 단위·시나리오 스위트 | `1881`개 테스트 통과 |
 | 컨포먼스 시나리오 | P3–P13 + 영수증 정합성에 걸쳐 `88`개 |
 | 린트 | `ruff` 클린 |
 | 패키지 메타데이터 | `zeus-agent==1.0.0a1` (알파 리셋; 메이저는 컨포먼스 게이트) |

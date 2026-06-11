@@ -11,7 +11,7 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1880%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1881%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -195,7 +195,7 @@ local regression evidence, not as proof of production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public unit and scenario suite | `1880` tests passed |
+| Public unit and scenario suite | `1881` tests passed |
 | Conformance scenarios | `88` across P3–P13 + receipt coherence |
 | Lint | `ruff` clean |
 | Package metadata | `zeus-agent==1.0.0a1` (alpha reset; majors are conformance-gated) |
