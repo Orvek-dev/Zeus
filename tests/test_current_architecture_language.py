@@ -6,8 +6,11 @@ from typing import Final
 
 
 PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
+# README left this set at the control-plane refoundation: the 12-pillar core
+# language is ARCHIVED branding, kept only inside the archived master-plan
+# records below. tests/test_docs_domain_language.py pins that the README
+# family never reintroduces it.
 CURRENT_ARCHITECTURE_DOCS: Final[tuple[Path, ...]] = (
-    PROJECT_ROOT / "README.md",
     PROJECT_ROOT / "docs/hermes-grade-platform-master-design.md",
     PROJECT_ROOT / "docs/hermes-live-platform-absorption-master-plan.md",
 )

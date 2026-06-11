@@ -1,6 +1,6 @@
 services:
   zeus:
-    image: zeus-agent:6.1.0
+    image: zeus-agent:1.0.0-alpha.1
     build:
       context: .
       dockerfile: Dockerfile

@@ -212,9 +212,9 @@ def test_ask_mode_parks_streaming_response(tmp_path: Path) -> None:
 
 
 def test_block_mode_stream_buffer_is_bounded(tmp_path: Path) -> None:
-    """Codex r3 [P2]: block/ask must not buffer a stream without bound — past
-    the cap the response is withheld fail-closed (same doctrine as the
-    tool_call cap), with its own receipt."""
+    """block/ask must not buffer a stream without bound — past the cap the
+    response is withheld fail-closed (same doctrine as the tool_call cap),
+    with its own receipt."""
     proxy, engine, _store = _proxy(tmp_path, mode="block")
     huge = "x" * 1_200_000
     chunks = [_content_chunk(huge), _content_chunk(huge), _content_chunk("", finish="stop")]

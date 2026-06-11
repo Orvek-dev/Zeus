@@ -212,7 +212,8 @@ TTL·취소 지원) 없이는 기동을 거부합니다. 인지 장기는 기본
 | 문서 | 목적 |
 | --- | --- |
 | [English README](README.md) | 영문 개요, 만든 이유, 퀵스타트, 문서 안내 |
-| [호스트 연결](CONNECTING.md) | Claude Code · hermes-agent · OpenClaw를 게이트에 연결하는 방법 |
+| [호스트 연결 (한국어)](CONNECTING.ko.md) | Claude Code · hermes-agent · OpenClaw를 게이트에 연결하는 방법 ([English](CONNECTING.md)) |
+| [한국어 문서 안내](docs/ko.md) | 한국어 읽기 순서와 문서 분류(현행/아카이브) |
 | [Commands](docs/commands.md) | 레거시 CLI 카탈로그 (`zeus dev` 아래로 이동) |
 | [Docker And OrbStack](docs/docker.md) | 로컬 Docker/OrbStack 빌드·실행·스모크 체크 |
 | [Security policy](SECURITY.md) | 공개 보안 태세와 현재 알파 경계 |

@@ -133,10 +133,10 @@ def test_hook_processes_share_state_db(tmp_path: Path) -> None:
 
 
 def test_once_grant_burn_survives_at_every_gate(tmp_path: Path) -> None:
-    """Codex r3 [P1]: the burn used to persist only because the Claude hook
-    remembered to save. The write-through store makes consume() durable at the
-    ENGINE level, so hermes/openclaw/gateway processes (any build_engine
-    caller) get it too — no per-gate persistence calls to forget."""
+    """The burn used to persist only because the Claude hook remembered to
+    save. The write-through store makes consume() durable at the ENGINE
+    level, so hermes/openclaw/gateway processes (any build_engine caller)
+    get it too — no per-gate persistence calls to forget."""
     from zeus_agent.graded_approval_runtime import GrantScope, issue_grant
 
     home = tmp_path / "zeus"
@@ -166,8 +166,8 @@ def test_once_grant_burn_survives_at_every_gate(tmp_path: Path) -> None:
 
 
 def test_expired_park_can_never_resolve_approved(tmp_path: Path) -> None:
-    """Codex r3 [P1]: an approval that races past the TTL must fail closed —
-    resolve() re-checks expiry itself instead of trusting a prior sweep."""
+    """An approval that races past the TTL must fail closed — resolve()
+    re-checks expiry itself instead of trusting a prior sweep."""
     engine = _engine(tmp_path)
     asked = engine.decide(
         DecisionRequest(

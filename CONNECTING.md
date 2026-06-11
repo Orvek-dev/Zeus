@@ -1,5 +1,7 @@
 # Connecting a host agent to Zeus
 
+[English](CONNECTING.md) · [한국어](CONNECTING.ko.md)
+
 Zeus is a local-first governance control plane: your agent keeps doing the
 work; Zeus decides, records, approves, and blocks at four gates (LLM proxy ·
 MCP gateway · decision hooks · egress ring). Model keys stay on the host side.

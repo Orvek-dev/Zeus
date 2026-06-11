@@ -2,48 +2,42 @@
 
 [English README](../README.md) · [한국어 README](../README.ko.md)
 
-이 문서는 공개 문서의 한국어 읽기 순서를 제공합니다. 현재 모든 장문 설계 문서는
-영어 canonical 문서를 기준으로 유지하고, 한국어 README와 이 안내 문서에서 핵심
-맥락을 먼저 제공합니다.
+이 문서는 공개 문서의 한국어 읽기 순서를 제공합니다. 영어 문서가
+canonical이며, 핵심 진입 문서(README, CONNECTING)는 한국어 번역을
+함께 유지합니다.
 
 ## 먼저 읽기
 
 1. [한국어 README](../README.ko.md)
-   - Zeus를 왜 만들었는지
-   - Zeus가 어떤 문제를 풀려고 하는지
-   - Quickstart와 핵심 명령
-
-2. [Commands](commands.md)
-   - 설치 후 실제로 실행해볼 수 있는 public local CLI 명령
-
-3. [Hermes comparison](hermes-comparison.md)
-   - Hermes와 Zeus가 어떤 점에서 같고 다른지
-   - Zeus가 왜 objective contract, authority, evidence 중심인지
-
-4. [Live connection architecture](live-connection-architecture.md)
-   - 외부 AI API, MCP, gateway, browser, terminal, sandbox를 어떻게 연결해야 하는지
-   - 어떤 live surface가 아직 production-ready claim이 아닌지
-
-5. [Security policy](../SECURITY.md)
-   - local-first, no-secret-echo, authority/lease/evidence boundary
+   - Zeus를 왜 만들었는지, 네 개의 관문, 최종 행동-영수증 계약
+   - Quickstart와 정직한 알파 경계
+2. [호스트 연결 (한국어)](../CONNECTING.ko.md)
+   - Claude Code · hermes-agent · OpenClaw를 게이트에 연결하는 방법
+   - 페어링(무확인 연결 금지), 예산, 정책, 다이제스트
+3. [Security policy](../SECURITY.md) (영어)
+   - 로컬 우선 기본값, 영수증 정합성, 현재 알파 경계
+4. [Commands](commands.md) (영어)
+   - 레거시 CLI 카탈로그 — 전부 `zeus dev` 네임스페이스 아래로 이동
+5. [Docker And OrbStack](docker.md) (영어)
+   - 로컬 컨테이너 빌드·실행·스모크 체크
 
 ## 현재 문서 분류
 
 | 문서 | 성격 |
 | --- | --- |
-| `README.md` | 영어 canonical 공개 진입점 |
-| `README.ko.md` | 한국어 공개 진입점 |
-| `docs/commands.md` | CLI 명령 카탈로그 |
-| `docs/hermes-comparison.md` | 현재 Zeus와 Hermes 비교 |
-| `docs/live-connection-architecture.md` | live 연결 목표 아키텍처 |
-| `docs/hermes-grade-platform-master-design.md` | 장기 목표 설계 |
-| `docs/hermes-live-platform-absorption-master-plan.md` | Hermes live platform 흡수 장기 계획 |
-| `docs/zeus-*-boundary.md` | 과거 RC 및 공개/보안 경계 기록 |
+| `README.md` / `README.ko.md` | 공개 진입점 (EN canonical / KO 번역) |
+| `CONNECTING.md` / `CONNECTING.ko.md` | 호스트 연결 가이드 (EN canonical / KO 번역) |
+| `SECURITY.md` | 보안 태세와 알파 경계 |
+| `CHANGELOG.md` | 릴리스 역사 (재창립 이전 라인 포함) |
+| `docs/commands.md` | 레거시 CLI 카탈로그 (`zeus dev`) |
+| `docs/docker.md` | 컨테이너 사용법 |
+| `docs/acs-compat.md` | ACS 매니페스트 읽기 호환 |
+| `docs/hermes-*.md`, `docs/live-connection-architecture.md`, `docs/zeus-*-boundary.md`, `docs/zeus-w205-w212-hard-close.md` | **아카이브** — 재창립 이전(v0.x–v6.x) 기록. 파킹된 하네스가 참조하므로 원문 보존. 내용이 README와 다르면 README가 우선 |
 
 ## 한국어 번역 정책
 
-- README와 주요 독자 안내는 한국어로 제공합니다.
-- 장문 설계 문서는 영어 canonical을 유지하되, 한국어 README/문서 안내에서
-  읽는 순서와 핵심 의미를 제공합니다.
-- 문서가 제품의 실제 구현 상태와 다를 경우, 현재 구현 상태와 release boundary를
-  우선합니다.
+- README와 CONNECTING(호스트 연결)은 한국어 번역을 유지합니다.
+- 운영 문서(commands/docker/acs-compat)와 보안 정책은 영어 canonical을
+  유지하되, 이 안내에서 읽는 순서를 제공합니다.
+- 문서가 제품의 실제 구현 상태와 다를 경우, 현재 구현 상태와 README의
+  정직한 경계 서술이 우선합니다.

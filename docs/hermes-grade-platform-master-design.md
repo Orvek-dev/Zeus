@@ -1,3 +1,5 @@
+> **ARCHIVED — pre-refoundation record (v0.x–v6.x agent-platform line).** Kept verbatim for the parked conformance harness. The current product is the local-first governance control plane described in [README.md](../README.md); where this document disagrees with the README, the README wins.
+
 # Hermes-Grade Zeus Platform Master Design
 
 This document defines the target design for growing Zeus from the current

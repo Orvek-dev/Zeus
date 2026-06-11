@@ -21,10 +21,10 @@ docker compose up -d zeus
 ## Smoke Checks
 
 ```sh
-docker exec zeus-agent zeus status --json
-docker exec zeus-agent zeus higher-order-agent-os --scenario status --json
-docker exec zeus-agent zeus objective-compile-workflow --objective "Zeus, compile this goal into a governed workflow." --requires-code --task-count 4 --json
-docker exec zeus-agent zeus governed-live-connectors --scenario trusted-local-smoke --json
+docker exec zeus-agent zeus --version
+docker exec zeus-agent zeus init
+docker exec zeus-agent zeus status
+docker exec zeus-agent zeus dev kernel-status   # legacy harness surface, parked under `zeus dev`
 ```
 
 ## Stop
@@ -37,5 +37,5 @@ The `zeus_home` volume keeps local Zeus state across restarts. Remove it only
 when you intentionally want a clean local state:
 
 ```sh
-docker volume rm 14_zeus_public_v050_zeus_home
+docker compose down --volumes
 ```
