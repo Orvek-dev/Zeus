@@ -17,7 +17,7 @@ def register_approval_commands(app: typer.Typer) -> None:
     @app.command("approve", help="Issue a graded standing grant, or resolve a parked ASK.")
     def approve(
         capability_id: str | None = typer.Argument(None, help="Capability to license, e.g. fs.write"),
-        scope: str = typer.Option("session", "--scope", help="once | session | narrower"),
+        scope: str = typer.Option("auto", "--scope", help="auto | once | session | narrower"),
         session_id: str | None = typer.Option(None, "--session-id"),
         path: str | None = typer.Option(None, "--path", help="Narrowed path prefix (scope=narrower)."),
         hours: int = typer.Option(8, "--hours", help="Grant lifetime in hours (0 = no expiry)."),
@@ -42,14 +42,18 @@ def register_approval_commands(app: typer.Typer) -> None:
             return
         if capability_id is None:
             raise typer.BadParameter("provide a capability_id, or use --parked <id>")
-        try:
-            parsed_scope = GrantScope(scope)
-        except ValueError:
-            raise typer.BadParameter("scope must be once, session, or narrower")
+        if scope == "auto":
+            parsed_scope = GrantScope.narrower
+            path = path if path is not None else str(Path.cwd())
+        else:
+            try:
+                parsed_scope = GrantScope(scope)
+            except ValueError:
+                raise typer.BadParameter("scope must be auto, once, session, or narrower")
+            if parsed_scope is GrantScope.narrower and path is None:
+                path = str(Path.cwd())
         if parsed_scope is GrantScope.session and session_id is None:
             raise typer.BadParameter("--session-id is required for scope=session")
-        if parsed_scope is GrantScope.narrower and path is None:
-            raise typer.BadParameter("--path is required for scope=narrower")
         grant = issue_grant(
             grant_id="grant.{0}.{1}".format(capability_id.replace(".", "_"), int(time.time())),
             capability_id=capability_id,

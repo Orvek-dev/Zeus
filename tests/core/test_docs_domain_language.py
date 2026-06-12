@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import Final
 
-PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
+PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[2]
 README_EN: Final[Path] = PROJECT_ROOT / "README.md"
 README_KO: Final[Path] = PROJECT_ROOT / "README.ko.md"
 CONNECTING: Final[Path] = PROJECT_ROOT / "CONNECTING.md"
@@ -53,8 +53,12 @@ ACTIVE_LIVE_CLAIMS: Final[tuple[str, ...]] = (
 STALE_EVIDENCE_MARKERS: Final[tuple[str, ...]] = (
     "tests-1791",
     "`1791` public tests passed",
+    "tests-1927",
+    "`1927`",
     "12%2F12%20starter",
     "`12/12` governed scenarios",
+    "zeus dev",
+    "docs/commands.md",
 )
 
 
@@ -68,10 +72,10 @@ def test_readmes_carry_current_control_plane_facts() -> None:
 
     for text, name in ((en, "EN"), (ko, "KO")):
         # version + evidence badges stay in sync with the package reality
-        assert "version-1.0.0--alpha.4" in text, name
-        assert "tests-1927%20passed" in text, name
+        assert "version-1.0.0--alpha.5" in text, name
+        assert "tests-283%20passed" in text, name
         assert "conformance-88%20scenarios" in text, name
-        assert "`1927`" in text, name
+        assert "`283`" in text, name
         assert "`88`" in text, name
         for marker in STALE_EVIDENCE_MARKERS:
             assert marker not in text, (name, marker)

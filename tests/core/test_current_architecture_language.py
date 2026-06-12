@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Final
 
 
-PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
+PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[2]
 # README left this set at the control-plane refoundation: the 12-pillar core
 # language is ARCHIVED branding, kept only inside the archived master-plan
 # records below. tests/test_docs_domain_language.py pins that the README

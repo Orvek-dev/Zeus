@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zeus-agent"
-version = "1.0.0a4"
+version = "1.0.0a5"
 description = "Local-first governance control plane for AI agents."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,5 +30,8 @@ zeus = "zeus_agent.cli_main:app"
 packages = ["src/zeus_agent"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests/core", "tests/conformance"]
 pythonpath = ["src"]
+
+[tool.ruff]
+extend-exclude = ["attic"]

@@ -16,10 +16,10 @@ canonical이며, 핵심 진입 문서(README, CONNECTING)는 한국어 번역을
    - 페어링(무확인 연결 금지), 예산, 정책, 다이제스트
 3. [Security policy](../SECURITY.md) (영어)
    - 로컬 우선 기본값, 영수증 정합성, 현재 알파 경계
-4. [Commands](commands.md) (영어)
-   - 레거시 CLI 카탈로그 — 전부 `zeus dev` 네임스페이스 아래로 이동
-5. [Docker And OrbStack](docker.md) (영어)
+4. [Docker And OrbStack](docker.md) (영어)
    - 로컬 컨테이너 빌드·실행·스모크 체크
+5. [Legacy Wave Attic](../attic/legacy-wave/README.md) (영어)
+   - 재창립 이전 wave 하네스의 보관 위치와 제외 규칙
 
 ## 현재 문서 분류
 
@@ -29,10 +29,10 @@ canonical이며, 핵심 진입 문서(README, CONNECTING)는 한국어 번역을
 | `CONNECTING.md` / `CONNECTING.ko.md` | 호스트 연결 가이드 (EN canonical / KO 번역) |
 | `SECURITY.md` | 보안 태세와 알파 경계 |
 | `CHANGELOG.md` | 릴리스 역사 (재창립 이전 라인 포함) |
-| `docs/commands.md` | 레거시 CLI 카탈로그 (`zeus dev`) |
 | `docs/docker.md` | 컨테이너 사용법 |
 | `docs/acs-compat.md` | ACS 매니페스트 읽기 호환 |
 | `docs/private-dogfood-eval-boundary.md` | private live-host dogfood/eval 자산 분리 규칙 |
+| `attic/legacy-wave/` | **아카이브** — 재창립 이전 wave CLI/eval/test 하네스. 기본 테스트·제품 CLI·릴리스 증거에서 제외 |
 | `docs/hermes-*.md`, `docs/live-connection-architecture.md`, `docs/zeus-*-boundary.md`, `docs/zeus-w205-w212-hard-close.md` | **아카이브** — 재창립 이전(v0.x–v6.x) 기록. 파킹된 하네스가 참조하므로 원문 보존. 내용이 README와 다르면 README가 우선 |
 
 ## 한국어 번역 정책

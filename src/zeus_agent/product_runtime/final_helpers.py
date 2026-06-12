@@ -214,9 +214,9 @@ def promotion_request() -> LiveTransportPromotionRequest:
 
 
 def adjacent_surface_pass() -> bool:
-    from zeus_agent.eval.wave8 import run_wave8_eval
+    from zeus_agent.eval.total_architecture import run_total_architecture_eval
 
-    return run_wave8_eval()["failed"] == 0
+    return run_total_architecture_eval()["failed"] == 0
 
 
 def blocked_label(blocked: bool) -> str:

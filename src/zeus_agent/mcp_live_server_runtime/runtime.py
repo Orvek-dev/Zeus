@@ -16,7 +16,7 @@ from zeus_agent.mcp_live_server_runtime.support import build_adapter_plan
 from zeus_agent.mcp_live_server_runtime.support import build_transport_lease
 from zeus_agent.mcp_live_server_runtime.support import safe_surface_scan
 from zeus_agent.mcp_live_server_runtime.support import unsafe_surface_scan
-from zeus_agent.wave16_provider_http_server import Wave16ProviderHttpServer
+from zeus_agent.loopback_provider_http_server import LoopbackProviderHttpServer
 
 McpLiveServerDecision = Literal["report", "blocked"]
 McpLiveServerScenario = Literal["status", "loopback-smoke", "prompt-injection-scan"]
@@ -122,7 +122,7 @@ def _loopback_smoke(*, secret_ref: str, query: str) -> McpLiveServerContract:
             credential_material_accessed=secret_material.credential_material_accessed,
         )
 
-    server = Wave16ProviderHttpServer()
+    server = LoopbackProviderHttpServer()
     server.start()
     try:
         endpoint = "{0}/v1/chat/completions".format(server.base_url)

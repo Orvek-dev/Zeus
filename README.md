@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.4-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.5-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1927%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-283%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -197,8 +197,9 @@ zeus connect hermes --check --port 8788        # hook canary + receipt check
 See [CONNECTING.md](CONNECTING.md) for the Claude Code, hermes-agent, and
 OpenClaw walkthroughs. Hosts without any hook surface can call the contract
 directly: `zeus decide` reads a `DecisionRequest` JSON and prints the
-decision + receipt; `zeus record` binds the outcome. The legacy platform
-surface lives under `zeus dev` — see [docs/commands.md](docs/commands.md).
+decision + receipt; `zeus record` binds the outcome. The pre-control-plane
+wave harness is archived under `attic/legacy-wave` and is not part of the
+product CLI or release evidence.
 
 ## What Zeus Does
 
@@ -228,10 +229,10 @@ local regression evidence, not as proof of production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public unit and scenario suite | `1927` tests passed |
+| Public product suite | `283` tests passed (`tests/core` + `tests/conformance`) |
 | Conformance scenarios | `88` across P3–P13 + receipt coherence |
 | Lint | `ruff` clean |
-| Package metadata | `zeus-agent==1.0.0a4` (alpha reset; majors are conformance-gated) |
+| Package metadata | `zeus-agent==1.0.0a5` (alpha reset; majors are conformance-gated) |
 | Raw-secret storage proof | byte-level scan: a proposed memory containing a key never reaches the SQLite file unredacted |
 
 **Honest boundary.** The conformance suite is synthetic: contracts are frozen
@@ -254,11 +255,11 @@ only product behavior, public tests, and the boundary rules are committed.
 | --- | --- |
 | [한국어 README](README.ko.md) | Korean overview, reason for Zeus, quickstart, and document guide |
 | [Connecting hosts](CONNECTING.md) | Plug Claude Code, hermes-agent, or OpenClaw into the gates |
-| [Commands](docs/commands.md) | Legacy CLI command catalog, now reachable under `zeus dev` |
 | [Docker And OrbStack](docs/docker.md) | Local Docker/OrbStack build, run, smoke-check, and volume instructions |
 | [Private dogfood/eval boundary](docs/private-dogfood-eval-boundary.md) | What stays local, what can become product code, and the staging checks before release |
 | [Security policy](SECURITY.md) | Public security posture and the current alpha boundary |
 | [Changelog](CHANGELOG.md) | Release history, including the pre-refoundation line |
+| [Legacy Wave Attic](attic/legacy-wave/README.md) | Archived pre-control-plane wave harness, excluded from product tests and release evidence |
 
 ## License
 

@@ -12,7 +12,7 @@ class ProviderHttpRecord:
     body: str
 
 
-class Wave16ProviderHttpServer:
+class LoopbackProviderHttpServer:
     def __init__(self) -> None:
         self.records: list[ProviderHttpRecord] = []
         handler = _handler_for(self.records)
@@ -80,7 +80,7 @@ def _handler_for(records: list[ProviderHttpRecord]):
 
 def _openai_response() -> dict[str, object]:
     return {
-        "id": "chatcmpl_wave16_loopback",
+        "id": "chatcmpl_loopback_smoke",
         "choices": [
             {
                 "message": {
@@ -127,7 +127,7 @@ def _openai_malformed_tool_bad_arguments() -> dict[str, object]:
 
 def _openai_response_with_tool_call(tool_call: dict[str, object]) -> dict[str, object]:
     return {
-        "id": "chatcmpl_wave16_malformed_tool",
+        "id": "chatcmpl_loopback_malformed_tool",
         "choices": [{"message": {"content": "openai loopback response", "tool_calls": [tool_call]}}],
         "usage": {"prompt_tokens": 8, "completion_tokens": 5, "total_tokens": 13},
     }

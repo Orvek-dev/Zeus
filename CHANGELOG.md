@@ -4,6 +4,36 @@ All notable changes to Zeus Agent are recorded here.
 
 ## Unreleased
 
+## v1.0.0-alpha.5 - 2026-06-12
+
+### Changed
+
+- Moved the pre-control-plane wave, objective, G006, and RC closeout harnesses
+  into `attic/legacy-wave`; the product source tree now has zero active
+  `*wave*.py` modules.
+- Narrowed the default public release evidence to the product suite only:
+  `tests/core` plus `tests/conformance`, currently `283` tests.
+- Removed the legacy command catalog from public docs and replaced `zeus dev`
+  with an archived-harness notice.
+- Renamed the active loopback HTTP helper from the old wave name to
+  `loopback_provider_http_server`.
+
+### Fixed
+
+- `python -m zeus_agent` now opens the product CLI entrypoint.
+- `zeus approve fs.write` now defaults to a current-directory narrowed grant
+  instead of requiring a session id for the common dogfood approval path.
+
+### Evidence
+
+- `.venv/bin/python -m pytest` passed: `283` tests.
+- `ruff` clean.
+- `git diff --check` clean.
+- `.venv/bin/pip install -e . --no-deps` succeeded.
+- CLI smoke passed for `zeus --version`, `python -m zeus_agent --version`,
+  `zeus dev kernel-status`, `zeus init`, `zeus status`, `zeus approve
+  fs.write`, and `zeus approvals`.
+
 ## v1.0.0-alpha.4 - 2026-06-12
 
 ### Added

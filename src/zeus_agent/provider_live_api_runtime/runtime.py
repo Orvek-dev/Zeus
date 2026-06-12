@@ -20,7 +20,7 @@ from zeus_agent.live_transport_audit_runtime import LiveTransportAuditRuntime
 from zeus_agent.live_transport_lease_runtime import LiveTransportLeaseRuntime
 from zeus_agent.live_transport_opt_in_runtime import LiveTransportOptInRuntime
 from zeus_agent.runtime_lease import RuntimeLease
-from zeus_agent.wave16_provider_http_server import Wave16ProviderHttpServer
+from zeus_agent.loopback_provider_http_server import LoopbackProviderHttpServer
 
 ProviderLiveApiDecision = Literal["report", "blocked"]
 ProviderLiveApiScenario = Literal["status", "loopback-smoke"]
@@ -132,7 +132,7 @@ def _loopback_smoke(*, secret_ref: str, message: str) -> ProviderLiveApiContract
             credential_material_accessed=secret_material.credential_material_accessed,
         )
 
-    server = Wave16ProviderHttpServer()
+    server = LoopbackProviderHttpServer()
     server.start()
     try:
         endpoint = "{0}/v1/chat/completions".format(server.base_url)

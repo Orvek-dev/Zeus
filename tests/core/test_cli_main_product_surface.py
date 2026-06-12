@@ -6,6 +6,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from zeus_agent import __version__
@@ -124,6 +125,23 @@ def test_approve_then_approvals_lists_grant(tmp_path: Path) -> None:
     grants = json.loads(listed.stdout)
     assert len(grants) == 1
     assert grants[0]["capability_id"] == "fs.write"
+
+
+def test_approve_defaults_to_current_directory_narrow_grant(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    home = str(tmp_path / "zeus")
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    monkeypatch.chdir(workspace)
+
+    issued = runner.invoke(app, ["approve", "fs.write", "--home", home])
+
+    assert issued.exit_code == 0
+    grant = json.loads(issued.stdout)
+    assert grant["capability_id"] == "fs.write"
+    assert grant["scope"] == "narrower"
+    assert grant["narrowed_paths"] == [str(workspace)]
 
 
 def test_status_reports_coverage_and_chain(tmp_path: Path) -> None:

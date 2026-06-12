@@ -21,7 +21,7 @@ from zeus_agent.live_gateway_loopback_transport_runtime import LiveGatewayLoopba
 from zeus_agent.live_response_redaction_runtime import LiveResponseRedactionRuntime
 from zeus_agent.live_secret_material_runtime import LiveSecretMaterialRuntime
 from zeus_agent.live_transport_audit_runtime import LiveTransportAuditRuntime
-from zeus_agent.wave16_provider_http_server import Wave16ProviderHttpServer
+from zeus_agent.loopback_provider_http_server import LoopbackProviderHttpServer
 
 _TARGET_VERSION: Final = "v1.0.0-rc.4"
 _OBJECTIVE_CONTRACT_ID: Final = "zeus.v1.0.0-rc.4.gateway_live_delivery"
@@ -133,7 +133,7 @@ def _loopback_smoke(
         transport_kind="loopback_delivery",
         execution_ref="gateway-live-delivery://rc4/loopback",
     )
-    server = Wave16ProviderHttpServer()
+    server = LoopbackProviderHttpServer()
     server.start()
     try:
         execution = LiveGatewayHttpTransportRuntime().execute(

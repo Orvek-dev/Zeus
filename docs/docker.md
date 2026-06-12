@@ -24,7 +24,6 @@ docker compose up -d zeus
 docker exec zeus-agent zeus --version
 docker exec zeus-agent zeus init
 docker exec zeus-agent zeus status
-docker exec zeus-agent zeus dev kernel-status   # legacy harness surface, parked under `zeus dev`
 ```
 
 ## Stop

@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.4-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.5-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1927%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-283%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -192,8 +192,9 @@ zeus connect hermes --check --port 8788        # 훅 canary + 영수증 확인
 
 Claude Code · hermes-agent · OpenClaw 연결 안내는
 [CONNECTING.md](CONNECTING.md)에 있습니다. 훅 표면이 없는 호스트는 계약을
-직접 호출합니다(`zeus decide` / `zeus record`). 기존 플랫폼 표면 전체는
-`zeus dev` 아래에 있습니다 — [docs/commands.md](docs/commands.md) 참고.
+직접 호출합니다(`zeus decide` / `zeus record`). 재창립 이전 wave 하네스는
+`attic/legacy-wave` 아래에 보관되며, 제품 CLI나 릴리스 증거에 포함하지
+않습니다.
 
 ## Zeus가 하는 일
 
@@ -223,10 +224,10 @@ Claude Code · hermes-agent · OpenClaw 연결 안내는
 
 | 증거 표면 | 현재 결과 |
 | --- | --- |
-| 공개 단위·시나리오 스위트 | `1927`개 테스트 통과 |
+| 공개 제품 스위트 | `283`개 테스트 통과 (`tests/core` + `tests/conformance`) |
 | 컨포먼스 시나리오 | P3–P13 + 영수증 정합성에 걸쳐 `88`개 |
 | 린트 | `ruff` 클린 |
-| 패키지 메타데이터 | `zeus-agent==1.0.0a4` (알파 리셋; 메이저는 컨포먼스 게이트) |
+| 패키지 메타데이터 | `zeus-agent==1.0.0a5` (알파 리셋; 메이저는 컨포먼스 게이트) |
 | 원시 비밀 저장 증명 | 바이트 수준 스캔: 키가 담긴 기억 후보가 SQLite 파일에 마스킹 없이 닿지 않음 |
 
 **정직한 경계.** 컨포먼스는 합성입니다 — 시뮬레이션된 호스트에 대해 계약을
@@ -249,11 +250,11 @@ TTL·취소 지원) 없이는 기동을 거부합니다. 인지 장기는 기본
 | [English README](README.md) | 영문 개요, 만든 이유, 퀵스타트, 문서 안내 |
 | [호스트 연결 (한국어)](CONNECTING.ko.md) | Claude Code · hermes-agent · OpenClaw를 게이트에 연결하는 방법 ([English](CONNECTING.md)) |
 | [한국어 문서 안내](docs/ko.md) | 한국어 읽기 순서와 문서 분류(현행/아카이브) |
-| [Commands](docs/commands.md) | 레거시 CLI 카탈로그 (`zeus dev` 아래로 이동) |
 | [Docker And OrbStack](docs/docker.md) | 로컬 Docker/OrbStack 빌드·실행·스모크 체크 |
 | [Private dogfood/eval boundary](docs/private-dogfood-eval-boundary.md) | 로컬에 남길 것, 제품 코드로 승격할 것, 릴리스 전 staging 체크 |
 | [Security policy](SECURITY.md) | 공개 보안 태세와 현재 알파 경계 |
 | [Changelog](CHANGELOG.md) | 릴리스 역사 (재창립 이전 라인 포함) |
+| [Legacy Wave Attic](attic/legacy-wave/README.md) | 제품 테스트와 릴리스 증거에서 제외한 재창립 이전 wave 하네스 |
 
 ## License
 
