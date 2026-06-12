@@ -10,9 +10,13 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import typer
+
+if TYPE_CHECKING:
+    from zeus_agent.graded_approval_runtime import ApprovalGrant
+    from zeus_agent.trust_loop_runtime import ParkedAction
 
 app = typer.Typer(
     no_args_is_help=True,
@@ -40,6 +44,49 @@ def _echo_json(payload: object) -> None:
 
 def _is_loopback(bind: str) -> bool:
     return bind.strip().lower() in {"127.0.0.1", "::1", "localhost", "[::1]"}
+
+
+def _hermes_preflight(*, port: int, home: Optional[Path]) -> dict:
+    """What Zeus can verify before a dogfood/soak run; host-side items that
+    Zeus cannot reach (hermes config, hook allowlist, doctor) are returned as
+    a manual checklist so nothing is silently assumed green."""
+    import urllib.error
+    import urllib.request
+
+    from zeus_agent import __version__
+
+    state = _state(home)
+    home_ready = (state.root).is_dir()
+    proxy_ok = False
+    proxy_detail = "unreachable on 127.0.0.1:{0}".format(port)
+    try:
+        with urllib.request.urlopen(
+            "http://127.0.0.1:{0}/health".format(port), timeout=2
+        ) as response:
+            body = json.loads(response.read().decode("utf-8"))
+            proxy_ok = body.get("gate") == "llm_proxy"
+            proxy_detail = body
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        proxy_detail = "unreachable: {0}".format(exc)
+
+    return {
+        "zeus_version": __version__,
+        "checks": {
+            "control_plane_home": {"ok": home_ready, "path": str(state.root)},
+            "proxy_health": {"ok": proxy_ok, "detail": proxy_detail},
+        },
+        "manual": [
+            "hermes config: provider `zeus` set + model.provider=zeus (not a bare base_url)",
+            "hermes hooks allowlisted: `hermes hooks doctor` is green",
+            "pairing approved: `zeus pair --approve <code>` was run for hermes",
+            "PATH includes ~/.local/bin (hermes on PATH)",
+            "proxy started with `--hook-owned-host hermes` (no double ask)",
+        ],
+        "soak_note": "for a 7-day soak, start from a FRESH control-plane home "
+        "(zeus init --home <new>) — a dogfood ledger with synthetic/early-bridge "
+        "records is not clean soak evidence. Record hermes + zeus versions first.",
+        "ready": home_ready and proxy_ok,
+    }
 
 
 def _version_callback(value: bool) -> None:
@@ -79,30 +126,40 @@ def init(home: Optional[Path] = typer.Option(None, "--home")) -> None:
 
 @app.command("hook")
 def hook(
-    host: str = typer.Argument("claude-code", help="Host gate: claude-code."),
+    host: str = typer.Argument("claude-code", help="Host gate: claude-code | hermes."),
     event: str = typer.Option("pre", "--event", help="pre (PreToolUse) or post (PostToolUse)."),
     home: Optional[Path] = typer.Option(None, "--home"),
 ) -> None:
-    """Hook entrypoint: JSON on stdin, decision JSON on stdout (Gate 0)."""
-    if host != "claude-code":
-        raise typer.BadParameter("unsupported host: {0}".format(host))
+    """Hook entrypoint: JSON on stdin, decision JSON on stdout (Gate 0/3)."""
     raw = sys.stdin.read()
     try:
         payload = json.loads(raw) if raw.strip() else {}
     except json.JSONDecodeError:
         payload = {}
-    try:
-        from zeus_agent.adapters.claude_code_hook import run_hook_event
+    payload = payload if isinstance(payload, dict) else {}
+    if host == "claude-code":
+        try:
+            from zeus_agent.adapters.claude_code_hook import run_hook_event
 
-        output = run_hook_event(_state(home), event, payload if isinstance(payload, dict) else {})
-    except Exception as exc:  # fail closed, never brick the host session
-        output = {
-            "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "ask",
-                "permissionDecisionReason": "[Zeus] internal error, falling back to ask: {0}".format(exc),
+            output = run_hook_event(_state(home), event, payload)
+        except Exception as exc:  # fail closed, never brick the host session
+            output = {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "ask",
+                    "permissionDecisionReason": "[Zeus] internal error, falling back to ask: {0}".format(exc),
+                }
             }
-        }
+    elif host == "hermes":
+        try:
+            from zeus_agent.adapters.hermes import HermesGate
+
+            gate = HermesGate(_state(home).build_engine())
+            output = gate.post_tool_call(payload) if event == "post" else gate.pre_tool_call(payload)
+        except Exception as exc:  # hermes pre-hook is blocking → fail closed to block
+            output = {"action": "block", "reason": "[Zeus] internal error, failing closed: {0}".format(exc)}
+    else:
+        raise typer.BadParameter("unsupported host: {0} (use claude-code or hermes)".format(host))
     typer.echo(json.dumps(output, ensure_ascii=False))
 
 
@@ -111,11 +168,17 @@ def connect(
     host: str = typer.Argument("claude-code"),
     write: bool = typer.Option(False, "--write", help="Merge hook config into <project>/.claude/settings.json."),
     project_dir: Path = typer.Option(Path("."), "--project-dir"),
+    check: bool = typer.Option(False, "--check", help="Preflight the connection instead of printing config."),
+    port: int = typer.Option(8788, "--port", help="Proxy port to probe with --check."),
+    home: Optional[Path] = typer.Option(None, "--home"),
 ) -> None:
     """Self-onboarding: print (or write) the host's hook configuration."""
     if host == "hermes":
         from zeus_agent.adapters.hermes import hermes_connect_bundle
 
+        if check:
+            _echo_json(_hermes_preflight(port=port, home=home))
+            return
         _echo_json(hermes_connect_bundle())
         return
     if host == "openclaw":
@@ -211,16 +274,23 @@ def record(
 
 @app.command("approve")
 def approve(
-    capability_id: str = typer.Argument(..., help="Capability to license, e.g. fs.write"),
+    capability_id: Optional[str] = typer.Argument(None, help="Capability to license, e.g. fs.write"),
     scope: str = typer.Option("session", "--scope", help="once | session | narrower"),
     session_id: Optional[str] = typer.Option(None, "--session-id"),
     path: Optional[str] = typer.Option(None, "--path", help="Narrowed path prefix (scope=narrower)."),
     hours: int = typer.Option(8, "--hours", help="Grant lifetime in hours (0 = no expiry)."),
+    parked: Optional[str] = typer.Option(None, "--parked", help="Resolve a parked ASK by its parked_action_id."),
+    deny: bool = typer.Option(False, "--deny", help="With --parked: reject instead of approve."),
     home: Optional[Path] = typer.Option(None, "--home"),
 ) -> None:
-    """Issue a graded standing grant (once / session / narrower)."""
+    """Issue a graded standing grant, or resolve a parked ASK with --parked."""
     from zeus_agent.graded_approval_runtime import GrantScope, issue_grant
 
+    if parked is not None:
+        _resolve_parked(parked, deny=deny, home=home)
+        return
+    if capability_id is None:
+        raise typer.BadParameter("provide a capability_id, or use --parked <id>")
     try:
         parsed_scope = GrantScope(scope)
     except ValueError:
@@ -241,11 +311,133 @@ def approve(
     _echo_json(grant.model_dump(mode="json"))
 
 
+def _resolve_parked(parked_action_id: str, *, deny: bool, home: Optional[Path]) -> None:
+    """Operator cockpit for a parked ASK: resolve the queue row, and on approve
+    issue a matching once-grant so the host's re-issued call passes. Hard-risk
+    actions are never licensed — the human must approve each instance."""
+    from zeus_agent.graded_approval_runtime import GrantScope, issue_grant
+    from datetime import datetime, timedelta, timezone
+
+    from zeus_agent.trust_loop_runtime import (
+        ActionRisk,
+        ReplayAuthorization,
+        Reversibility,
+        SQLiteApprovalQueue,
+        SQLiteControlPlaneStore,
+        SQLiteReplayAuthorizationStore,
+    )
+
+    state = _state(home)
+    store = SQLiteControlPlaneStore(state.state_path)
+    queue = SQLiteApprovalQueue(store)
+    try:
+        parked = queue.get(parked_action_id)
+    except KeyError:
+        raise typer.BadParameter("unknown parked_action_id: {0}".format(parked_action_id))
+    resolved = queue.resolve(parked_action_id, approved=not deny)
+    if resolved.status != "approved":
+        _echo_json({"parked_action_id": parked_action_id, "status": resolved.status})
+        return
+    action = parked.action
+    hard_risk = action.risk is ActionRisk.high or action.reversibility is Reversibility.irreversible
+    if hard_risk:
+        now = datetime.now(timezone.utc)
+        token_id = "replay.{0}.{1}".format(
+            action.capability_id.replace(".", "_"),
+            store.next_counter("replay_token_seq"),
+        )
+        SQLiteReplayAuthorizationStore(store).add(
+            ReplayAuthorization(
+                token_id=token_id,
+                host=parked.host,
+                session_id=parked.session_id,
+                capability_id=action.capability_id,
+                payload_hash=parked.payload_hash,
+                created_at=now,
+                expires_at=now + timedelta(hours=1),
+            )
+        )
+        _echo_json(
+            {
+                "parked_action_id": parked_action_id,
+                "status": "approved",
+                "capability_id": action.capability_id,
+                "replay": "approved_for_exact_payload_once",
+                "replay_token_id": token_id,
+                "next": (
+                    "re-issue the same host action; do not paste Zeus operator commands "
+                    "into the governed host"
+                ),
+            }
+        )
+        return
+    path = action.payload.get("path") if isinstance(action.payload.get("path"), str) else None
+    grant = issue_grant(
+        grant_id="grant.parked.{0}.{1}".format(action.capability_id.replace(".", "_"), int(time.time())),
+        capability_id=action.capability_id,
+        scope=GrantScope.once,
+        narrowed_paths=(path,) if path is not None else (),
+        expires_at_epoch=int(time.time()) + 3600,
+    )
+    state.add_grant(grant)
+    _echo_json(
+        {
+            "parked_action_id": parked_action_id,
+            "status": "approved",
+            "capability_id": action.capability_id,
+            "grant_id": grant.grant_id,
+            "next": "the host's re-issued call now passes once (covered_by_grant_once)",
+        }
+    )
+
+
 @app.command("approvals")
-def approvals(home: Optional[Path] = typer.Option(None, "--home")) -> None:
-    """List standing grants (the licenses that silence repeat asks)."""
-    store = _state(home).load_grants()
-    _echo_json([grant.model_dump(mode="json") for grant in store.all()])
+def approvals(
+    pending: bool = typer.Option(False, "--pending", help="Show parked ASKs awaiting resolution."),
+    home: Optional[Path] = typer.Option(None, "--home"),
+) -> None:
+    """List standing grants, or parked ASKs with --pending (the operator inbox)."""
+    state = _state(home)
+    if pending:
+        from datetime import datetime, timezone
+
+        from zeus_agent.trust_loop_runtime import SQLiteApprovalQueue, SQLiteControlPlaneStore
+
+        queue = SQLiteApprovalQueue(SQLiteControlPlaneStore(state.state_path))
+        rows = queue.pending(now=datetime.now(timezone.utc))
+        _echo_json(
+            [
+                {
+                    "parked_action_id": parked.parked_action_id,
+                    "capability_id": parked.action.capability_id,
+                    "run_id": parked.action.run_id,
+                    "risk": parked.action.risk.value,
+                    "reversibility": parked.action.reversibility.value,
+                    "host": parked.host,
+                    "session_id": parked.session_id,
+                    "payload": parked.action.payload,
+                    "approval_effect": _approval_effect(parked),
+                    "operator_note": (
+                        "resolve in Zeus control tower or a separate operator terminal; "
+                        "do not paste this command into the governed host"
+                    ),
+                    "created_at": parked.created_at.isoformat(),
+                    "expires_at": parked.expires_at.isoformat(),
+                    "resolve": "zeus approve --parked {0}".format(parked.parked_action_id),
+                }
+                for parked in rows
+            ]
+        )
+        return
+    _echo_json([grant.model_dump(mode="json") for grant in state.load_grants().all()])
+
+
+def _approval_effect(parked: "ParkedAction") -> str:
+    from zeus_agent.trust_loop_runtime import ActionRisk, Reversibility
+
+    action = parked.action
+    hard_risk = action.risk is ActionRisk.high or action.reversibility is Reversibility.irreversible
+    return "exact_payload_replay_once" if hard_risk else "once_grant"
 
 
 @app.command("ledger")
@@ -264,6 +456,139 @@ def ledger(
         return
     records = recorder.ledger.records()
     _echo_json(records[-max(tail, 0):])
+
+
+@app.command("why", help="Show why a parked action or record happened.")
+def why(
+    parked: Optional[str] = typer.Option(None, "--parked", help="Parked action id."),
+    record: Optional[str] = typer.Option(None, "--record", help="Ledger record id."),
+    home: Optional[Path] = typer.Option(None, "--home"),
+) -> None:
+    from zeus_agent.trust_loop_runtime import (
+        FlightRecorder,
+        SQLiteApprovalQueue,
+        SQLiteControlPlaneStore,
+        SQLiteEvidenceLedger,
+    )
+
+    state = _state(home)
+    recorder = FlightRecorder(SQLiteEvidenceLedger(state.ledger_path))
+    if record is not None:
+        _echo_json({"record_id": record, "chain": list(recorder.why(record))})
+        return
+    if parked is None:
+        raise typer.BadParameter("provide --parked <id> or --record <id>")
+    queue = SQLiteApprovalQueue(SQLiteControlPlaneStore(state.state_path))
+    try:
+        item = queue.get(parked)
+    except KeyError:
+        raise typer.BadParameter("unknown parked_action_id: {0}".format(parked))
+    _echo_json(
+        {
+            "parked_action_id": item.parked_action_id,
+            "status": item.status,
+            "capability_id": item.action.capability_id,
+            "host": item.host,
+            "session_id": item.session_id,
+            "approval_effect": _approval_effect(item),
+            "operator_note": (
+                "resolve in Zeus control tower or a separate operator terminal; "
+                "do not paste Zeus commands into the governed host"
+            ),
+            "timeline": _timeline_for_parked(item, recorder.ledger.records()),
+        }
+    )
+
+
+def _timeline_for_parked(
+    parked: "ParkedAction", records: list[dict[str, object]]
+) -> list[dict[str, object]]:
+    timeline: list[dict[str, object]] = []
+    decision_receipt_ids = _decision_receipt_ids_for_parked(parked, records)
+    for record in records:
+        payload = _record_payload(record)
+        if not _matches_parked(parked, record, payload, decision_receipt_ids):
+            continue
+        row: dict[str, object] = {
+            "seq": record["seq"],
+            "record_id": record["record_id"],
+            "kind": record["kind"],
+            "run_id": record["run_id"],
+            "capability_id": payload.get("capability_id"),
+        }
+        for field in ("host", "surface", "decision", "reason", "governed"):
+            if field in payload:
+                row[field] = payload[field]
+        if "decision_receipt_record_id" in payload:
+            row["decision_receipt_record_id"] = payload["decision_receipt_record_id"]
+        timeline.append(row)
+    return timeline
+
+
+def _decision_receipt_ids_for_parked(
+    parked: "ParkedAction", records: list[dict[str, object]]
+) -> set[str]:
+    receipt_ids: set[str] = set()
+    for record in records:
+        if str(record["kind"]) != "decision_receipt":
+            continue
+        payload = _record_payload(record)
+        if _decision_receipt_matches_parked(parked, record, payload):
+            receipt_ids.add(str(record["record_id"]))
+    return receipt_ids
+
+
+def _decision_receipt_matches_parked(
+    parked: "ParkedAction", record: dict[str, object], payload: dict[str, object]
+) -> bool:
+    if str(record["run_id"]) != parked.action.run_id:
+        return False
+    if payload.get("capability_id") != parked.action.capability_id:
+        return False
+    if parked.session_id and payload.get("session_id") not in {None, parked.session_id}:
+        return False
+    action_id = payload.get("action_id")
+    if action_id is not None:
+        return action_id == parked.action.action_id
+    action_payload_hash = payload.get("action_payload_hash")
+    if action_payload_hash is not None:
+        return action_payload_hash == parked.payload_hash
+    return payload.get("args") == parked.action.payload
+
+
+def _matches_parked(
+    parked: "ParkedAction",
+    record: dict[str, object],
+    payload: dict[str, object],
+    decision_receipt_ids: set[str],
+) -> bool:
+    kind = str(record["kind"])
+    if kind == "decision_receipt":
+        return str(record["record_id"]) in decision_receipt_ids
+    if kind == "gate_observation":
+        receipt_id = payload.get("decision_receipt_record_id")
+        return isinstance(receipt_id, str) and receipt_id in decision_receipt_ids
+    return False
+
+
+def _record_payload(record: dict[str, object]) -> dict[str, object]:
+    try:
+        payload = json.loads(str(record["payload_json"]))
+    except ValueError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _grant_status_counts(grants: tuple["ApprovalGrant", ...], *, now_epoch: int) -> dict[str, int]:
+    counts = {"active": 0, "consumed": 0, "expired": 0, "total": len(grants)}
+    for grant in grants:
+        if grant.consumed:
+            counts["consumed"] += 1
+        elif grant.expires_at_epoch != 0 and now_epoch >= grant.expires_at_epoch:
+            counts["expired"] += 1
+        else:
+            counts["active"] += 1
+    return counts
 
 
 @app.command("status")
@@ -303,6 +628,7 @@ def status(home: Optional[Path] = typer.Option(None, "--home")) -> None:
     response_at = _parse_ts(watchdog["last_response_at"])
     if request_at is not None and (response_at is None or response_at < request_at):
         watchdog["waiting_on_provider_seconds"] = int((now - request_at).total_seconds())
+    grants = _grant_status_counts(state.load_grants().all(), now_epoch=int(now.timestamp()))
     _echo_json(
         {
             "home": str(state.root),
@@ -310,7 +636,8 @@ def status(home: Optional[Path] = typer.Option(None, "--home")) -> None:
             "decision_mix": decision_mix,
             "asks": decision_mix.get("ask", 0),
             "chain_ok": recorder.ledger.verify_chain().ok,
-            "standing_grants": len(state.load_grants().all()),
+            "standing_grants": grants["active"],
+            "grants": grants,
             "wallet_week": weekly_spend_digest(recorder, now=now),
             "budgets": [
                 {"scope": row[0], "id": row[1], "limit_units": row[2], "spent_units": row[3]}
@@ -343,9 +670,15 @@ def proxy(
     unsafe_no_v1_auth: bool = typer.Option(
         False, "--unsafe-no-v1-auth", help="Allow a non-loopback bind with NO /v1 auth (dangerous)."
     ),
+    hook_owned_host: list[str] = typer.Option(
+        [],
+        "--hook-owned-host",
+        help="Host whose own blocking pre_tool_call hook owns the ASK (proxy defers soft asks to it). Repeatable.",
+    ),
     home: Optional[Path] = typer.Option(None, "--home"),
 ) -> None:
     """Serve the governed LLM proxy (Gate 1): point the host's base_url here."""
+    from zeus_agent.decision_api_runtime import HostKind
     from zeus_agent.proxy_runtime import (
         LlmProxyEngine,
         run_proxy_server,
@@ -355,6 +688,11 @@ def proxy(
 
     from zeus_agent.pairing_runtime import PairingManager
     from zeus_agent.zeusd_runtime import ZeusApiSurface
+
+    try:
+        owned = frozenset(HostKind(h.strip().lower().replace("-", "_")) for h in hook_owned_host)
+    except ValueError as exc:
+        raise typer.BadParameter("unknown --hook-owned-host: {0}".format(exc)) from exc
 
     # /v1 is spoken by vanilla SDKs (static headers only) so it can't be
     # HMAC-paired like /zeus. On a non-loopback bind that means an unauthenticated
@@ -374,6 +712,7 @@ def proxy(
         engine=engine,
         store=store,
         persist_taint=state.save_taint,
+        hook_owned_hosts=owned,
     )
     pairing = PairingManager(store)
     api = ZeusApiSurface(engine=engine, pairing=pairing)
@@ -679,6 +1018,8 @@ def mcp(
             record = CapabilityRecord.model_validate_json(raw)
         except ValueError:
             continue
+        if record.server_ref is None and not capability_id.startswith("mcp."):
+            continue  # only gateway-imported MCP tools belong in this registry
         rows.append(
             {
                 "capability_id": capability_id,
@@ -687,6 +1028,18 @@ def mcp(
                 "server": record.server_ref,
             }
         )
+    if not rows:
+        # D8: an empty registry reads as broken; it usually just means no
+        # downstream MCP server has been imported yet.
+        _echo_json(
+            {
+                "tools": [],
+                "note": "no downstream MCP tools imported yet — this is expected until a "
+                "downstream server is added. Run `zeus mcp --sync` after configuring a "
+                "downstream MCP server; imported tools arrive quarantined for review.",
+            }
+        )
+        return
     _echo_json(rows)
 
 
