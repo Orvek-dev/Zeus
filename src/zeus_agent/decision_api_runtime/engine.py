@@ -23,7 +23,7 @@ from zeus_agent.capability_registry_runtime import (
     VerbClass,
 )
 from zeus_agent.governor_runtime import GovernorBank
-from zeus_agent.graded_approval_runtime import GrantStore
+from zeus_agent.graded_approval_runtime import GrantScope, GrantStore
 from zeus_agent.taint_runtime import (
     SessionTaintTracker,
     TaintLabel,
@@ -38,12 +38,14 @@ from zeus_agent.trust_loop_runtime import (
     ExecutionOutcome,
     ExecutionStatus,
     FlightRecorder,
+    ReplayAuthorizationStore,
     Reversibility,
     SQLiteTrustStatStore,
     TrustDecision,
     TrustDecisionEngine,
     TrustLoopAction,
     TrustPolicyProfile,
+    replay_payload_hash,
 )
 from zeus_agent.trust_loop_runtime.ledger import _redact_json
 
@@ -116,6 +118,7 @@ class ZeusDecisionEngine:
         governors: Optional[GovernorBank] = None,
         grants: Optional[GrantStore] = None,
         queue: Optional[ApprovalQueue] = None,
+        replay_authorizations: Optional[ReplayAuthorizationStore] = None,
         trust_stats: Optional[SQLiteTrustStatStore] = None,
         policy_profile: TrustPolicyProfile = TrustPolicyProfile.cautious,
         approved_hosts: tuple[str, ...] = (),
@@ -129,6 +132,7 @@ class ZeusDecisionEngine:
         self.governors = governors if governors is not None else GovernorBank()
         self.grants = grants if grants is not None else GrantStore()
         self.queue = queue if queue is not None else ApprovalQueue()
+        self.replay_authorizations = replay_authorizations
         self.trust_stats = trust_stats
         self._policy = TrustDecisionEngine(policy_profile)
         self._approved_hosts = approved_hosts
@@ -303,7 +307,39 @@ class ZeusDecisionEngine:
             and explainable
         ):
             decision, reason = TrustDecision.AUTO, "covered_by_grant_{0}".format(grant.scope.value)
-            self.grants.consume(grant.grant_id)
+            if not _forward_once_grant_to_owner(request, record, grant.scope):
+                self.grants.consume(grant.grant_id)
+
+        if decision is TrustDecision.ASK and self.replay_authorizations is not None:
+            replay = self.replay_authorizations.consume(
+                host=request.context.host.value,
+                session_id=request.session_id,
+                capability_id=request.capability_id,
+                payload_hash=replay_payload_hash(args),
+                now=timestamp,
+            )
+            if replay is not None:
+                decision, reason = TrustDecision.AUTO, "covered_by_replay_once"
+
+        # D9: another gate owns the synchronous ask on this surface (a paired
+        # blocking hook). Downgrade a SOFT ask to NOTIFY so the operator is
+        # asked once at that gate, not twice. Walls (DENY) are never deferred.
+        if (
+            request.context.defer_ask_to_owner
+            and decision is TrustDecision.ASK
+            and downgradable
+            and not hard_risk
+            and explainable
+            and record.side_effect is SideEffectClass.none
+        ):
+            decision, reason = TrustDecision.NOTIFY, "{0}_deferred_to_owner".format(reason)
+
+        # advance the loop governor only for a RELEASED decision (D4): a parked
+        # ASK the host keeps retrying must not spin the iteration counter.
+        if decision in {TrustDecision.AUTO, TrustDecision.NOTIFY}:
+            self.governors.record_release(
+                run_id=request.run_id, state_hash=request.context.state_hash
+            )
 
         return self._finalize(
             request, args, decision, reason,
@@ -413,25 +449,31 @@ class ZeusDecisionEngine:
         obligations = self._obligations(decision, record)
         if not record_known:
             reason = "{0}.unregistered_conservative".format(reason)
-        event = self.recorder.record_decision(
-            run_id=request.run_id,
-            payload={
-                "principal_id": request.principal_id,
-                "session_id": request.session_id,
-                "capability_id": request.capability_id,
-                "host": request.context.host.value,
-                "surface": request.context.surface.value,
-                "objective_id": request.context.objective_id,
-                "decision": decision.value,
-                "reason": reason,
-                "requested_units": request.requested_units,
-                "obligations": [item.value for item in obligations],
-                "args": args,
-            },
-        )
+        payload = {
+            "principal_id": request.principal_id,
+            "session_id": request.session_id,
+            "capability_id": request.capability_id,
+            "host": request.context.host.value,
+            "surface": request.context.surface.value,
+            "objective_id": request.context.objective_id,
+            "decision": decision.value,
+            "reason": reason,
+            "requested_units": request.requested_units,
+            "obligations": [item.value for item in obligations],
+            "args": args,
+        }
+        if action is not None:
+            payload["action_id"] = action.action_id
+            payload["action_payload_hash"] = replay_payload_hash(args)
+        event = self.recorder.record_decision(run_id=request.run_id, payload=payload)
         parked_action_id: Optional[str] = None
         if decision is TrustDecision.ASK and action is not None:
-            parked_action_id = self.queue.park(action).parked_action_id
+            parked_action_id = self.queue.park(
+                action,
+                host=request.context.host.value,
+                session_id=request.session_id,
+                payload_hash=replay_payload_hash(args),
+            ).parked_action_id
         return DecisionResponse(
             decision=decision,
             reason=reason,
@@ -480,6 +522,19 @@ def _scope_violation(
         if network_host not in set(grant.network_hosts):
             return "host_outside_envelope_scope"
     return None
+
+
+def _forward_once_grant_to_owner(
+    request: DecisionRequest,
+    record: CapabilityRecord,
+    scope: GrantScope,
+) -> bool:
+    return (
+        request.context.defer_ask_to_owner
+        and request.context.surface.value == "llm_proxy"
+        and record.side_effect is not SideEffectClass.none
+        and scope is GrantScope.once
+    )
 
 
 def _redact_args(args: dict[str, JsonValue]) -> dict[str, JsonValue]:

@@ -72,6 +72,10 @@ def grant_covers(
     if grant.expires_at_epoch != 0 and now_epoch >= grant.expires_at_epoch:
         return False
     if grant.scope is GrantScope.once:
+        if grant.narrowed_paths and path is None:
+            return False
+        if grant.narrowed_paths and not _path_is_allowed(path, grant.narrowed_paths):
+            return False
         return True
     if grant.scope is GrantScope.session:
         return session_id is not None and session_id == grant.session_id
@@ -80,7 +84,13 @@ def grant_covers(
         return False
     if path is None:
         return False
-    return any(path == allowed or path.startswith(allowed.rstrip("/") + "/") for allowed in grant.narrowed_paths)
+    return _path_is_allowed(path, grant.narrowed_paths)
+
+
+def _path_is_allowed(path: str | None, allowed_paths: tuple[str, ...]) -> bool:
+    if path is None:
+        return False
+    return any(path == allowed or path.startswith(allowed.rstrip("/") + "/") for allowed in allowed_paths)
 
 
 class GrantStore:

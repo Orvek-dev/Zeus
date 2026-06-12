@@ -1,0 +1,136 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+from zeus_agent.adapters.claude_code_hook import ControlPlaneState
+from zeus_agent.cli_main import app
+from zeus_agent.decision_api_runtime import DecisionContext, DecisionRequest, GateSurface, HostKind
+from zeus_agent.graded_approval_runtime import GrantScope, issue_grant
+from zeus_agent.proxy_runtime import seed_proxy_capability_store
+from zeus_agent.trust_loop_runtime import TrustDecision
+
+runner = CliRunner()
+
+
+def _decision_request(
+    *,
+    session_id: str,
+    run_id: str,
+    surface: str,
+    path: str,
+    defer_ask_to_owner: bool = False,
+) -> str:
+    return json.dumps(
+        {
+            "principal_id": "agent.hermes",
+            "session_id": session_id,
+            "run_id": run_id,
+            "capability_id": "fs.write",
+            "args": {"path": path},
+            "context": {
+                "host": "hermes",
+                "surface": surface,
+                "defer_ask_to_owner": defer_ask_to_owner,
+            },
+        }
+    )
+
+
+def test_hermes_hook_uses_tool_input_for_path_payload(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    hook_payload = {
+        "session_id": "h.s1",
+        "tool": "write_file",
+        "tool_input": {"path": "/tmp/dogfood-note.txt"},
+    }
+
+    result = runner.invoke(
+        app,
+        ["hook", "hermes", "--home", home],
+        input=json.dumps(hook_payload),
+    )
+    assert result.exit_code == 0
+    assert json.loads(result.stdout)["action"] == "block"
+
+    pending = json.loads(runner.invoke(app, ["approvals", "--pending", "--home", home]).stdout)
+    assert pending[0]["payload"] == {"path": "/tmp/dogfood-note.txt"}
+
+
+def test_proxy_approval_hands_off_once_to_hermes_hook(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    proxy_req = _decision_request(
+        session_id="llm-proxy.default",
+        run_id="run.proxy.llmproxydefa",
+        surface="llm_proxy",
+        path="/tmp/dogfood-note.txt",
+        defer_ask_to_owner=True,
+    )
+
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", proxy_req, "--home", home]).stdout)
+    assert asked["decision"] == "ask"
+    approved = json.loads(
+        runner.invoke(app, ["approve", "--parked", asked["parked_action_id"], "--home", home]).stdout
+    )
+    assert approved["status"] == "approved"
+
+    wrong_hook_req = _decision_request(
+        session_id="20260611_154742_0066de",
+        run_id="run.hermes.202606111547",
+        surface="hook",
+        path="/tmp/other-note.txt",
+    )
+    wrong_hook_retry = json.loads(
+        runner.invoke(app, ["decide", "--request-json", wrong_hook_req, "--home", home]).stdout
+    )
+    assert wrong_hook_retry["decision"] == "ask"
+
+    proxy_retry = json.loads(runner.invoke(app, ["decide", "--request-json", proxy_req, "--home", home]).stdout)
+    assert proxy_retry["decision"] == "auto"
+    assert proxy_retry["reason"] == "covered_by_grant_once"
+
+    hook_req = _decision_request(
+        session_id="20260611_154742_0066de",
+        run_id="run.hermes.202606111547",
+        surface="hook",
+        path="/tmp/dogfood-note.txt",
+    )
+    hook_retry = json.loads(runner.invoke(app, ["decide", "--request-json", hook_req, "--home", home]).stdout)
+    assert hook_retry["decision"] == "auto"
+    assert hook_retry["reason"] == "covered_by_grant_once"
+
+
+def test_long_lived_proxy_engine_reloads_approval_grants(tmp_path: Path) -> None:
+    state = ControlPlaneState(tmp_path / "zeus")
+    engine = state.build_engine(capabilities=seed_proxy_capability_store())
+    request = DecisionRequest(
+        principal_id="agent.llm_proxy",
+        session_id="llm-proxy.default",
+        run_id="run.proxy.llmproxydefa",
+        capability_id="fs.write",
+        args={"path": "/tmp/dogfood-note.txt"},
+        context=DecisionContext(
+            host=HostKind.hermes,
+            surface=GateSurface.llm_proxy,
+            defer_ask_to_owner=True,
+        ),
+    )
+
+    asked = engine.decide(request)
+    assert asked.decision is TrustDecision.ASK
+
+    state.add_grant(
+        issue_grant(
+            grant_id="grant.external.fs_write",
+            capability_id="fs.write",
+            scope=GrantScope.narrower,
+            narrowed_paths=("/tmp/dogfood-note.txt",),
+            expires_at_epoch=0,
+        )
+    )
+
+    retried = engine.decide(request)
+    assert retried.decision is TrustDecision.AUTO
+    assert retried.reason == "covered_by_grant_narrower"

@@ -24,6 +24,12 @@ from .models import (
 )
 from .planning import PlanCandidate, PlanTournament
 from .policy import TrustDecisionEngine, TrustPolicyOutcome
+from .replay_authorization import (
+    ReplayAuthorization,
+    ReplayAuthorizationStore,
+    SQLiteReplayAuthorizationStore,
+    replay_payload_hash,
+)
 from .skill_manifest import SkillManifest
 from .state_store import SQLiteControlPlaneStore
 from .trust_ledger import GrantProposal, TrustLedger, TrustStat
@@ -50,9 +56,12 @@ __all__ = [
     "PlanCandidate",
     "PlanTournament",
     "Reversibility",
+    "ReplayAuthorization",
+    "ReplayAuthorizationStore",
     "SQLiteApprovalQueue",
     "SQLiteControlPlaneStore",
     "SQLiteEvidenceLedger",
+    "SQLiteReplayAuthorizationStore",
     "SQLiteTrustStatStore",
     "SkillManifest",
     "TrustDecision",
@@ -63,4 +72,5 @@ __all__ = [
     "TrustPolicyProfile",
     "TrustStat",
     "UndoPlan",
+    "replay_payload_hash",
 ]

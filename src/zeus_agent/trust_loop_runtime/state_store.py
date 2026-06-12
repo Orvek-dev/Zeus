@@ -4,9 +4,11 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
-QueueRow = tuple[str, str, str, str, str, str]
+QueueRow = tuple[str, str, str, str, str, str, str, str, str]
+ReplayRow = tuple[str, str, str, str, str, str, str, str]
 _QUEUE_COLUMNS = (
-    "parked_action_id, action_id, action_json, status, created_at, expires_at"
+    "parked_action_id, action_id, action_json, status, created_at, expires_at, "
+    "host, session_id, payload_hash"
 )
 
 
@@ -159,20 +161,37 @@ class SQLiteControlPlaneStore:
         action_json: str,
         created_at: str,
         expires_at: str,
+        dedup_key: str = "",
+        host: str = "",
+        session_id: str = "",
+        payload_hash: str = "",
     ) -> None:
-        """Supersede any pending park for the same action, then insert — one
-        transaction, so two gate processes cannot both hold the active park."""
+        """Supersede any pending park with the same dedup_key, then insert — one
+        transaction. The dedup_key is the STABLE identity of a request
+        (capability + run + payload), so a host retrying a parked ASK replaces
+        its prior row instead of piling up duplicates (D4)."""
         with self._connect() as connection:
-            connection.execute(
-                "UPDATE parked_actions SET status = 'superseded' "
-                "WHERE action_id = ? AND status = 'pending'",
-                (action_id,),
-            )
+            if dedup_key:
+                connection.execute(
+                    "UPDATE parked_actions SET status = 'superseded' "
+                    "WHERE dedup_key = ? AND status = 'pending'",
+                    (dedup_key,),
+                )
             connection.execute(
                 "INSERT INTO parked_actions("
                 + _QUEUE_COLUMNS
-                + ") VALUES (?, ?, ?, 'pending', ?, ?)",
-                (parked_action_id, action_id, action_json, created_at, expires_at),
+                + ", dedup_key) VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)",
+                (
+                    parked_action_id,
+                    action_id,
+                    action_json,
+                    created_at,
+                    expires_at,
+                    host,
+                    session_id,
+                    payload_hash,
+                    dedup_key,
+                ),
             )
 
     def queue_row(self, parked_action_id: str) -> Optional[QueueRow]:
@@ -208,6 +227,64 @@ class SQLiteControlPlaneStore:
                 "UPDATE parked_actions SET status = ? WHERE parked_action_id = ?",
                 (status, parked_action_id),
             )
+
+    def replay_add(
+        self,
+        *,
+        token_id: str,
+        host: str,
+        session_id: str,
+        capability_id: str,
+        payload_hash: str,
+        created_at: str,
+        expires_at: str,
+        consumed_at: str = "",
+    ) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                "INSERT INTO replay_authorizations("
+                "token_id, host, session_id, capability_id, payload_hash, "
+                "created_at, expires_at, consumed_at"
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    token_id,
+                    host,
+                    session_id,
+                    capability_id,
+                    payload_hash,
+                    created_at,
+                    expires_at,
+                    consumed_at,
+                ),
+            )
+
+    def replay_consume(
+        self,
+        *,
+        host: str,
+        session_id: str,
+        capability_id: str,
+        payload_hash: str,
+        now_iso: str,
+    ) -> Optional[ReplayRow]:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT token_id, host, session_id, capability_id, payload_hash, "
+                "created_at, expires_at, consumed_at "
+                "FROM replay_authorizations "
+                "WHERE host = ? AND session_id = ? AND capability_id = ? "
+                "AND payload_hash = ? AND consumed_at = '' AND expires_at > ? "
+                "ORDER BY created_at ASC, token_id ASC LIMIT 1",
+                (host, session_id, capability_id, payload_hash, now_iso),
+            ).fetchone()
+            if row is None:
+                return None
+            token_id = str(row[0])
+            connection.execute(
+                "UPDATE replay_authorizations SET consumed_at = ? WHERE token_id = ?",
+                (now_iso, token_id),
+            )
+        return tuple(str(value) for value in row)
 
     # ----------------------------------------------------------------- schema
     def _ensure_schema(self) -> None:
@@ -251,15 +328,51 @@ class SQLiteControlPlaneStore:
                 "action_json TEXT NOT NULL, "
                 "status TEXT NOT NULL, "
                 "created_at TEXT NOT NULL, "
-                "expires_at TEXT NOT NULL)",
+                "expires_at TEXT NOT NULL, "
+                "host TEXT NOT NULL DEFAULT '', "
+                "session_id TEXT NOT NULL DEFAULT '', "
+                "payload_hash TEXT NOT NULL DEFAULT '', "
+                "dedup_key TEXT NOT NULL DEFAULT '')",
             )
+            # back-compat for control-plane homes created before dedup_key (D4):
+            # a host retrying a parked ASK must supersede its prior pending row,
+            # not pile up new ones and spin the loop governor.
+            existing = {row[1] for row in connection.execute("PRAGMA table_info(parked_actions)")}
+            if "dedup_key" not in existing:
+                connection.execute(
+                    "ALTER TABLE parked_actions ADD COLUMN dedup_key TEXT NOT NULL DEFAULT ''"
+                )
+            for column in ("host", "session_id", "payload_hash"):
+                if column not in existing:
+                    connection.execute(
+                        "ALTER TABLE parked_actions ADD COLUMN "
+                        + column
+                        + " TEXT NOT NULL DEFAULT ''"
+                    )
             connection.execute(
                 "CREATE INDEX IF NOT EXISTS idx_parked_actions_status "
                 "ON parked_actions(status)",
             )
             connection.execute(
-                "CREATE INDEX IF NOT EXISTS idx_parked_actions_action "
-                "ON parked_actions(action_id, status)",
+                "CREATE INDEX IF NOT EXISTS idx_parked_actions_dedup "
+                "ON parked_actions(dedup_key, status)",
+            )
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS replay_authorizations ("
+                "token_id TEXT PRIMARY KEY, "
+                "host TEXT NOT NULL, "
+                "session_id TEXT NOT NULL, "
+                "capability_id TEXT NOT NULL, "
+                "payload_hash TEXT NOT NULL, "
+                "created_at TEXT NOT NULL, "
+                "expires_at TEXT NOT NULL, "
+                "consumed_at TEXT NOT NULL DEFAULT '')",
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_replay_authorizations_match "
+                "ON replay_authorizations("
+                "host, session_id, capability_id, payload_hash, consumed_at, expires_at"
+                ")",
             )
 
     def _connect(self) -> sqlite3.Connection:

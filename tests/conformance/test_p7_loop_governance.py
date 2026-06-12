@@ -107,6 +107,37 @@ def test_no_progress_pause_on_identical_state_hash(tmp_path: Path) -> None:
     assert decisions[2].reason == "loop_no_progress"
 
 
+# ------------------------------------------------ D4: refused asks don't spiral
+def test_refused_asks_do_not_trip_the_loop_cap(tmp_path: Path) -> None:
+    """A host that keeps retrying a parked ASK must not manufacture a loop-cap
+    lockout: only RELEASED decisions advance the iteration counter."""
+    engine, _store, _state = _engine(tmp_path)
+    engine.governors.loop._max_iterations = 3  # noqa: SLF001 (tight cap for the test)
+
+    # a side-effecting call with no envelope ASKs every time; retry it many times
+    reasons = [
+        engine.decide(_request("fs.write", run_id="run.retry", args={"path": "/w/a"})).reason
+        for _ in range(8)
+    ]
+    assert all(r == "no_envelope_for_side_effect" for r in reasons), reasons
+    assert "loop_iteration_cap" not in reasons, "refused retries must not spin the loop counter"
+
+    # genuine RELEASED progress still trips the cap (reads are auto)
+    caps = [engine.decide(_request("fs.read", run_id="run.real")).reason for _ in range(5)]
+    assert "loop_iteration_cap" in caps
+
+
+def test_retried_ask_supersedes_its_prior_park(tmp_path: Path) -> None:
+    """The same parked request retried collapses to ONE pending row (D4),
+    instead of piling up duplicates that bury the operator's inbox."""
+    engine, store, _state = _engine(tmp_path)
+    for _ in range(4):
+        engine.decide(_request("fs.write", run_id="run.dup", args={"path": "/w/a"}))
+    pending = store.queue_rows(status="pending")
+    fs_writes = [r for r in pending if "fs_write" in r[1] or "fs.write" in r[2]]
+    assert len(fs_writes) == 1, "retries of the same ask must supersede, not accumulate"
+
+
 # -------------------------------------------------------------- deadman-demotes
 def test_deadman_unacked_digest_demotes_autonomy(tmp_path: Path) -> None:
     engine, store, state = _engine(tmp_path)

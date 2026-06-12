@@ -14,6 +14,7 @@ from zeus_agent.trust_loop_runtime import (
     SQLiteApprovalQueue,
     SQLiteControlPlaneStore,
     SQLiteEvidenceLedger,
+    SQLiteReplayAuthorizationStore,
     SQLiteTrustStatStore,
 )
 
@@ -71,6 +72,7 @@ class ControlPlaneState:
             ),
             grants=self.load_grants(),
             queue=SQLiteApprovalQueue(store),
+            replay_authorizations=SQLiteReplayAuthorizationStore(store),
             trust_stats=SQLiteTrustStatStore(self.trust_path),
             seq_counter=lambda: store.next_counter("decision_seq"),
             # explainable-or-escalated, enforced inside decide() so the receipt
@@ -106,12 +108,8 @@ class ControlPlaneState:
         a grant burned in memory only (engine step 4b consume) would re-fire at
         the next process — "approve once" must mean once at EVERY gate, not
         just the one that remembered to persist."""
-        store = _WriteThroughGrantStore(self.save_grants)
-        for raw in self._read_json(self.grants_path, []):
-            try:
-                store.seed(ApprovalGrant.model_validate(raw))
-            except ValueError:
-                continue
+        store = _WriteThroughGrantStore(self.save_grants, self._load_grant_records)
+        store.refresh()
         return store
 
     def add_grant(self, grant: ApprovalGrant) -> None:
@@ -120,8 +118,17 @@ class ControlPlaneState:
         self._write_json(self.grants_path, data)
 
     def save_grants(self, store: GrantStore) -> None:
-        data = [grant.model_dump(mode="json") for grant in store.all()]
+        data = [grant.model_dump(mode="json") for grant in GrantStore.all(store)]
         self._write_json(self.grants_path, data)
+
+    def _load_grant_records(self) -> tuple[ApprovalGrant, ...]:
+        grants: list[ApprovalGrant] = []
+        for raw in self._read_json(self.grants_path, []):
+            try:
+                grants.append(ApprovalGrant.model_validate(raw))
+            except ValueError:
+                continue
+        return tuple(grants)
 
     # --------------------------------------------------------------- pendings
     def push_pending(self, fingerprint: str, receipt_id: str) -> None:
@@ -148,20 +155,50 @@ class _WriteThroughGrantStore(GrantStore):
     without re-saving; `add()`/`consume()` write through immediately so a
     burned once-grant is dead for every later gate process."""
 
-    def __init__(self, save) -> None:
+    def __init__(self, save, load) -> None:
         super().__init__()
         self._save = save
+        self._load = load
+        self._refreshing = False
+
+    def refresh(self) -> None:
+        if self._refreshing:
+            return
+        self._refreshing = True
+        try:
+            self._grants = {}
+            for grant in self._load():
+                super().add(grant)
+        finally:
+            self._refreshing = False
 
     def seed(self, grant: ApprovalGrant) -> None:
         super().add(grant)
 
     def add(self, grant: ApprovalGrant) -> None:
+        self.refresh()
         super().add(grant)
         self._save(self)
 
+    def get(self, grant_id: str) -> Optional[ApprovalGrant]:
+        self.refresh()
+        return super().get(grant_id)
+
+    def all(self) -> tuple[ApprovalGrant, ...]:
+        self.refresh()
+        return super().all()
+
     def consume(self, grant_id: str) -> None:
+        self.refresh()
         super().consume(grant_id)
         self._save(self)
+
+    def covering(self, **kwargs) -> Optional[ApprovalGrant]:
+        self.refresh()
+        grant = super().covering(**kwargs)
+        if grant is not None and kwargs.get("consume", True):
+            self._save(self)
+        return grant
 
 
 def _governor_config(store: SQLiteControlPlaneStore):

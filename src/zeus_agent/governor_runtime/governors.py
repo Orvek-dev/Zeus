@@ -151,6 +151,23 @@ class LoopGovernor:
         self._last_hash: dict[str, str] = {}
         self._repeats: dict[str, int] = {}
 
+    def check(self, run_id: str, *, state_hash: Optional[str] = None) -> GovernorVerdict:
+        """Read-only verdict for the pre-call gate: would the NEXT released
+        iteration trip the cap? Mutation is deferred to ``observe`` so REFUSED
+        calls never advance the loop — otherwise a host retrying a parked ASK
+        would spin the counter into a self-inflicted lockup (D4)."""
+        iterations = self._iterations.get(run_id, 0) + 1
+        if iterations > self._max_iterations:
+            return GovernorVerdict(
+                allowed=False, forced_decision=TrustDecision.ASK, reason="loop_iteration_cap"
+            )
+        if state_hash is not None and self._last_hash.get(run_id) == state_hash:
+            if self._repeats.get(run_id, 1) + 1 >= self._no_progress_limit:
+                return GovernorVerdict(
+                    allowed=False, forced_decision=TrustDecision.ASK, reason="loop_no_progress"
+                )
+        return _OK
+
     def observe(self, run_id: str, *, state_hash: Optional[str] = None) -> GovernorVerdict:
         iterations = self._iterations.get(run_id, 0) + 1
         self._iterations[run_id] = iterations
@@ -285,8 +302,18 @@ class GovernorBank:
         if not rate.allowed:
             return rate
         if run_id is not None:
-            loop = self.loop.observe(run_id, state_hash=state_hash)
+            # read-only here; the iteration is counted in record_release() only
+            # when the decision actually releases (D4: refused calls don't spin).
+            loop = self.loop.check(run_id, state_hash=state_hash)
             if not loop.allowed:
                 return loop
+        # rate still counts every attempt — load is load, refused or not.
         self.rate.record_call(capability_id, now=now)
         return _OK
+
+    def record_release(self, *, run_id: Optional[str], state_hash: Optional[str] = None) -> None:
+        """Advance the loop counter — called by decide() ONLY for a released
+        (AUTO/NOTIFY) decision, so a parked ASK that the host keeps retrying
+        cannot manufacture a loop-cap lockout."""
+        if run_id is not None:
+            self.loop.observe(run_id, state_hash=state_hash)

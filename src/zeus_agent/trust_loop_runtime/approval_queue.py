@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import datetime, timedelta, timezone
 from typing import Literal, cast
 
@@ -19,6 +21,9 @@ class ParkedAction(BaseModel):
     status: ParkedActionStatus = "pending"
     created_at: datetime
     expires_at: datetime
+    host: str = ""
+    session_id: str = ""
+    payload_hash: str = ""
 
     @field_validator("parked_action_id")
     @classmethod
@@ -31,7 +36,15 @@ class ApprovalQueue:
         self._actions: dict[str, ParkedAction] = {}
         self._active_by_action_id: dict[str, str] = {}
 
-    def park(self, action: TrustLoopAction, *, ttl_seconds: int = 600) -> ParkedAction:
+    def park(
+        self,
+        action: TrustLoopAction,
+        *,
+        ttl_seconds: int = 600,
+        host: str = "",
+        session_id: str = "",
+        payload_hash: str = "",
+    ) -> ParkedAction:
         created_at = datetime.now(timezone.utc)
         active_id = self._active_by_action_id.get(action.action_id)
         if active_id is not None:
@@ -42,6 +55,9 @@ class ApprovalQueue:
             action=action,
             created_at=created_at,
             expires_at=created_at + timedelta(seconds=ttl_seconds),
+            host=host,
+            session_id=session_id,
+            payload_hash=payload_hash,
         )
         self._actions[parked.parked_action_id] = parked
         self._active_by_action_id[action.action_id] = parked.parked_action_id
@@ -69,7 +85,15 @@ class SQLiteApprovalQueue(ApprovalQueue):
     def __init__(self, store: SQLiteControlPlaneStore) -> None:
         self._store = store
 
-    def park(self, action: TrustLoopAction, *, ttl_seconds: int = 600) -> ParkedAction:
+    def park(
+        self,
+        action: TrustLoopAction,
+        *,
+        ttl_seconds: int = 600,
+        host: str = "",
+        session_id: str = "",
+        payload_hash: str = "",
+    ) -> ParkedAction:
         created_at = datetime.now(timezone.utc)
         parked = ParkedAction(
             parked_action_id=_parked_action_id(
@@ -78,6 +102,9 @@ class SQLiteApprovalQueue(ApprovalQueue):
             action=action,
             created_at=created_at,
             expires_at=created_at + timedelta(seconds=ttl_seconds),
+            host=host,
+            session_id=session_id,
+            payload_hash=payload_hash,
         )
         self._store.queue_park(
             parked_action_id=parked.parked_action_id,
@@ -85,6 +112,10 @@ class SQLiteApprovalQueue(ApprovalQueue):
             action_json=action.model_dump_json(),
             created_at=parked.created_at.isoformat(),
             expires_at=parked.expires_at.isoformat(),
+            dedup_key=_dedup_key(action),
+            host=host,
+            session_id=session_id,
+            payload_hash=payload_hash,
         )
         return parked
 
@@ -119,14 +150,38 @@ class SQLiteApprovalQueue(ApprovalQueue):
         return current.model_copy(update={"status": status})
 
 
+def _dedup_key(action: TrustLoopAction) -> str:
+    """Stable identity of a parkable request: the same capability, run, and
+    payload retried by a host must collapse to ONE pending row (D4)."""
+    material = json.dumps(
+        {"c": action.capability_id, "r": action.run_id, "p": action.payload},
+        sort_keys=True,
+        ensure_ascii=False,
+    )
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()
+
+
 def _row_to_parked(row: QueueRow) -> ParkedAction:
-    parked_action_id, _action_id, action_json, status, created_at, expires_at = row
+    (
+        parked_action_id,
+        _action_id,
+        action_json,
+        status,
+        created_at,
+        expires_at,
+        host,
+        session_id,
+        payload_hash,
+    ) = row
     return ParkedAction(
         parked_action_id=parked_action_id,
         action=TrustLoopAction.model_validate_json(action_json),
         status=cast(ParkedActionStatus, status),
         created_at=datetime.fromisoformat(created_at),
         expires_at=datetime.fromisoformat(expires_at),
+        host=host,
+        session_id=session_id,
+        payload_hash=payload_hash,
     )
 
 
