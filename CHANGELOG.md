@@ -2,6 +2,39 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-alpha.3 - 2026-06-12
+
+### Fixed
+
+- Treat sensitive filesystem reads as governed actions: `.env`, private-key,
+  cloud credential, SSH, and secret-like paths now force an ASK before content
+  can be exposed through `fs.read`.
+- Extended Hermes and proxy tool mapping for web aliases such as
+  `web_extract`, `fetch_url`, `extract_url`, and `browser_navigate` so they
+  resolve to `web.fetch` instead of falling through to conservative
+  `host.tool.*`.
+- Reduced dogfood false positives for read-only diagnostics: path-qualified
+  Python binaries, versioned `python3.x`, safe `python -m pip` read-only
+  commands, and Zeus module probes now classify as read-only when appropriate.
+
+### Added
+
+- `zeus status` now separates standing grants, replay authorizations, approval
+  queue state, and the operator inbox so active authority is not confused with
+  resolved approval history.
+- Replay authorization rows are queryable from the control-plane store for
+  status and cockpit surfaces.
+
+### Evidence
+
+- `ruff` clean.
+- Product test suite passed without private live-host eval files:
+  `.venv/bin/python -m pytest --ignore=tests/test_live_host_eval_tree.py`
+  passed: `1915` tests.
+- Existing Hermes dogfood status smoke on `dogfood-r5b`: observed `25`,
+  governed `25`, `chain_ok=true`, pending approvals `0`; new status fields
+  rendered `grant_inventory`, `approval_queue`, and `operator_inbox`.
+
 ## v1.0.0-alpha.2 - 2026-06-12
 
 ### Fixed

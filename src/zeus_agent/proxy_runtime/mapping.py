@@ -27,7 +27,20 @@ _TERMINAL_TOOLS: Final = frozenset(
     {"bash", "exec", "shell", "run", "run_command", "execute_command", "terminal", "process"}
 )
 _WEB_TOOLS: Final = frozenset(
-    {"web_search", "web_fetch", "fetch", "browse", "browser", "http_get", "search_web", "curl"}
+    {
+        "web_search",
+        "web_fetch",
+        "web_extract",
+        "fetch",
+        "fetch_url",
+        "extract_url",
+        "browser_navigate",
+        "browse",
+        "browser",
+        "http_get",
+        "search_web",
+        "curl",
+    }
 )
 _FS_READ_TOOLS: Final = frozenset(
     {"read", "read_file", "cat", "list_dir", "ls", "glob", "grep", "find_files"}

@@ -52,12 +52,17 @@ _PROBE_PROGRAMS: Final = frozenset(
 _PROBE_ARGS: Final = frozenset({"--version", "-V", "--help", "-h"})
 _PYTEST_PROBE_ARGS: Final = frozenset({"--collect-only", "--version", "--help", "-h", "-q", "--quiet"})
 _PYTEST_REQUIRED_PROBES: Final = frozenset({"--collect-only", "--version", "--help", "-h"})
+_PIP_READ_ONLY_SUBCOMMANDS: Final = frozenset({"check", "freeze", "list", "show"})
+_PIP_READ_ONLY_FLAGS: Final = frozenset(
+    {"--files", "-f", "--format", "--local", "--not-required", "--path", "--verbose", "-v"}
+)
 _GIT_READ_ONLY: Final = frozenset(
     {"status", "log", "diff", "show", "branch", "rev-parse", "describe", "ls-files", "grep"}
 )
 _GIT_NETWORK: Final = frozenset({"push", "pull", "fetch", "clone", "ls-remote"})
 _FIND_WRITE_FLAGS: Final = frozenset({"-delete", "-exec", "-execdir", "-ok", "-okdir", "-fls", "-fprint", "-fprintf"})
-_SAFE_ZEUS_MODULE_PROBES: Final = frozenset({"zeus_agent", "zeus_agent.cli_main"})
+_SAFE_ZEUS_MODULE_PROBES: Final = frozenset({"zeus_agent", "zeus_agent.cli_main", "src.zeus_agent"})
+_PYTHON_VERSIONED_RE: Final = re.compile(r"python3(?:\.\d+)?")
 _REDIRECT_RE: Final = re.compile(r"\d*&?>>?\s*(?P<target>&?\S+)")
 _DISCARD_TARGETS: Final = frozenset({"/dev/null", "/dev/stdout", "/dev/stderr"})
 
@@ -135,23 +140,32 @@ def _has_file_write_redirect(text: str) -> bool:
 
 
 def _is_read_only_probe(program: str, args: list[str]) -> bool:
-    if program not in _PROBE_PROGRAMS:
+    if _probe_program_name(program) not in _PROBE_PROGRAMS:
         return False
     return bool(args) and all(arg in _PROBE_ARGS for arg in args)
 
 
 def _is_read_only_python_module_probe(program: str, args: list[str]) -> bool:
-    if program not in {"python", "python3"} or len(args) < 2 or args[0] != "-m":
+    if _probe_program_name(program) not in {"python", "python3"} or len(args) < 2 or args[0] != "-m":
         return False
     if args[1] == "pytest":
         return _is_pytest_probe_args(args[2:])
+    if args[1] == "pip":
+        return _is_read_only_pip_module_probe(args[2:])
     if args[1] in _SAFE_ZEUS_MODULE_PROBES:
         return bool(args[2:]) and all(arg in _PROBE_ARGS for arg in args[2:])
     return False
 
 
 def _is_read_only_pytest_probe(program: str, args: list[str]) -> bool:
-    return program == "pytest" and _is_pytest_probe_args(args)
+    return _probe_program_name(program) == "pytest" and _is_pytest_probe_args(args)
+
+
+def _probe_program_name(program: str) -> str:
+    name = program.rsplit("/", 1)[-1]
+    if _PYTHON_VERSIONED_RE.fullmatch(name):
+        return "python3"
+    return name
 
 
 def _is_pytest_probe_args(args: list[str]) -> bool:
@@ -160,6 +174,18 @@ def _is_pytest_probe_args(args: list[str]) -> bool:
         and all(arg in _PYTEST_PROBE_ARGS for arg in args)
         and any(arg in _PYTEST_REQUIRED_PROBES for arg in args)
     )
+
+
+def _is_read_only_pip_module_probe(args: list[str]) -> bool:
+    if not args:
+        return False
+    if all(arg in _PROBE_ARGS for arg in args):
+        return True
+    return args[0] in _PIP_READ_ONLY_SUBCOMMANDS and all(_pip_arg_is_read_only(arg) for arg in args[1:])
+
+
+def _pip_arg_is_read_only(arg: str) -> bool:
+    return not arg.startswith("-") or arg in _PIP_READ_ONLY_FLAGS
 
 
 def _is_read_only_command_probe(program: str, args: list[str]) -> bool:

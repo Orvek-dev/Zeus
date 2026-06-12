@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.2-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.3-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1911%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1915%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -193,7 +193,7 @@ Claude Code · hermes-agent · OpenClaw 연결 안내는
 | 공개 단위·시나리오 스위트 | `1911`개 테스트 통과 |
 | 컨포먼스 시나리오 | P3–P13 + 영수증 정합성에 걸쳐 `88`개 |
 | 린트 | `ruff` 클린 |
-| 패키지 메타데이터 | `zeus-agent==1.0.0a2` (알파 리셋; 메이저는 컨포먼스 게이트) |
+| 패키지 메타데이터 | `zeus-agent==1.0.0a3` (알파 리셋; 메이저는 컨포먼스 게이트) |
 | 원시 비밀 저장 증명 | 바이트 수준 스캔: 키가 담긴 기억 후보가 SQLite 파일에 마스킹 없이 닿지 않음 |
 
 **정직한 경계.** 컨포먼스는 합성입니다 — 시뮬레이션된 호스트에 대해 계약을

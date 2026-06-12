@@ -14,7 +14,17 @@ from zeus_agent.trust_loop_runtime import Reversibility
 _TERMINAL: Final = frozenset({"terminal", "run_command", "shell", "bash", "execute"})
 _FS_READ: Final = frozenset({"read_file", "file_read", "list_files", "search_files", "grep"})
 _FS_WRITE: Final = frozenset({"write_file", "file_write", "edit_file", "create_file"})
-_WEB: Final = frozenset({"web_search", "fetch_url", "browser", "http_request"})
+_WEB: Final = frozenset(
+    {
+        "web_search",
+        "web_extract",
+        "fetch_url",
+        "extract_url",
+        "browser_navigate",
+        "browser",
+        "http_request",
+    }
+)
 _SEND: Final = frozenset({"send_message", "send_email", "post_message"})
 _TODO: Final = frozenset({"todo", "todos", "todo_list", "update_todo", "task_list"})
 _META_READ: Final = frozenset(

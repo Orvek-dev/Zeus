@@ -155,6 +155,35 @@ def test_read_only_is_auto_with_receipt(tmp_path: Path) -> None:
     assert response.ttl_ms > 0
 
 
+def test_secret_path_read_asks_before_host_receives_content(tmp_path: Path) -> None:
+    engine = _engine(tmp_path)
+    request = DecisionRequest(
+        principal_id="agent.llm_proxy",
+        session_id="session.secret",
+        run_id="run.secret",
+        capability_id="fs.read",
+        args={"path": "/tmp/hermes-r4b-canary.env"},
+        context=DecisionContext(
+            host=HostKind.hermes,
+            surface=GateSurface.llm_proxy,
+            defer_ask_to_owner=True,
+        ),
+    )
+
+    response = engine.decide(request, now=NOW)
+
+    assert response.decision is TrustDecision.ASK
+    assert response.reason == "sensitive_path_read"
+    assert response.parked_action_id is not None
+
+
+def test_non_secret_path_read_still_auto(tmp_path: Path) -> None:
+    engine = _engine(tmp_path)
+    response = engine.decide(_request("fs.read", args={"path": "/tmp/hermes-r4b-note.txt"}), now=NOW)
+
+    assert response.decision is TrustDecision.AUTO
+
+
 def test_every_decision_lands_in_ledger_even_deny(tmp_path: Path) -> None:
     engine = _engine(tmp_path)
     response = engine.decide(_request("mcp.quarantined.tool"), now=NOW)

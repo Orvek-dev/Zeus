@@ -50,6 +50,7 @@ from zeus_agent.trust_loop_runtime import (
 from zeus_agent.trust_loop_runtime.ledger import _redact_json
 
 from .models import DecisionRequest, DecisionResponse, Obligation
+from .secret_paths import secret_path_read_reason
 
 _AUTO_TTL_MS: Final = 30_000
 
@@ -227,6 +228,9 @@ class ZeusDecisionEngine:
         action = self._build_action(request, args, record, risk, assessment.tainted, assessment.taint_sensitive, envelope, network_host)
         policy = self._policy.evaluate(action, approval_bound=False, undo_proven=False)
         decision, reason = policy.decision, policy.reason
+        secret_read_reason = (
+            secret_path_read_reason(path) if request.capability_id == "fs.read" else None
+        )
 
         # envelope tier overlay: ask_first/always_ask floor the policy verdict;
         # an in-envelope grant used OUTSIDE its compiled scope is an
@@ -259,6 +263,9 @@ class ZeusDecisionEngine:
 
         if assessment.forced_decision is TrustDecision.ASK and decision is not TrustDecision.DENY:
             decision, reason, downgradable = TrustDecision.ASK, assessment.reasons[0], False
+
+        if secret_read_reason is not None and decision is not TrustDecision.DENY:
+            decision, reason, downgradable = TrustDecision.ASK, secret_read_reason, False
 
         # 6. pre-call governors (budget DENY; deadman/novelty/rate/loop ASK).
         verdict = self.governors.precall(

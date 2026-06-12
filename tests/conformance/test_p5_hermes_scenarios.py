@@ -298,6 +298,53 @@ def test_proxy_maps_hermes_meta_tools_without_ask_storm(tmp_path: Path) -> None:
     assert not any(c.startswith("host.tool.") for c in decisions), "no conservative fall-through"
 
 
+def test_proxy_maps_hermes_web_tools_to_web_fetch(tmp_path: Path) -> None:
+    engine, store = _engine(tmp_path)
+    proxy = LlmProxyEngine(engine=engine, store=store)
+    body = {"model": "gpt-5.4", "messages": [{"role": "user", "content": "go"}]}
+    session = ProxySession(session_id="h.web", host=HostKind.hermes)
+
+    def _completion(tool_name: str) -> dict:
+        return {
+            "id": "c",
+            "object": "chat.completion",
+            "model": "gpt-5.4",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "t",
+                                "type": "function",
+                                "function": {
+                                    "name": tool_name,
+                                    "arguments": '{"url": "https://example.com"}',
+                                },
+                            }
+                        ],
+                    },
+                    "finish_reason": "tool_calls",
+                }
+            ],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 5},
+        }
+
+    for tool_name in ("web_extract", "browser_navigate"):
+        result = proxy.chat_completion(body, session, lambda _body, tool=tool_name: _completion(tool))
+        assert result.released_tool_calls == 1
+        assert result.blocked_tool_calls == 0
+    decisions = [
+        json.loads(str(r["payload_json"]))
+        for r in engine.recorder.ledger.records()
+        if str(r["kind"]) == "decision_receipt"
+    ]
+    assert any(item.get("capability_id") == "web.fetch" for item in decisions)
+    assert all(not str(item.get("capability_id", "")).startswith("host.tool.") for item in decisions)
+
+
 # ----------------------------- D9: hook-owned host is not double-asked at proxy
 def test_hook_owned_host_does_not_defer_side_effects_until_hook_block_is_proven(tmp_path: Path) -> None:
     engine, store = _engine(tmp_path)

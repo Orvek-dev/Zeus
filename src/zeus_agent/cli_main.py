@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Optional
 import typer
 
 if TYPE_CHECKING:
-    from zeus_agent.graded_approval_runtime import ApprovalGrant
     from zeus_agent.trust_loop_runtime import ParkedAction
 
 app = typer.Typer(
@@ -579,18 +578,6 @@ def _record_payload(record: dict[str, object]) -> dict[str, object]:
     return payload if isinstance(payload, dict) else {}
 
 
-def _grant_status_counts(grants: tuple["ApprovalGrant", ...], *, now_epoch: int) -> dict[str, int]:
-    counts = {"active": 0, "consumed": 0, "expired": 0, "total": len(grants)}
-    for grant in grants:
-        if grant.consumed:
-            counts["consumed"] += 1
-        elif grant.expires_at_epoch != 0 and now_epoch >= grant.expires_at_epoch:
-            counts["expired"] += 1
-        else:
-            counts["active"] += 1
-    return counts
-
-
 @app.command("status")
 def status(home: Optional[Path] = typer.Option(None, "--home")) -> None:
     """Control-plane status: coverage, decision mix, asks, chain, wallet."""
@@ -601,6 +588,12 @@ def status(home: Optional[Path] = typer.Option(None, "--home")) -> None:
         FlightRecorder,
         SQLiteControlPlaneStore,
         SQLiteEvidenceLedger,
+    )
+    from zeus_agent.status_runtime import (
+        approval_queue_status_counts,
+        grant_status_counts,
+        operator_inbox_summary,
+        replay_authorization_status_counts,
     )
     from zeus_agent.wallet_runtime import weekly_spend_digest
 
@@ -628,7 +621,9 @@ def status(home: Optional[Path] = typer.Option(None, "--home")) -> None:
     response_at = _parse_ts(watchdog["last_response_at"])
     if request_at is not None and (response_at is None or response_at < request_at):
         watchdog["waiting_on_provider_seconds"] = int((now - request_at).total_seconds())
-    grants = _grant_status_counts(state.load_grants().all(), now_epoch=int(now.timestamp()))
+    grants = grant_status_counts(state.load_grants().all(), now_epoch=int(now.timestamp()))
+    replay_grants = replay_authorization_status_counts(store, now=now)
+    queue_counts = approval_queue_status_counts(store, now=now)
     _echo_json(
         {
             "home": str(state.root),
@@ -638,6 +633,12 @@ def status(home: Optional[Path] = typer.Option(None, "--home")) -> None:
             "chain_ok": recorder.ledger.verify_chain().ok,
             "standing_grants": grants["active"],
             "grants": grants,
+            "grant_inventory": {
+                "standing": grants,
+                "replay_authorizations": replay_grants,
+            },
+            "approval_queue": queue_counts,
+            "operator_inbox": operator_inbox_summary(queue_counts),
             "wallet_week": weekly_spend_digest(recorder, now=now),
             "budgets": [
                 {"scope": row[0], "id": row[1], "limit_units": row[2], "spent_units": row[3]}

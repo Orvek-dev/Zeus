@@ -68,8 +68,8 @@ def test_readmes_carry_current_control_plane_facts() -> None:
 
     for text, name in ((en, "EN"), (ko, "KO")):
         # version + evidence badges stay in sync with the package reality
-        assert "version-1.0.0--alpha.2" in text, name
-        assert "tests-1911%20passed" in text, name
+        assert "version-1.0.0--alpha.3" in text, name
+        assert "tests-1915%20passed" in text, name
         assert "conformance-88%20scenarios" in text, name
         assert "`1911`" in text, name
         assert "`88`" in text, name

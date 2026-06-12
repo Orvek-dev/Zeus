@@ -33,6 +33,11 @@ def test_dogfood_python_module_diagnostics_stay_read_only() -> None:
         "python --version && printf '\\n---\\n' && pytest --collect-only -q",
         "python -m pytest --collect-only -q",
         "python -m zeus_agent.cli_main --help",
+        ".venv/bin/python -m zeus_agent --help",
+        "/usr/local/bin/python3.12 -m zeus_agent.cli_main --help",
+        "python -m src.zeus_agent --help",
+        "python -m pip show zeus-agent || true",
+        "python -m pip list && printf '\\n---\\n' && python -m pip check || true",
         "python --version && printf '\\n---\\n' && python -m pytest --version && "
         "printf '\\n---\\n' && python -m zeus_agent --help",
         "pwd && printf '\\n---\\n' && git status --short --branch && printf '\\n---\\n' && "

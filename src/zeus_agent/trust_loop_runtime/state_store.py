@@ -286,6 +286,16 @@ class SQLiteControlPlaneStore:
             )
         return tuple(str(value) for value in row)
 
+    def replay_rows(self) -> list[ReplayRow]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT token_id, host, session_id, capability_id, payload_hash, "
+                "created_at, expires_at, consumed_at "
+                "FROM replay_authorizations "
+                "ORDER BY created_at ASC, token_id ASC",
+            ).fetchall()
+        return [tuple(str(value) for value in row) for row in rows]
+
     # ----------------------------------------------------------------- schema
     def _ensure_schema(self) -> None:
         with self._connect() as connection:

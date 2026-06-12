@@ -237,6 +237,55 @@ def test_status_splits_active_consumed_and_expired_grants(tmp_path: Path) -> Non
     assert status["grants"] == {"active": 1, "consumed": 1, "expired": 1, "total": 3}
 
 
+def test_status_separates_grants_replays_and_approval_queue(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    write_a = _decide_req("fs.write", path="/work/a.py")
+    write_b = _decide_req("fs.write", path="/work/b.py")
+    hard = _decide_req("terminal.run.external", path="/work/hard.py")
+
+    soft_ask = json.loads(
+        runner.invoke(app, ["decide", "--request-json", write_a, "--home", home]).stdout
+    )
+    runner.invoke(app, ["approve", "--parked", soft_ask["parked_action_id"], "--home", home])
+
+    hard_ask = json.loads(
+        runner.invoke(app, ["decide", "--request-json", hard, "--home", home]).stdout
+    )
+    runner.invoke(app, ["approve", "--parked", hard_ask["parked_action_id"], "--home", home])
+
+    rejected = json.loads(
+        runner.invoke(app, ["decide", "--request-json", write_b, "--home", home]).stdout
+    )
+    runner.invoke(
+        app,
+        ["approve", "--parked", rejected["parked_action_id"], "--deny", "--home", home],
+    )
+
+    result = runner.invoke(app, ["status", "--home", home])
+
+    assert result.exit_code == 0
+    status = json.loads(result.stdout)
+    assert status["standing_grants"] == 1
+    assert status["grants"] == {"active": 1, "consumed": 0, "expired": 0, "total": 1}
+    assert status["grant_inventory"]["standing"] == status["grants"]
+    assert status["grant_inventory"]["replay_authorizations"] == {
+        "active": 1,
+        "consumed": 0,
+        "expired": 0,
+        "total": 1,
+    }
+    assert status["approval_queue"] == {
+        "pending": 0,
+        "approved": 2,
+        "rejected": 1,
+        "expired": 0,
+        "superseded": 0,
+        "total": 3,
+    }
+    assert status["operator_inbox"]["pending_asks"] == 0
+    assert status["operator_inbox"]["resolved_history"] == 3
+
+
 def test_connect_prints_hook_config(tmp_path: Path) -> None:
     result = runner.invoke(app, ["connect", "claude-code"])
     assert result.exit_code == 0
