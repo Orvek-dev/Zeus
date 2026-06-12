@@ -6,6 +6,7 @@ from typing import Optional
 
 QueueRow = tuple[str, str, str, str, str, str, str, str, str]
 ReplayRow = tuple[str, str, str, str, str, str, str, str]
+_SCHEMA_VERSION = 1
 _QUEUE_COLUMNS = (
     "parked_action_id, action_id, action_json, status, created_at, expires_at, "
     "host, session_id, payload_hash"
@@ -299,6 +300,7 @@ class SQLiteControlPlaneStore:
     # ----------------------------------------------------------------- schema
     def _ensure_schema(self) -> None:
         with self._connect() as connection:
+            _ensure_known_schema_version(connection)
             connection.execute("PRAGMA journal_mode=WAL")
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS budget_limits ("
@@ -384,6 +386,14 @@ class SQLiteControlPlaneStore:
                 "host, session_id, capability_id, payload_hash, consumed_at, expires_at"
                 ")",
             )
+            connection.execute("PRAGMA user_version = {0}".format(_SCHEMA_VERSION))
 
     def _connect(self) -> sqlite3.Connection:
         return sqlite3.connect(self.path)
+
+
+def _ensure_known_schema_version(connection: sqlite3.Connection) -> None:
+    row = connection.execute("PRAGMA user_version").fetchone()
+    version = int(row[0]) if row is not None else 0
+    if version > _SCHEMA_VERSION:
+        raise RuntimeError("control_plane_schema_too_new:{0}".format(version))

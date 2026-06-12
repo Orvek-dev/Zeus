@@ -254,6 +254,29 @@ def test_session_grant_downgrades_repeat_ask_to_auto(tmp_path: Path) -> None:
     assert response.reason == "covered_by_grant_session"
 
 
+def test_self_protection_overrides_imported_or_session_grants(tmp_path: Path) -> None:
+    protected_home = tmp_path / "zeus" / "control-plane"
+    engine = _engine(tmp_path, self_protection_roots=(protected_home,))
+    engine.grants.add(
+        issue_grant(
+            grant_id="grant.session.protect",
+            capability_id="fs.write",
+            scope=GrantScope.session,
+            session_id="session.1",
+            expires_at_epoch=int((NOW + timedelta(hours=1)).timestamp()),
+        )
+    )
+
+    response = engine.decide(
+        _request("fs.write", args={"path": str(protected_home / "grants.json")}),
+        now=NOW,
+    )
+
+    assert response.decision is TrustDecision.ASK
+    assert response.reason == "self_protection_boundary"
+    assert response.parked_action_id is not None
+
+
 def test_grant_never_covers_hard_risk(tmp_path: Path) -> None:
     engine = _engine(tmp_path)
     engine.grants.add(

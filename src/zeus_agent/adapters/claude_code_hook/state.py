@@ -74,12 +74,34 @@ class ControlPlaneState:
             queue=SQLiteApprovalQueue(store),
             replay_authorizations=SQLiteReplayAuthorizationStore(store),
             trust_stats=SQLiteTrustStatStore(self.trust_path),
+            self_protection_roots=self.self_protection_roots(),
+            force_deny_reason=store.kv_get("operator.freeze_reason") or None,
             seq_counter=lambda: store.next_counter("decision_seq"),
             # explainable-or-escalated, enforced inside decide() so the receipt
             # is the truth — every gate built here inherits the rule.
             explainability=lambda record: explain(record) is not None,
         )
         return engine
+
+    def self_protection_roots(self) -> tuple[Path, ...]:
+        return (
+            self.root,
+            Path.home() / ".claude",
+            Path.home() / ".hermes",
+            Path.home() / ".openclaw",
+        )
+
+    def tripwire_paths(self) -> tuple[Path, ...]:
+        return (
+            self.ledger_path,
+            self.state_path,
+            self.trust_path,
+            self.taint_path,
+            self.grants_path,
+            self.pending_path,
+            self.root / "connect.json",
+            self.root / "broker.json",
+        )
 
     # ------------------------------------------------------------------ taint
     def load_taint(self) -> SessionTaintTracker:

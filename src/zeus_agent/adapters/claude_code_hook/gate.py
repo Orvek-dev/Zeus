@@ -102,6 +102,19 @@ class ClaudeCodeGate:
         self.state.save_taint(self.engine.taint, (session_id,))
         return {"recorded": True, "outcome_record_id": outcome_record, "receipt_id": receipt_id}
 
+    def handle_stop(self, payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        from zeus_agent.completion_gate_runtime import evaluate_completion_claim
+
+        result = evaluate_completion_claim(payload)
+        event = self.engine.recorder.ledger.append(
+            kind="completion_gate",
+            run_id="run.cc.completion.{0}".format(_short(_text(payload.get("session_id")) or "default")),
+            payload=result.model_dump(mode="json"),
+        )
+        output = result.to_hook_output()
+        output["zeus"]["receipt_id"] = event.record_id
+        return output
+
     # -------------------------------------------------------------- internals
     def _stamp_taint(
         self,
@@ -184,6 +197,8 @@ def run_hook_event(
     gate = ClaudeCodeGate(state)
     if event == "post":
         return gate.handle_post(payload)
+    if event == "stop":
+        return gate.handle_stop(payload)
     return gate.handle_pre(payload)
 
 

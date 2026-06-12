@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -39,6 +41,20 @@ def test_product_surface_is_small() -> None:
         assert verb in result.stdout
     # the legacy wave surface must NOT leak into the product help
     assert "wave" not in result.stdout.lower()
+
+
+def test_cli_entrypoint_stays_thin() -> None:
+    entrypoint = Path("src/zeus_agent/cli_main.py")
+    runtime_modules = sorted(Path("src/zeus_agent/cli_runtime").glob("*.py"))
+
+    assert _pure_loc(entrypoint) <= 100
+    assert runtime_modules
+    assert all(_pure_loc(module) <= 250 for module in runtime_modules)
+
+
+def _pure_loc(path: Path) -> int:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return sum(1 for line in lines if line.strip() and not line.lstrip().startswith("#"))
 
 
 def test_init_creates_control_plane_home(tmp_path: Path) -> None:
@@ -340,6 +356,8 @@ def test_parked_ask_cockpit_approve_makes_retry_auto(tmp_path: Path) -> None:
     pending = json.loads(runner.invoke(app, ["approvals", "--pending", "--home", home]).stdout)
     assert any(p["parked_action_id"] == asked["parked_action_id"] for p in pending)
     assert pending[0]["capability_id"] == "fs.write"
+    assert pending[0]["short_id"]
+    assert pending[0]["card"]["approval_effect"] == "once_grant"
 
     approved = json.loads(
         runner.invoke(app, ["approve", "--parked", asked["parked_action_id"], "--home", home]).stdout
@@ -350,6 +368,78 @@ def test_parked_ask_cockpit_approve_makes_retry_auto(tmp_path: Path) -> None:
     again = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
     assert again["decision"] == "auto"
     assert again["reason"] == "covered_by_grant_once"
+
+
+def test_parked_ask_can_be_resolved_by_last_id(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    req = _decide_req("fs.write")
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+
+    approved = json.loads(runner.invoke(app, ["approve", "--last", "--confirm", "--home", home]).stdout)
+
+    assert approved["status"] == "approved"
+    assert approved["parked_action_id"] == asked["parked_action_id"]
+
+
+def test_approve_last_requires_confirmation(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    runner.invoke(app, ["decide", "--request-json", _decide_req("fs.write"), "--home", home])
+
+    result = runner.invoke(app, ["approve", "--last", "--home", home])
+
+    assert result.exit_code != 0
+    assert "--confirm" in result.output
+
+
+def test_parked_ask_can_be_resolved_with_narrowed_scope(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    req = _decide_req("fs.write", path="/work/project/a.py")
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+
+    approved = json.loads(
+        runner.invoke(
+            app,
+            [
+                "approve",
+                "--parked",
+                asked["parked_action_id"],
+                "--narrow-path",
+                "/work/project",
+                "--home",
+                home,
+            ],
+        ).stdout
+    )
+
+    assert approved["status"] == "approved"
+    assert approved["grant_scope"] == "narrower"
+    assert approved["narrowed_paths"] == ["/work/project"]
+    inside = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+    assert inside["decision"] == "auto"
+    assert inside["reason"] == "covered_by_grant_narrower"
+    outside = json.loads(
+        runner.invoke(
+            app,
+            ["decide", "--request-json", _decide_req("fs.write", path="/tmp/outside.py"), "--home", home],
+        ).stdout
+    )
+    assert outside["decision"] == "ask"
+
+
+def test_notify_delivers_pending_ask_cards_to_webhook(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    runner.invoke(app, ["decide", "--request-json", _decide_req("fs.write"), "--home", home])
+    received: list[dict[str, object]] = []
+    server = _WebhookServer(received)
+    server.start()
+    try:
+        result = runner.invoke(app, ["notify", "--webhook", server.url, "--home", home])
+    finally:
+        server.shutdown()
+
+    payload = json.loads(result.stdout)
+    assert payload["delivered"] == 1
+    assert received[0]["cards"][0]["capability_id"] == "fs.write"
 
 
 def test_parked_ask_hard_risk_approval_issues_payload_scoped_replay(tmp_path: Path) -> None:
@@ -408,10 +498,105 @@ def test_hermes_connect_check_preflights(tmp_path: Path) -> None:
     result = runner.invoke(app, ["connect", "hermes", "--check", "--home", home])
     report = json.loads(result.stdout)
     assert report["checks"]["control_plane_home"]["ok"] is True
+    assert report["checks"]["hook_canary"]["ok"] is True
+    assert str(report["checks"]["hook_canary"]["receipt_id"]).startswith("trust.ev.")
     assert report["checks"]["proxy_health"]["ok"] is False  # no proxy running in the test
     assert report["ready"] is False
     assert any("doctor" in item for item in report["manual"])
     assert "control-plane home" in report["soak_note"]
+
+
+def test_completion_gate_blocks_claimed_done_without_artifact(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    result = runner.invoke(
+        app,
+        ["hook", "claude-code", "--event", "stop", "--home", home],
+        input=json.dumps(
+            {
+                "session_id": "complete.s1",
+                "final_message": "완료했습니다. /tmp/missing.txt 파일을 만들었습니다.",
+                "claimed_artifacts": ["/tmp/missing.txt"],
+                "claimed_tests": [".venv/bin/python -m pytest"],
+                "executed_commands": [],
+            }
+        ),
+    )
+
+    output = json.loads(result.stdout)
+    assert output["action"] == "block"
+    assert output["zeus"]["completion_allowed"] is False
+    assert "missing_artifact:/tmp/missing.txt" in output["zeus"]["blocked_reasons"]
+    assert "missing_test_command:.venv/bin/python -m pytest" in output["zeus"]["blocked_reasons"]
+
+
+def test_latency_command_reports_budget(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    result = runner.invoke(app, ["latency", "--home", home, "--samples", "3"])
+    payload = json.loads(result.stdout)
+    assert payload["samples"] == 3
+    assert payload["budget_p95_ms"] > 0
+    assert payload["decision_p95_ms"] >= 0
+
+
+def test_freeze_denies_new_decisions_until_released(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    runner.invoke(app, ["freeze", "--home", home])
+
+    frozen = json.loads(
+        runner.invoke(app, ["decide", "--request-json", _decide_req("fs.read"), "--home", home]).stdout
+    )
+    assert frozen["decision"] == "deny"
+    assert frozen["reason"] == "operator_freeze"
+
+    runner.invoke(app, ["freeze", "--release", "--home", home])
+    released = json.loads(
+        runner.invoke(app, ["decide", "--request-json", _decide_req("fs.read"), "--home", home]).stdout
+    )
+    assert released["decision"] == "auto"
+
+
+def test_tripwire_detects_external_control_plane_change(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    runner.invoke(app, ["init", "--home", home])
+    snap = runner.invoke(app, ["tripwire", "--snapshot", "--home", home])
+    assert json.loads(snap.stdout)["tracked"] > 0
+
+    grants_path = tmp_path / "zeus" / "control-plane" / "grants.json"
+    grants_path.write_text("[]\n", encoding="utf-8")
+    check = json.loads(runner.invoke(app, ["tripwire", "--check", "--home", home]).stdout)
+
+    assert check["changed"]
+    assert any(item["path"].endswith("grants.json") for item in check["changed"])
+
+
+def test_permission_import_summarizes_existing_claude_rules_without_secrets(tmp_path: Path) -> None:
+    settings = tmp_path / "settings.json"
+    settings.write_text(
+        json.dumps(
+            {
+                "permissions": {
+                    "allow": [
+                        "Read(./src/**)",
+                        "Bash(git status:*)",
+                        "Bash(rm -rf:*)",
+                    ]
+                },
+                "env": {"OPENAI_API_KEY": "sk-should-not-appear"},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(
+        app,
+        ["import-permissions", "claude-code", "--settings", str(settings)],
+    )
+
+    payload = json.loads(result.stdout)
+    assert payload["secret_material"] == "excluded"
+    assert "sk-should-not-appear" not in result.stdout
+    assert payload["tiers"]["low"] == 2
+    assert payload["tiers"]["high"] == 1
 
 
 def test_mcp_empty_registry_explains_itself(tmp_path: Path) -> None:
@@ -422,3 +607,42 @@ def test_mcp_empty_registry_explains_itself(tmp_path: Path) -> None:
     payload = json.loads(result.stdout)
     assert payload["tools"] == []
     assert "no downstream MCP" in payload["note"]
+
+
+class _WebhookServer:
+    def __init__(self, received: list[dict[str, object]]) -> None:
+        self._received = received
+        handler = self._handler()
+        self._server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
+
+    @property
+    def url(self) -> str:
+        host, port = self._server.server_address
+        return "http://{0}:{1}/notify".format(host, port)
+
+    def start(self) -> None:
+        self._thread.start()
+
+    def shutdown(self) -> None:
+        self._server.shutdown()
+        self._server.server_close()
+        self._thread.join(timeout=2)
+
+    def _handler(self):
+        received = self._received
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self) -> None:
+                length = int(self.headers.get("Content-Length", "0"))
+                raw = self.rfile.read(length).decode("utf-8")
+                decoded = json.loads(raw)
+                if isinstance(decoded, dict):
+                    received.append(decoded)
+                self.send_response(204)
+                self.end_headers()
+
+            def log_message(self, format: str, *args: object) -> None:
+                return None
+
+        return Handler

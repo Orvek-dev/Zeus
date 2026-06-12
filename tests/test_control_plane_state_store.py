@@ -5,6 +5,7 @@ one-decision gate process sharing the same control-plane home."""
 from __future__ import annotations
 
 import json
+import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -202,3 +203,19 @@ def test_store_counters_and_budget_roundtrip(tmp_path: Path) -> None:
     store.add_budget_spend("run", "r1", 2)
     assert store.budget_spent("run", "r1") == 5
     assert json.loads("{}") == {}  # keep json import honest
+
+
+def test_control_plane_store_and_ledger_stamp_schema_versions(tmp_path: Path) -> None:
+    state_path = tmp_path / "state.sqlite3"
+    ledger_path = tmp_path / "ledger.sqlite3"
+
+    SQLiteControlPlaneStore(state_path)
+    SQLiteEvidenceLedger(ledger_path)
+
+    with sqlite3.connect(state_path) as connection:
+        state_version = connection.execute("PRAGMA user_version").fetchone()[0]
+    with sqlite3.connect(ledger_path) as connection:
+        ledger_version = connection.execute("PRAGMA user_version").fetchone()[0]
+
+    assert state_version >= 1
+    assert ledger_version >= 1

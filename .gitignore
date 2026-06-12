@@ -36,6 +36,10 @@ scripts/harness/
 spec/
 templates/
 
+# Private live-host dogfood/eval assets. Keep local; do not publish.
+evals/
+tests/test_live_host_eval_tree.py
+
 # Logs and local evidence
 *.log
 *.jsonl

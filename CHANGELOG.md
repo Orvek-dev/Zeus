@@ -2,6 +2,44 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## Unreleased
+
+## v1.0.0-alpha.4 - 2026-06-12
+
+### Added
+
+- Added top-tier self-protection for Zeus control-plane material, plus a
+  tripwire command for out-of-band control-plane file changes.
+- Added `zeus connect hermes --check` canary receipt verification.
+- Added a minimum completion gate for claimed-done Stop/post-task hooks:
+  claimed artifacts and test commands must have evidence.
+- Added operator-inbox cards with short parked IDs, `zeus approve --last`,
+  `zeus notify --webhook`, `zeus freeze`, latency budget measurement, and
+  Claude Code permission-import summaries that exclude raw secret material.
+- Stamped schema versions on the control-plane state store and evidence ledger.
+
+### Changed
+
+- Split the product CLI command registry out of `cli_main.py` into
+  focused `cli_runtime/*_commands.py` modules; `cli_main.py` is now a thin
+  Typer entrypoint and the boundary is locked by a product-surface test.
+- Updated README/README.ko to match the current product surface: Hermes
+  dogfood onboarding, operator inbox, completion gate, self-protection,
+  tripwire, latency checks, and the public/private dogfood boundary.
+- Aligned package metadata to `zeus-agent==1.0.0a4`.
+
+### Evidence
+
+- Product test suite passed without private live-host eval files:
+  `.venv/bin/python -m pytest --ignore=tests/test_live_host_eval_tree.py`
+  passed: `1927` tests.
+- `ruff` clean.
+- `git diff --check` clean.
+- `zeus status --home /tmp/zeus-a4-baseline-smoke` returned
+  `chain_ok=true`.
+- Private dogfood/eval assets remain local-only and ignored:
+  `evals/`, `tests/test_live_host_eval_tree.py`.
+
 ## v1.0.0-alpha.3 - 2026-06-12
 
 ### Fixed

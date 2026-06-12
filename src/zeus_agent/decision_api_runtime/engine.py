@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Callable, Final, Optional
 
 from pydantic import JsonValue
@@ -24,6 +25,7 @@ from zeus_agent.capability_registry_runtime import (
 )
 from zeus_agent.governor_runtime import GovernorBank
 from zeus_agent.graded_approval_runtime import GrantScope, GrantStore
+from zeus_agent.self_protection_runtime import SelfProtectionPolicy
 from zeus_agent.taint_runtime import (
     SessionTaintTracker,
     TaintLabel,
@@ -123,6 +125,8 @@ class ZeusDecisionEngine:
         trust_stats: Optional[SQLiteTrustStatStore] = None,
         policy_profile: TrustPolicyProfile = TrustPolicyProfile.cautious,
         approved_hosts: tuple[str, ...] = (),
+        self_protection_roots: tuple[Path, ...] = (),
+        force_deny_reason: Optional[str] = None,
         seq_counter: Optional[Callable[[], int]] = None,
         explainability: Optional[Callable[[CapabilityRecord], bool]] = None,
     ) -> None:
@@ -137,6 +141,8 @@ class ZeusDecisionEngine:
         self.trust_stats = trust_stats
         self._policy = TrustDecisionEngine(policy_profile)
         self._approved_hosts = approved_hosts
+        self._self_protection = SelfProtectionPolicy(self_protection_roots)
+        self._force_deny_reason = force_deny_reason
         # seq_counter (e.g. SQLiteControlPlaneStore.next_counter) keeps action
         # ids unique across one-decision-per-process gates; the in-memory
         # fallback only serves a single engine lifetime.
@@ -166,6 +172,11 @@ class ZeusDecisionEngine:
         if record.status is CapabilityStatus.quarantined:
             return self._finalize(
                 request, args, TrustDecision.DENY, "capability_quarantined",
+                envelope=envelope, record=record,
+            )
+        if self._force_deny_reason is not None:
+            return self._finalize(
+                request, args, TrustDecision.DENY, self._force_deny_reason,
                 envelope=envelope, record=record,
             )
         if envelope is not None and envelope.locked(request.capability_id) is not None:
@@ -260,6 +271,14 @@ class ZeusDecisionEngine:
         elif record.side_effect is not SideEffectClass.none and decision is TrustDecision.AUTO:
             # no objective opened: side effects do not run silently.
             decision, reason = TrustDecision.ASK, "no_envelope_for_side_effect"
+
+        self_protection_reason = self._self_protection.reason_for(
+            capability_id=request.capability_id,
+            side_effect=record.side_effect,
+            args=args,
+        )
+        if self_protection_reason is not None and decision is not TrustDecision.DENY:
+            decision, reason, downgradable = TrustDecision.ASK, self_protection_reason, False
 
         if assessment.forced_decision is TrustDecision.ASK and decision is not TrustDecision.DENY:
             decision, reason, downgradable = TrustDecision.ASK, assessment.reasons[0], False

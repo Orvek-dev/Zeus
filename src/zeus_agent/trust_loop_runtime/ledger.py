@@ -14,6 +14,8 @@ from zeus_agent.security.credentials import redact_secret_spans
 
 from .models import ChainVerification, require_text
 
+_SCHEMA_VERSION = 1
+
 
 @dataclass(frozen=True)
 class LedgerEvent:
@@ -132,6 +134,7 @@ class SQLiteEvidenceLedger:
 
     def _ensure_schema(self) -> None:
         with self._connect() as connection:
+            _ensure_known_schema_version(connection)
             connection.execute("PRAGMA journal_mode=WAL")
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS trust_events ("
@@ -146,6 +149,7 @@ class SQLiteEvidenceLedger:
                 "payload_json TEXT NOT NULL"
                 ")",
             )
+            connection.execute("PRAGMA user_version = {0}".format(_SCHEMA_VERSION))
 
     def _connect(self) -> sqlite3.Connection:
         return sqlite3.connect(self.path)
@@ -154,6 +158,13 @@ class SQLiteEvidenceLedger:
 def _next_seq(connection: sqlite3.Connection) -> int:
     row = connection.execute("SELECT COALESCE(MAX(seq), 0) + 1 FROM trust_events").fetchone()
     return int(row[0])
+
+
+def _ensure_known_schema_version(connection: sqlite3.Connection) -> None:
+    row = connection.execute("PRAGMA user_version").fetchone()
+    version = int(row[0]) if row is not None else 0
+    if version > _SCHEMA_VERSION:
+        raise RuntimeError("ledger_schema_too_new:{0}".format(version))
 
 
 def _previous_hash(connection: sqlite3.Connection) -> str:

@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.3-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.4-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1915%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1927%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -27,10 +27,10 @@
 # Zeus
 
 Zeus is a **local-first governance control plane for AI agents**. It is not
-another agent: your agent platform — Claude Code live today; hermes-agent and
-OpenClaw adapters contract-frozen, real-host validation pending — keeps doing
-the work, and plugs into Zeus through gates. Zeus decides what may run,
-records what happened, blocks what must not happen, and converts a clean
+another agent: your agent platform — Claude Code and hermes-agent in live
+dogfood today, OpenClaw contract-frozen with real-host validation pending —
+keeps doing the work, and plugs into Zeus through gates. Zeus decides what may
+run, records what happened, blocks what must not happen, and converts a clean
 track record into fewer interruptions.
 
 ```text
@@ -80,6 +80,16 @@ Around that contract sit the kernel organs:
 - **Credential broker** — agents plan with secret references and never hold
   raw keys; material is injected only at the egress point, on an allowed
   decision, and the injection itself is recorded as an outcome.
+- **Self-protection tier** — Zeus control-plane material, hook configs,
+  broker references, and pairing state sit above ordinary grants. A broad
+  `fs.write` grant cannot override that tier, and `zeus tripwire` catches
+  out-of-band edits that never crossed a hook.
+- **Completion gate** — Stop/post-task claims can be checked for concrete
+  evidence: declared artifacts must exist and declared test commands must
+  have run before the host can treat the work as complete.
+- **Operator inbox** — parked asks have short IDs, a shared card format,
+  `zeus approvals --pending`, `zeus approve --last --confirm`, webhook
+  delivery, and a freeze switch for incidents.
 
 The north-star metric is **asks per week**: governance that earns autonomy
 down, instead of nagging forever or rubber-stamping everything.
@@ -108,10 +118,10 @@ considered complete, then it should not pretend that the job is done.
 
 | Gate | What it does | Status |
 | --- | --- | --- |
-| **Gate 0 — Claude Code hooks** | PreToolUse → `decide()`, PostToolUse → `record()`. Static tool→capability map; shell commands risk-classified deterministically; approval card with five answers and graded responses. | Live (dogfooding) |
+| **Gate 0 — host hooks** | Claude Code PreToolUse → `decide()`, PostToolUse → `record()`. Hermes hook onboarding is available through `zeus connect hermes --check`. Static tool→capability maps; shell commands risk-classified deterministically; approval card with five answers and graded responses. | Live dogfood for Claude Code + Hermes |
 | **Gate 1 — LLM proxy `/v1`** | OpenAI-compatible. Ingress: pre-call budget → HTTP 429, cost attribution per objective, quota-aware model switching (governed). Egress: every `tool_call` decided before release — streamed fragments are buffered whole, denied calls are stripped and replaced with a block notice. Secret-hygiene modes `count / redact / block / ask` with cross-chunk streaming redaction. | Implemented; synthetic conformance |
 | **Gate 2 — MCP gateway** | Downstream tools import as quarantined; review activates; a schema rug-pull re-quarantines; injection findings in descriptions or results taint the session; per-tool budgets. | Implemented; synthetic conformance |
-| **Gate 3 — zeusd Decision API** | `POST /zeus/decide·record`, `GET /zeus/brief` over the proxy port. HMAC pairing, never zero-confirm. hermes: blocking `pre_tool_call` + attenuated child principals (out-of-envelope subagent = DENY). OpenClaw: exec approval relay with durable, TTL-fail-closed parks. | Implemented; pinned-host validation pending (the v2/v3 gates) |
+| **Gate 3 — zeusd Decision API** | `POST /zeus/decide·record`, `GET /zeus/brief` over the proxy port. HMAC pairing, never zero-confirm. hermes: blocking `pre_tool_call` + attenuated child principals (out-of-envelope subagent = DENY) with canary receipt checks. OpenClaw: exec approval relay with durable, TTL-fail-closed parks. | Implemented; pinned-host 95% soak gates still pending |
 | **Gate 4 — egress ring** | Host/path ring checked *before* policy — a ring violation is a DENY receipt, not a silent override. Keys injected only at egress on an allowed decision. Emits [sandbox-runtime](https://github.com/anthropics/sandbox-runtime) profiles from the ring. | Ring live in-process; OS-level enforcement via the srt wrapper is the next milestone |
 
 ## Quickstart (10 minutes)
@@ -148,6 +158,15 @@ zeus approve fs.write --scope session --session-id <session>   # this session
 zeus approve fs.write --scope narrower --path /work/project    # this path, standing
 ```
 
+If a host parks an action, resolve it from the control plane, then re-issue the
+same host action:
+
+```sh
+zeus approvals --pending
+zeus approve --last --confirm
+zeus approve --parked <short-id> --narrow-path /work/project
+```
+
 **5. Inspect what your agent actually did:**
 
 ```sh
@@ -156,12 +175,23 @@ zeus ledger --tail 20          # recent receipts
 zeus ledger --why trust.ev.000042   # the causal chain behind one action
 ```
 
+**6. Add the operator safety rails you need for dogfooding:**
+
+```sh
+zeus tripwire --snapshot       # baseline control-plane file hashes
+zeus tripwire --check          # detect out-of-band changes
+zeus notify --webhook <url>    # deliver pending approval cards
+zeus freeze --reason incident  # deny new decisions until --release
+zeus latency --samples 50      # warm decision latency budget
+```
+
 **Other hosts** go through the proxy and the `/zeus` API:
 
 ```sh
 zeus proxy --upstream https://api.openai.com   # /v1 LLM gate + /zeus decision API (loopback by default)
 zeus pair --approve ZEUS-XXXX                  # pairing is never zero-confirm
 zeus policy --hygiene-mode redact --confirm    # secret hygiene: count | redact | block | ask
+zeus connect hermes --check --port 8788        # hook canary + receipt check
 ```
 
 See [CONNECTING.md](CONNECTING.md) for the Claude Code, hermes-agent, and
@@ -185,6 +215,9 @@ surface lives under `zeus dev` — see [docs/commands.md](docs/commands.md).
 | Policy packs & NL rules | `zeus policy --apply safe-assistant`, `"weekly budget $12"`-style rules, and mode changes are themselves governed, confirmed, and ledgered. |
 | Flight recorder | Hash-chained receipts with causal edges, governed ledger reads (agent view is scoped, masked, audited, and re-tainted), and a coverage metric. |
 | Earned autonomy | Real receipts feed per-capability trust; sustained clean records soften risk and shrink scopes; one schema rug-pull re-quarantines an MCP tool. |
+| Self-protection | Control-plane files, hook settings, broker references, and pairing state are protected above ordinary grants; tripwire snapshots catch out-of-band edits. |
+| Completion gate | Claimed-done Stop/post-task hooks require deterministic evidence for claimed artifacts and test commands. |
+| Operator inbox | Pending asks are inspectable as cards, resolvable by short ID or `--last --confirm`, deliverable by webhook, and freezeable during incidents. |
 | Cognition organs (default-OFF) | Long-term memory writes land as redacted candidates (poisoned candidates store hash + preview only and can never be promoted); skills/plugins install quarantined, hash-pinned, and injection-scanned. |
 | Conformance | 88 frozen scenarios across gates 0–4, governance UX, loop governance, both host adapters, hygiene, remote safety, and receipt coherence. Majors are gated on a *pinned real host*: ≥95% plus a 7-day zero-bypass soak with independent out-of-Zeus measurement. |
 
@@ -195,10 +228,10 @@ local regression evidence, not as proof of production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public unit and scenario suite | `1911` tests passed |
+| Public unit and scenario suite | `1927` tests passed |
 | Conformance scenarios | `88` across P3–P13 + receipt coherence |
 | Lint | `ruff` clean |
-| Package metadata | `zeus-agent==1.0.0a3` (alpha reset; majors are conformance-gated) |
+| Package metadata | `zeus-agent==1.0.0a4` (alpha reset; majors are conformance-gated) |
 | Raw-secret storage proof | byte-level scan: a proposed memory containing a key never reaches the SQLite file unredacted |
 
 **Honest boundary.** The conformance suite is synthetic: contracts are frozen
@@ -212,7 +245,8 @@ non-cooperative host). `/v1` binds loopback by default; non-loopback binds
 refuse to start without issued tokens (`zeus pair --issue-v1-token`, with TTL
 and revocation) or an explicit unsafe flag. Cognition organs are default-OFF.
 No hosted SaaS, browser automation, or third-party production validation is
-claimed.
+claimed. Local dogfood/eval harnesses are intentionally private and ignored;
+only product behavior, public tests, and the boundary rules are committed.
 
 ## Docs
 
@@ -222,6 +256,7 @@ claimed.
 | [Connecting hosts](CONNECTING.md) | Plug Claude Code, hermes-agent, or OpenClaw into the gates |
 | [Commands](docs/commands.md) | Legacy CLI command catalog, now reachable under `zeus dev` |
 | [Docker And OrbStack](docs/docker.md) | Local Docker/OrbStack build, run, smoke-check, and volume instructions |
+| [Private dogfood/eval boundary](docs/private-dogfood-eval-boundary.md) | What stays local, what can become product code, and the staging checks before release |
 | [Security policy](SECURITY.md) | Public security posture and the current alpha boundary |
 | [Changelog](CHANGELOG.md) | Release history, including the pre-refoundation line |
 

@@ -1,5 +1,5 @@
 __all__ = ["ZeusAgent", "__version__"]
-__version__ = "1.0.0a3"
+__version__ = "1.0.0a4"
 
 
 def __getattr__(name: str) -> object:

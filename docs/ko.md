@@ -32,6 +32,7 @@ canonical이며, 핵심 진입 문서(README, CONNECTING)는 한국어 번역을
 | `docs/commands.md` | 레거시 CLI 카탈로그 (`zeus dev`) |
 | `docs/docker.md` | 컨테이너 사용법 |
 | `docs/acs-compat.md` | ACS 매니페스트 읽기 호환 |
+| `docs/private-dogfood-eval-boundary.md` | private live-host dogfood/eval 자산 분리 규칙 |
 | `docs/hermes-*.md`, `docs/live-connection-architecture.md`, `docs/zeus-*-boundary.md`, `docs/zeus-w205-w212-hard-close.md` | **아카이브** — 재창립 이전(v0.x–v6.x) 기록. 파킹된 하네스가 참조하므로 원문 보존. 내용이 README와 다르면 README가 우선 |
 
 ## 한국어 번역 정책
