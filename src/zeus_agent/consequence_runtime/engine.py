@@ -24,6 +24,7 @@ _FAMILY_WHAT: Final[dict[str, tuple[str, str]]] = {
     "mail.send": ("메일을 보냅니다", "외부 수신자(되돌릴 수 없는 발신)"),
     "mcp.": ("외부 MCP 도구를 호출합니다", "해당 MCP 서버가 다루는 시스템"),
     "memory.write": ("에이전트 장기 기억에 내용을 저장합니다", "이후 모든 세션의 판단 근거"),
+    "agent.memory.write": ("에이전트 장기 기억 후보를 저장합니다", "이후 세션의 판단 근거 후보"),
     "skill.install": ("새 스킬/플러그인을 설치합니다", "에이전트가 할 수 있는 일 자체"),
     # absorbed from the hook's card.py registry so consequence is the single
     # source of truth (decide() enforces explainability against THIS table).

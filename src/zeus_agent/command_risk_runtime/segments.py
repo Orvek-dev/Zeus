@@ -92,6 +92,15 @@ def classify_segment(text: str) -> CommandRisk:
     if _is_read_only_python_module_probe(program, tokens[1:]):
         reasons.append("python_module_probe")
         return make_risk(program, SideEffectClass.none, Reversibility.reversible, ActionRisk.low, tuple(reasons))
+    if _is_local_write_python_module(program, tokens[1:]):
+        reasons.append("python_module_local_write")
+        return make_risk(
+            program,
+            SideEffectClass.local_write,
+            Reversibility.compensable,
+            ActionRisk.medium,
+            tuple(reasons),
+        )
     if _is_read_only_pytest_probe(program, tokens[1:]):
         reasons.append("pytest_probe")
         return make_risk(program, SideEffectClass.none, Reversibility.reversible, ActionRisk.low, tuple(reasons))
@@ -153,7 +162,7 @@ def _is_read_only_python_module_probe(program: str, args: list[str]) -> bool:
     if args[1] == "pip":
         return _is_read_only_pip_module_probe(args[2:])
     if args[1] in _SAFE_ZEUS_MODULE_PROBES:
-        return bool(args[2:]) and all(arg in _PROBE_ARGS for arg in args[2:])
+        return _is_safe_zeus_module_probe(_without_fd_redirect_tokens(args[2:]))
     return False
 
 
@@ -185,11 +194,37 @@ def _is_read_only_pip_module_probe(args: list[str]) -> bool:
 
 
 def _pip_arg_is_read_only(arg: str) -> bool:
-    return not arg.startswith("-") or arg in _PIP_READ_ONLY_FLAGS
+    if not arg.startswith("-"):
+        return True
+    flag = arg.split("=", maxsplit=1)[0]
+    return flag in _PIP_READ_ONLY_FLAGS
 
 
 def _is_read_only_command_probe(program: str, args: list[str]) -> bool:
     return program == "command" and len(args) == 2 and args[0] in {"-v", "-V"} and bool(args[1])
+
+
+def _is_safe_zeus_module_probe(args: list[str]) -> bool:
+    if not args:
+        return False
+    if all(arg in _PROBE_ARGS for arg in args):
+        return True
+    if args[-1] not in _PROBE_ARGS:
+        return False
+    return all(not arg.startswith("-") for arg in args[:-1])
+
+
+def _is_local_write_python_module(program: str, args: list[str]) -> bool:
+    return (
+        _probe_program_name(program) in {"python", "python3"}
+        and len(args) >= 2
+        and args[0] == "-m"
+        and args[1] == "compileall"
+    )
+
+
+def _without_fd_redirect_tokens(args: list[str]) -> list[str]:
+    return [arg for arg in args if not re.fullmatch(r"\d?>&\d", arg)]
 
 
 def _classify_git(tokens: list[str]) -> CommandRisk:

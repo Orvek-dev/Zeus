@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Final
 from urllib.parse import urlparse
 
@@ -30,6 +32,19 @@ _TODO: Final = frozenset({"todo", "todos", "todo_list", "update_todo", "task_lis
 _META_READ: Final = frozenset(
     {"skills_list", "skills", "skill_view", "skill_search", "list_skills", "skill_info"}
 )
+_MEMORY_READ: Final = frozenset(
+    {"memory", "memory_read", "memory_search", "search_memory", "recall_memory", "list_memory"}
+)
+_MEMORY_WRITE: Final = frozenset(
+    {"memory_write", "remember", "save_memory", "store_memory", "upsert_memory"}
+)
+_MEMORY_WRITE_INTENTS: Final = frozenset({"write", "save", "remember", "store", "upsert"})
+_MEMORY_WRITE_KEYS: Final = frozenset(
+    {"content", "text", "value", "note", "fact", "entry", "message", "user", "assistant"}
+)
+_MEMORY_READ_ONLY_KEYS: Final = frozenset(
+    {"query", "pattern", "glob", "limit", "offset", "search", "filter"}
+)
 
 _TERMINAL_BY_RISK: Final[dict[tuple[SideEffectClass, Reversibility], str]] = {
     (SideEffectClass.none, Reversibility.reversible): "terminal.run.read",
@@ -58,14 +73,24 @@ def map_hermes_tool_call(tool: str, args: dict[str, JsonValue]) -> MappedHermesC
         return MappedHermesCall("fs.read", _path_args(args))
     if name in _META_READ:
         return MappedHermesCall("fs.read", {})  # read-only host introspection
+    if name in _MEMORY_READ or name in _MEMORY_WRITE:
+        write = (
+            name in _MEMORY_WRITE
+            or _memory_intent(args) in _MEMORY_WRITE_INTENTS
+            or _memory_payload_suggests_write(args)
+        )
+        return MappedHermesCall(
+            "agent.memory.write" if write else "agent.memory.read",
+            _memory_args(args, write=write),
+        )
     if name in _FS_WRITE:
         return MappedHermesCall("fs.write", _path_args(args))
     if name in _WEB:
-        url = str(args.get("url", args.get("query", "")))
+        url = _url_arg(args)
         mapped: dict[str, JsonValue] = {"url": url}
         host = urlparse(url.strip()).hostname
         if host:
-            mapped["network_host"] = host
+            mapped["network_host"] = host.strip()
         return MappedHermesCall("web.fetch", mapped)
     if name in _SEND:
         mapped = {"recipient": str(args.get("to", args.get("recipient", "")))}
@@ -88,4 +113,76 @@ def _path_args(args: dict[str, JsonValue]) -> dict[str, JsonValue]:
         value = args.get(key)
         if isinstance(value, str) and value.strip():
             return {"path": value.strip()}
+    for key in ("directory", "dir", "root", "query", "pattern", "glob"):
+        value = args.get(key)
+        if isinstance(value, str) and _looks_like_path(value):
+            return {"path": value.strip()}
     return {}
+
+
+def _url_arg(args: dict[str, JsonValue]) -> str:
+    for key in ("url", "uri", "href", "link"):
+        value = args.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    urls = args.get("urls")
+    if isinstance(urls, list):
+        for value in urls:
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+    query = args.get("query")
+    if isinstance(query, str) and urlparse(query.strip()).scheme in {"http", "https"}:
+        return query.strip()
+    return ""
+
+
+def _looks_like_path(value: str) -> bool:
+    stripped = value.strip()
+    return bool(
+        stripped
+        and (
+            "/" in stripped
+            or stripped.startswith("~")
+            or stripped.startswith(".")
+            or stripped in {".ssh", ".aws", ".kube", ".gnupg"}
+        )
+    )
+
+
+def _memory_intent(args: dict[str, JsonValue]) -> str:
+    for key in ("action", "operation", "mode", "intent"):
+        value = args.get(key)
+        if isinstance(value, str):
+            return value.strip().lower()
+    return ""
+
+
+def _memory_payload_suggests_write(args: dict[str, JsonValue]) -> bool:
+    if not args:
+        return False
+    keys = {key.strip().lower() for key in args}
+    if keys and keys <= _MEMORY_READ_ONLY_KEYS:
+        return False
+    if keys & _MEMORY_WRITE_KEYS:
+        return True
+    for value in args.values():
+        if isinstance(value, str) and value.strip().startswith(("+", "+user:", "+assistant:")):
+            return True
+    return False
+
+
+def _memory_args(args: dict[str, JsonValue], *, write: bool) -> dict[str, JsonValue]:
+    if not write:
+        return {"operation": "read"}
+    return {
+        "operation": "write",
+        # Never place raw proposed memory in a decision receipt. The dedicated
+        # memory gate owns candidate storage and promotion; the proxy receipt
+        # only needs a stable payload identity for replay/approval matching.
+        "content_hash": _stable_hash(args),
+    }
+
+
+def _stable_hash(value: JsonValue) -> str:
+    material = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()

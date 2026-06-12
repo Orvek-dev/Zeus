@@ -4,6 +4,40 @@ All notable changes to Zeus Agent are recorded here.
 
 ## Unreleased
 
+## v1.0.0-alpha.6 - 2026-06-13
+
+### Fixed
+
+- Added Hermes-aware `memory` mapping at the LLM proxy boundary so host memory
+  reads no longer fall through to conservative `host.tool.*`, and memory writes
+  are parked as `agent.memory.write` with only a stable content hash in
+  receipts.
+- Preserved more Hermes tool evidence by extracting filesystem paths from
+  path-like search/query fields and network hosts from `url`, `urls`, and
+  URL-shaped query arguments.
+- Tightened dogfood command classification for real Hermes probes: read-only
+  `python -m pip` metadata commands, Zeus module help probes, and fd redirects
+  stay low-risk, while `python -m compileall` is classified as a local write
+  instead of an external high-risk action.
+- Hardened exact-payload replay approval under concurrent retries so a parked
+  approval can be consumed once, not twice.
+
+### Changed
+
+- R12 segmented live dogfood now runs each Hermes case against an isolated Zeus
+  home and proxy port, with per-case `/tmp` artifact cleanup and criteria-aware
+  reporting.
+
+### Evidence
+
+- `.venv/bin/python -m pytest -q` passed: `291` tests.
+- `ruff` clean.
+- Live-host eval schema verifier passed for Hermes, Claude Code, and OpenClaw.
+- Hermes R12 segmented dogfood on the final tree: `13/20` pass, memory
+  fall-through `0`, proxy secret findings `0`, and `chain_ok=true` for all
+  cases. Remaining incomplete cases are tracked as live prompt/fixture gaps,
+  not as evidence of successful bypass.
+
 ## v1.0.0-alpha.5 - 2026-06-12
 
 ### Changed

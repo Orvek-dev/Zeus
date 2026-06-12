@@ -270,21 +270,19 @@ class SQLiteControlPlaneStore:
     ) -> Optional[ReplayRow]:
         with self._connect() as connection:
             row = connection.execute(
-                "SELECT token_id, host, session_id, capability_id, payload_hash, "
-                "created_at, expires_at, consumed_at "
-                "FROM replay_authorizations "
+                "UPDATE replay_authorizations SET consumed_at = ? "
+                "WHERE token_id = ("
+                "SELECT token_id FROM replay_authorizations "
                 "WHERE host = ? AND session_id = ? AND capability_id = ? "
                 "AND payload_hash = ? AND consumed_at = '' AND expires_at > ? "
-                "ORDER BY created_at ASC, token_id ASC LIMIT 1",
-                (host, session_id, capability_id, payload_hash, now_iso),
+                "ORDER BY created_at ASC, token_id ASC LIMIT 1"
+                ") "
+                "RETURNING token_id, host, session_id, capability_id, payload_hash, "
+                "created_at, expires_at, consumed_at",
+                (now_iso, host, session_id, capability_id, payload_hash, now_iso),
             ).fetchone()
-            if row is None:
-                return None
-            token_id = str(row[0])
-            connection.execute(
-                "UPDATE replay_authorizations SET consumed_at = ? WHERE token_id = ?",
-                (now_iso, token_id),
-            )
+        if row is None:
+            return None
         return tuple(str(value) for value in row)
 
     def replay_rows(self) -> list[ReplayRow]:

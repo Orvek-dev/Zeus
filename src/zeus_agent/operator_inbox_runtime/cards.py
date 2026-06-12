@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from pydantic import JsonValue
 
-from zeus_agent.trust_loop_runtime import ActionRisk, ParkedAction, Reversibility
+from zeus_agent.trust_loop_runtime import ParkedAction
+
+
+def approval_effect_for(parked: ParkedAction) -> str:
+    return "exact_payload_replay_once"
 
 
 def short_parked_id(parked_action_id: str) -> str:
@@ -12,8 +16,7 @@ def short_parked_id(parked_action_id: str) -> str:
 
 def pending_card(parked: ParkedAction) -> dict[str, JsonValue]:
     action = parked.action
-    hard_risk = action.risk is ActionRisk.high or action.reversibility is Reversibility.irreversible
-    approval_effect = "exact_payload_replay_once" if hard_risk else "once_grant"
+    approval_effect = approval_effect_for(parked)
     return {
         "short_id": short_parked_id(parked.parked_action_id),
         "parked_action_id": parked.parked_action_id,

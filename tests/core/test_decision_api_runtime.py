@@ -177,6 +177,28 @@ def test_secret_path_read_asks_before_host_receives_content(tmp_path: Path) -> N
     assert response.parked_action_id is not None
 
 
+def test_ssh_directory_read_is_sensitive_even_when_directory_not_file(tmp_path: Path) -> None:
+    engine = _engine(tmp_path)
+    request = DecisionRequest(
+        principal_id="agent.llm_proxy",
+        session_id="session.ssh",
+        run_id="run.ssh",
+        capability_id="fs.read",
+        args={"path": "/home/zeus/.ssh"},
+        context=DecisionContext(
+            host=HostKind.hermes,
+            surface=GateSurface.llm_proxy,
+            defer_ask_to_owner=True,
+        ),
+    )
+
+    response = engine.decide(request, now=NOW)
+
+    assert response.decision is TrustDecision.ASK
+    assert response.reason == "sensitive_path_read"
+    assert response.parked_action_id is not None
+
+
 def test_non_secret_path_read_still_auto(tmp_path: Path) -> None:
     engine = _engine(tmp_path)
     response = engine.decide(_request("fs.read", args={"path": "/tmp/hermes-r4b-note.txt"}), now=NOW)
@@ -272,9 +294,9 @@ def test_self_protection_overrides_imported_or_session_grants(tmp_path: Path) ->
         now=NOW,
     )
 
-    assert response.decision is TrustDecision.ASK
+    assert response.decision is TrustDecision.DENY
     assert response.reason == "self_protection_boundary"
-    assert response.parked_action_id is not None
+    assert response.parked_action_id is None
 
 
 def test_grant_never_covers_hard_risk(tmp_path: Path) -> None:

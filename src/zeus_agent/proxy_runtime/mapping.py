@@ -121,6 +121,10 @@ def seed_proxy_capability_store() -> CapabilityStore:
                      "Rewrite a request to a policy-approved alternate model"),
             _builtin("agent.todo.update", VerbClass.transform, SideEffectClass.none, Reversibility.reversible,
                      "Update the host agent's internal task plan"),
+            _builtin("agent.memory.read", VerbClass.fetch, SideEffectClass.none, Reversibility.reversible,
+                     "Read host agent memory through a governed adapter"),
+            _builtin("agent.memory.write", VerbClass.store, SideEffectClass.local_write, Reversibility.compensable,
+                     "Write a long-term memory candidate through a governed adapter"),
             _builtin("fs.read", VerbClass.fetch, SideEffectClass.none, Reversibility.reversible,
                      "Read files and search the workspace"),
             _builtin("fs.write", VerbClass.store, SideEffectClass.local_write, Reversibility.compensable,
@@ -174,4 +178,21 @@ def _path_args(arguments: dict[str, JsonValue]) -> dict[str, JsonValue]:
         value = arguments.get(key)
         if isinstance(value, str) and value.strip():
             return {"path": value.strip()}
+    for key in ("directory", "dir", "root", "query", "pattern", "glob"):
+        value = arguments.get(key)
+        if isinstance(value, str) and _looks_like_path(value):
+            return {"path": value.strip()}
     return {}
+
+
+def _looks_like_path(value: str) -> bool:
+    stripped = value.strip()
+    return bool(
+        stripped
+        and (
+            "/" in stripped
+            or stripped.startswith("~")
+            or stripped.startswith(".")
+            or stripped in {".ssh", ".aws", ".kube", ".gnupg"}
+        )
+    )

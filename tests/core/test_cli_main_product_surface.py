@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import json
+import shlex
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -192,7 +194,7 @@ def test_why_shows_parked_action_timeline(tmp_path: Path) -> None:
     assert result.exit_code == 0
     report = json.loads(result.stdout)
     assert report["parked_action_id"] == asked["parked_action_id"]
-    assert report["approval_effect"] == "once_grant"
+    assert report["approval_effect"] == "exact_payload_replay_once"
     assert "separate operator terminal" in report["operator_note"]
     assert [
         item["kind"]
@@ -281,6 +283,10 @@ def test_status_separates_grants_replays_and_approval_queue(tmp_path: Path) -> N
         runner.invoke(app, ["decide", "--request-json", write_a, "--home", home]).stdout
     )
     runner.invoke(app, ["approve", "--parked", soft_ask["parked_action_id"], "--home", home])
+    runner.invoke(
+        app,
+        ["approve", "fs.write", "--scope", "session", "--session-id", "status.sess", "--home", home],
+    )
 
     hard_ask = json.loads(
         runner.invoke(app, ["decide", "--request-json", hard, "--home", home]).stdout
@@ -303,10 +309,10 @@ def test_status_separates_grants_replays_and_approval_queue(tmp_path: Path) -> N
     assert status["grants"] == {"active": 1, "consumed": 0, "expired": 0, "total": 1}
     assert status["grant_inventory"]["standing"] == status["grants"]
     assert status["grant_inventory"]["replay_authorizations"] == {
-        "active": 1,
+        "active": 2,
         "consumed": 0,
         "expired": 0,
-        "total": 1,
+        "total": 2,
     }
     assert status["approval_queue"] == {
         "pending": 0,
@@ -326,6 +332,28 @@ def test_connect_prints_hook_config(tmp_path: Path) -> None:
     config = json.loads(result.stdout)
     assert "PreToolUse" in config["hooks"]
     assert "PostToolUse" in config["hooks"]
+
+
+def test_connect_hermes_prints_executable_hooks_with_home(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    zeus_bin = bin_dir / "zeus"
+    zeus_bin.write_text("#!/bin/sh\n", encoding="utf-8")
+    zeus_bin.chmod(0o755)
+    monkeypatch.setenv("PATH", "{0}{1}{2}".format(bin_dir, os.pathsep, os.environ.get("PATH", "")))
+    home = tmp_path / "zeus home"
+
+    result = runner.invoke(app, ["connect", "hermes", "--home", str(home)])
+
+    assert result.exit_code == 0
+    patch = json.loads(result.stdout)["config_yaml_patch"]
+    pre = shlex.split(patch["hooks"]["pre_tool_call"][0]["command"])
+    post = shlex.split(patch["hooks"]["post_tool_call"][0]["command"])
+    assert pre == [str(zeus_bin), "hook", "hermes", "--event", "pre", "--home", str(home)]
+    assert post == [str(zeus_bin), "hook", "hermes", "--event", "post", "--home", str(home)]
 
 
 def test_connect_write_merges_settings(tmp_path: Path) -> None:
@@ -375,17 +403,20 @@ def test_parked_ask_cockpit_approve_makes_retry_auto(tmp_path: Path) -> None:
     assert any(p["parked_action_id"] == asked["parked_action_id"] for p in pending)
     assert pending[0]["capability_id"] == "fs.write"
     assert pending[0]["short_id"]
-    assert pending[0]["card"]["approval_effect"] == "once_grant"
+    assert pending[0]["card"]["approval_effect"] == "exact_payload_replay_once"
 
     approved = json.loads(
         runner.invoke(app, ["approve", "--parked", asked["parked_action_id"], "--home", home]).stdout
     )
     assert approved["status"] == "approved"
     assert approved["capability_id"] == "fs.write"
+    assert approved["replay"] == "approved_for_exact_payload_once"
 
     again = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
     assert again["decision"] == "auto"
-    assert again["reason"] == "covered_by_grant_once"
+    assert again["reason"] == "covered_by_replay_once"
+    third = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+    assert third["decision"] == "ask"
 
 
 def test_parked_ask_can_be_resolved_by_last_id(tmp_path: Path) -> None:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import shlex
+
 from pydantic import JsonValue
 
 
@@ -8,6 +10,8 @@ def hermes_connect_bundle(
     zeusd_url: str = "http://127.0.0.1:8788",
     pair_code: str = "<run pairing first>",
     default_model: str = "gpt-5.4",
+    zeus_bin: str = "zeus",
+    zeus_home: str | None = None,
 ) -> dict[str, JsonValue]:
     """Everything a hermes config needs to ride all three gates, in the schema
     hermes v0.16.x actually accepts.
@@ -21,6 +25,8 @@ def hermes_connect_bundle(
       ``no-key-required`` upstream; a named provider with ``key_env`` passes the
       real upstream key through Zeus instead.
     """
+    pre_hook = _hook_command(zeus_bin=zeus_bin, event="pre", zeus_home=zeus_home)
+    post_hook = _hook_command(zeus_bin=zeus_bin, event="post", zeus_home=zeus_home)
     return {
         "config_yaml_patch": {
             "providers": {
@@ -39,10 +45,10 @@ def hermes_connect_bundle(
                     "x-zeus-principal": "agent.hermes",
                 },
             },
-            "mcp_servers": {"zeus-gateway": {"command": ["zeus", "gateway"]}},
+            "mcp_servers": {"zeus-gateway": {"command": [zeus_bin, "gateway"]}},
             "hooks": {
-                "pre_tool_call": [{"command": "zeus hook hermes --event pre", "matcher": "*"}],
-                "post_tool_call": [{"command": "zeus hook hermes --event post", "matcher": "*"}],
+                "pre_tool_call": [{"command": pre_hook, "matcher": "*"}],
+                "post_tool_call": [{"command": post_hook, "matcher": "*"}],
             },
         },
         "allowlist": {
@@ -62,3 +68,10 @@ def hermes_connect_bundle(
             zeusd_url
         ),
     }
+
+
+def _hook_command(*, zeus_bin: str, event: str, zeus_home: str | None) -> str:
+    parts = [zeus_bin, "hook", "hermes", "--event", event]
+    if zeus_home is not None:
+        parts.extend(["--home", zeus_home])
+    return shlex.join(parts)

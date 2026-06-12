@@ -145,9 +145,8 @@ def _resolve_parked(
         return
     action = parked.action
     hard_risk = action.risk is ActionRisk.high or action.reversibility is Reversibility.irreversible
-    if hard_risk:
-        if narrow_path is not None:
-            raise typer.BadParameter("--narrow-path cannot authorize replay-only hard-risk actions")
+    replay_only = _approval_effect(parked) == "exact_payload_replay_once"
+    if replay_only and narrow_path is None:
         now = datetime.now(timezone.utc)
         token_id = "replay.{0}.{1}".format(
             action.capability_id.replace(".", "_"),
@@ -179,6 +178,8 @@ def _resolve_parked(
             }
         )
         return
+    if hard_risk and narrow_path is not None:
+        raise typer.BadParameter("--narrow-path cannot authorize replay-only hard-risk actions")
     path = _narrowed_path(action_path=action.payload.get("path"), narrow_path=narrow_path)
     grant_scope = GrantScope.narrower if narrow_path is not None else GrantScope.once
     grant = issue_grant(
@@ -217,8 +218,6 @@ def _narrowed_path(*, action_path: object, narrow_path: str | None) -> str | Non
 
 
 def _approval_effect(parked: ParkedAction) -> str:
-    from zeus_agent.trust_loop_runtime import ActionRisk, Reversibility
+    from zeus_agent.operator_inbox_runtime import approval_effect_for
 
-    action = parked.action
-    hard_risk = action.risk is ActionRisk.high or action.reversibility is Reversibility.irreversible
-    return "exact_payload_replay_once" if hard_risk else "once_grant"
+    return approval_effect_for(parked)

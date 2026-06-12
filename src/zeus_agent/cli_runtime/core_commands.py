@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
 import typer
 
-from .context import echo_json, state_for_home
+from .context import default_home, echo_json, state_for_home
 
 
 def register_core_commands(app: typer.Typer) -> None:
@@ -85,7 +86,13 @@ def register_core_commands(app: typer.Typer) -> None:
             if check:
                 echo_json(_hermes_preflight(port=port, home=home))
                 return
-            echo_json(hermes_connect_bundle())
+            hermes_home = home if home is not None else default_home()
+            echo_json(
+                hermes_connect_bundle(
+                    zeus_bin=_resolved_zeus_bin(),
+                    zeus_home=str(hermes_home.expanduser().resolve()),
+                )
+            )
             return
         if host == "openclaw":
             from zeus_agent.adapters.openclaw import openclaw_connect_bundle
@@ -169,6 +176,16 @@ def register_core_commands(app: typer.Typer) -> None:
             ExecutionOutcome(status=parsed_status, cost_actual_units=max(cost, 0), notes=note),
         )
         echo_json({"outcome_record_id": outcome_record_id, "caused_by": receipt})
+
+
+def _resolved_zeus_bin() -> str:
+    found = shutil.which("zeus")
+    if found is not None:
+        return str(Path(found).resolve())
+    candidate = Path(sys.argv[0])
+    if candidate.name == "zeus":
+        return str(candidate.resolve())
+    return "zeus"
 
 
 def _hermes_preflight(*, port: int, home: Path | None) -> dict:

@@ -283,7 +283,7 @@ def test_proxy_maps_hermes_meta_tools_without_ask_storm(tmp_path: Path) -> None:
     body = {"model": "gpt-5.4", "messages": [{"role": "user", "content": "go"}]}
     session = ProxySession(session_id="h.proxy", host=HostKind.hermes)
 
-    for tool in ("search_files", "skills_list", "skill_view", "todo"):
+    for tool in ("search_files", "skills_list", "skill_view", "todo", "memory"):
         result = proxy.chat_completion(body, session, lambda _b, t=tool: _completion(t))
         assert result.released_tool_calls == 1, "hermes read/meta tool must be released, not asked"
         assert result.blocked_tool_calls == 0
@@ -295,7 +295,156 @@ def test_proxy_maps_hermes_meta_tools_without_ask_storm(tmp_path: Path) -> None:
     }
     assert "fs.read" in decisions
     assert "agent.todo.update" in decisions
+    assert "agent.memory.read" in decisions
     assert not any(c.startswith("host.tool.") for c in decisions), "no conservative fall-through"
+
+
+def test_proxy_maps_hermes_memory_write_without_raw_content(tmp_path: Path) -> None:
+    engine, store = _engine(tmp_path)
+    proxy = LlmProxyEngine(engine=engine, store=store)
+    body = {"model": "gpt-5.4", "messages": [{"role": "user", "content": "go"}]}
+    session = ProxySession(session_id="h.memory", host=HostKind.hermes)
+
+    def _completion(arguments: str) -> dict:
+        return {
+            "id": "c",
+            "object": "chat.completion",
+            "model": "gpt-5.4",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "t",
+                                "type": "function",
+                                "function": {
+                                    "name": "memory",
+                                    "arguments": arguments,
+                                },
+                            }
+                        ],
+                    },
+                    "finish_reason": "tool_calls",
+                }
+            ],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 5},
+        }
+
+    payloads = (
+        '{"operation":"write","content":"operator secret note"}',
+        '{"content":"operator secret note"}',
+        '{"user":"operator secret note"}',
+    )
+    for payload in payloads:
+        result = proxy.chat_completion(body, session, lambda _body, raw=payload: _completion(raw))
+        assert result.blocked_tool_calls == 1
+
+    decisions = [
+        json.loads(str(r["payload_json"]))
+        for r in engine.recorder.ledger.records()
+        if str(r["kind"]) == "decision_receipt"
+    ]
+    memory_decisions = [item for item in decisions if item.get("capability_id") == "agent.memory.write"]
+    assert len(memory_decisions) == len(payloads)
+    for memory_decision in memory_decisions:
+        assert memory_decision["decision"] == "ask"
+        assert memory_decision["args"]["operation"] == "write"
+        assert "content_hash" in memory_decision["args"]
+    assert "operator secret note" not in json.dumps(memory_decisions, ensure_ascii=False)
+
+
+def test_proxy_maps_hermes_query_only_memory_to_read(tmp_path: Path) -> None:
+    engine, store = _engine(tmp_path)
+    proxy = LlmProxyEngine(engine=engine, store=store)
+    body = {"model": "gpt-5.4", "messages": [{"role": "user", "content": "go"}]}
+    session = ProxySession(session_id="h.memory.read", host=HostKind.hermes)
+
+    def _completion() -> dict:
+        return {
+            "id": "c",
+            "object": "chat.completion",
+            "model": "gpt-5.4",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "t",
+                                "type": "function",
+                                "function": {
+                                    "name": "memory",
+                                    "arguments": '{"query":"project preferences","limit":3}',
+                                },
+                            }
+                        ],
+                    },
+                    "finish_reason": "tool_calls",
+                }
+            ],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 5},
+        }
+
+    result = proxy.chat_completion(body, session, lambda _body: _completion())
+
+    assert result.released_tool_calls == 1
+    decisions = [
+        json.loads(str(r["payload_json"]))
+        for r in engine.recorder.ledger.records()
+        if str(r["kind"]) == "decision_receipt"
+    ]
+    memory_decision = [item for item in decisions if item.get("capability_id") == "agent.memory.read"][-1]
+    assert memory_decision["decision"] == "auto"
+
+
+def test_proxy_maps_hermes_secret_search_path_to_sensitive_ask(tmp_path: Path) -> None:
+    engine, store = _engine(tmp_path)
+    proxy = LlmProxyEngine(engine=engine, store=store)
+    body = {"model": "gpt-5.4", "messages": [{"role": "user", "content": "go"}]}
+    session = ProxySession(session_id="h.secret", host=HostKind.hermes)
+
+    def _completion(arguments: str) -> dict:
+        return {
+            "id": "c",
+            "object": "chat.completion",
+            "model": "gpt-5.4",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "t",
+                                "type": "function",
+                                "function": {"name": "search_files", "arguments": arguments},
+                            }
+                        ],
+                    },
+                    "finish_reason": "tool_calls",
+                }
+            ],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 5},
+        }
+
+    for arguments in ('{"path": "/home/zeus/.ssh"}', '{"query": "/home/zeus/.ssh"}'):
+        result = proxy.chat_completion(body, session, lambda _body, raw=arguments: _completion(raw))
+        assert result.blocked_tool_calls == 1
+
+    decisions = [
+        json.loads(str(r["payload_json"]))
+        for r in engine.recorder.ledger.records()
+        if str(r["kind"]) == "decision_receipt"
+    ]
+    sensitive = [item for item in decisions if item.get("reason") == "sensitive_path_read"]
+    assert len(sensitive) == 2
+    assert all(item["decision"] == "ask" for item in sensitive)
 
 
 def test_proxy_maps_hermes_web_tools_to_web_fetch(tmp_path: Path) -> None:
@@ -304,7 +453,7 @@ def test_proxy_maps_hermes_web_tools_to_web_fetch(tmp_path: Path) -> None:
     body = {"model": "gpt-5.4", "messages": [{"role": "user", "content": "go"}]}
     session = ProxySession(session_id="h.web", host=HostKind.hermes)
 
-    def _completion(tool_name: str) -> dict:
+    def _completion(tool_name: str, arguments: str) -> dict:
         return {
             "id": "c",
             "object": "chat.completion",
@@ -321,7 +470,7 @@ def test_proxy_maps_hermes_web_tools_to_web_fetch(tmp_path: Path) -> None:
                                 "type": "function",
                                 "function": {
                                     "name": tool_name,
-                                    "arguments": '{"url": "https://example.com"}',
+                                    "arguments": arguments,
                                 },
                             }
                         ],
@@ -332,8 +481,17 @@ def test_proxy_maps_hermes_web_tools_to_web_fetch(tmp_path: Path) -> None:
             "usage": {"prompt_tokens": 5, "completion_tokens": 5},
         }
 
-    for tool_name in ("web_extract", "browser_navigate"):
-        result = proxy.chat_completion(body, session, lambda _body, tool=tool_name: _completion(tool))
+    cases = (
+        ("web_extract", '{"url": "https://example.com"}'),
+        ("web_extract", '{"urls": ["https://example.org/a"]}'),
+        ("browser_navigate", '{"query": "https://docs.example.net/page"}'),
+    )
+    for tool_name, arguments in cases:
+        result = proxy.chat_completion(
+            body,
+            session,
+            lambda _body, tool=tool_name, raw=arguments: _completion(tool, raw),
+        )
         assert result.released_tool_calls == 1
         assert result.blocked_tool_calls == 0
     decisions = [
@@ -341,7 +499,12 @@ def test_proxy_maps_hermes_web_tools_to_web_fetch(tmp_path: Path) -> None:
         for r in engine.recorder.ledger.records()
         if str(r["kind"]) == "decision_receipt"
     ]
-    assert any(item.get("capability_id") == "web.fetch" for item in decisions)
+    web_decisions = [item for item in decisions if item.get("capability_id") == "web.fetch"]
+    assert {item["args"].get("network_host") for item in web_decisions} >= {
+        "example.com",
+        "example.org",
+        "docs.example.net",
+    }
     assert all(not str(item.get("capability_id", "")).startswith("host.tool.") for item in decisions)
 
 
@@ -422,7 +585,10 @@ def test_hook_owned_host_does_not_defer_side_effects_until_hook_block_is_proven(
 
 # ------------------------------- D6: connect bundle matches the live hermes schema
 def test_hermes_connect_bundle_emits_shell_hooks_and_named_provider() -> None:
-    bundle = hermes_connect_bundle()
+    bundle = hermes_connect_bundle(
+        zeus_bin="/usr/local/bin/zeus",
+        zeus_home="/tmp/zeus-hermes",
+    )
     patch = bundle["config_yaml_patch"]
     # named provider (not a bare base_url) so the real upstream key is passed,
     # not hermes' loopback `no-key-required` placeholder
@@ -434,8 +600,14 @@ def test_hermes_connect_bundle_emits_shell_hooks_and_named_provider() -> None:
     assert session_from_headers(headers).host is HostKind.hermes
     # SHELL hooks (a list of {command}), the schema hermes v0.16.x accepts
     pre = patch["hooks"]["pre_tool_call"]
-    assert isinstance(pre, list) and pre[0]["command"] == "zeus hook hermes --event pre"
+    assert (
+        isinstance(pre, list)
+        and pre[0]["command"]
+        == "/usr/local/bin/zeus hook hermes --event pre --home /tmp/zeus-hermes"
+    )
     post = patch["hooks"]["post_tool_call"]
-    assert post[0]["command"] == "zeus hook hermes --event post"
+    assert post[0]["command"] == (
+        "/usr/local/bin/zeus hook hermes --event post --home /tmp/zeus-hermes"
+    )
     assert "zeus pair --approve" in str(bundle["pairing"]["human_step"])
     assert "--hook-owned-host hermes" in str(bundle["proxy_note"])

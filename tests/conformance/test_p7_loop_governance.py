@@ -7,10 +7,14 @@ hours, drift report). Pre-call enforcement, never after-the-fact alerts.
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from typer.testing import CliRunner
+
 from zeus_agent.adapters.claude_code_hook import ControlPlaneState
+from zeus_agent.cli_main import app
 from zeus_agent.decision_api_runtime import (
     DecisionContext,
     DecisionRequest,
@@ -40,6 +44,7 @@ from zeus_agent.trust_loop_runtime import (
 )
 
 NOW = datetime(2026, 6, 11, 14, 0, tzinfo=timezone.utc)
+runner = CliRunner()
 
 
 def _request(
@@ -136,6 +141,45 @@ def test_retried_ask_supersedes_its_prior_park(tmp_path: Path) -> None:
     pending = store.queue_rows(status="pending")
     fs_writes = [r for r in pending if "fs_write" in r[1] or "fs.write" in r[2]]
     assert len(fs_writes) == 1, "retries of the same ask must supersede, not accumulate"
+
+
+def test_loop_cap_approval_issues_exact_replay_not_standing_grant(tmp_path: Path) -> None:
+    engine, _store, _state = _engine(tmp_path)
+    engine.governors.loop._max_iterations = 1  # noqa: SLF001 (tight cap for the test)
+    request = _request(
+        "llm.generate",
+        run_id="run.llm-cap",
+        args={"model": "gpt-5.4", "estimated_units": 1},
+    )
+
+    first = engine.decide(request)
+    assert first.decision is TrustDecision.AUTO
+    asked = engine.decide(request)
+    assert asked.decision is TrustDecision.ASK
+    assert asked.reason == "loop_iteration_cap"
+    assert asked.parked_action_id is not None
+
+    approved = json.loads(
+        runner.invoke(
+            app,
+            [
+                "approve",
+                "--parked",
+                asked.parked_action_id,
+                "--home",
+                str(tmp_path / "zeus"),
+            ],
+        ).stdout
+    )
+    assert approved["replay"] == "approved_for_exact_payload_once"
+    assert "grant_id" not in approved
+
+    retried = engine.decide(request)
+    assert retried.decision is TrustDecision.AUTO
+    assert retried.reason == "covered_by_replay_once"
+    again = engine.decide(request)
+    assert again.decision is TrustDecision.ASK
+    assert again.reason == "loop_iteration_cap"
 
 
 # -------------------------------------------------------------- deadman-demotes

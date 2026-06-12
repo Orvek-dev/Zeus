@@ -24,7 +24,7 @@ from zeus_agent.capability_registry_runtime import (
     VerbClass,
 )
 from zeus_agent.governor_runtime import GovernorBank
-from zeus_agent.graded_approval_runtime import GrantScope, GrantStore
+from zeus_agent.graded_approval_runtime import GrantStore
 from zeus_agent.self_protection_runtime import SelfProtectionPolicy
 from zeus_agent.taint_runtime import (
     SessionTaintTracker,
@@ -278,7 +278,7 @@ class ZeusDecisionEngine:
             args=args,
         )
         if self_protection_reason is not None and decision is not TrustDecision.DENY:
-            decision, reason, downgradable = TrustDecision.ASK, self_protection_reason, False
+            decision, reason, downgradable = TrustDecision.DENY, self_protection_reason, False
 
         if assessment.forced_decision is TrustDecision.ASK and decision is not TrustDecision.DENY:
             decision, reason, downgradable = TrustDecision.ASK, assessment.reasons[0], False
@@ -333,8 +333,7 @@ class ZeusDecisionEngine:
             and explainable
         ):
             decision, reason = TrustDecision.AUTO, "covered_by_grant_{0}".format(grant.scope.value)
-            if not _forward_once_grant_to_owner(request, record, grant.scope):
-                self.grants.consume(grant.grant_id)
+            self.grants.consume(grant.grant_id)
 
         if decision is TrustDecision.ASK and self.replay_authorizations is not None:
             replay = self.replay_authorizations.consume(
@@ -548,19 +547,6 @@ def _scope_violation(
         if network_host not in set(grant.network_hosts):
             return "host_outside_envelope_scope"
     return None
-
-
-def _forward_once_grant_to_owner(
-    request: DecisionRequest,
-    record: CapabilityRecord,
-    scope: GrantScope,
-) -> bool:
-    return (
-        request.context.defer_ask_to_owner
-        and request.context.surface.value == "llm_proxy"
-        and record.side_effect is not SideEffectClass.none
-        and scope is GrantScope.once
-    )
 
 
 def _redact_args(args: dict[str, JsonValue]) -> dict[str, JsonValue]:

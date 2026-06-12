@@ -7,12 +7,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.5-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.6-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-283%20passed-1f883d">
-  <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-291%20passed-1f883d">
+  <img alt="Conformance" src="https://img.shields.io/badge/conformance-102%20tests-8250df">
 </p>
 
 <p align="center">
@@ -215,7 +215,7 @@ Claude Code · hermes-agent · OpenClaw 연결 안내는
 | 완료 게이트 | Stop/post-task의 완료 주장은 선언 산출물과 테스트 명령에 대한 결정론적 증거를 요구한다. |
 | 오퍼레이터 인박스 | 대기 중인 ask는 카드로 검사하고, 짧은 ID나 `--last --confirm`으로 해결하며, 웹훅 전달과 incident freeze를 지원한다. |
 | 인지 장기 (기본 OFF) | 장기 기억 쓰기는 redact된 후보로만 저장(오염된 후보는 hash+미리보기만 남고 영구 승격 불가); 스킬/플러그인 설치는 격리·해시 고정·인젝션 스캔 후에만 활성화. |
-| 컨포먼스 | 게이트 0–4, 거버넌스 UX, 루프 거버넌스, 두 호스트 어댑터, 위생, 원격 안전, 영수증 정합성에 걸친 88개 동결 시나리오. 메이저 버전은 **고정된 실호스트**에서 95% 이상 + Zeus 밖 독립 계측 + 7일 무우회 소크로만 열린다. |
+| 컨포먼스 | 게이트 0–4, 거버넌스 UX, 루프 거버넌스, 두 호스트 어댑터, 위생, 원격 안전, 영수증 정합성에 걸친 102개 동결 테스트. 메이저 버전은 **고정된 실호스트**에서 95% 이상 + Zeus 밖 독립 계측 + 7일 무우회 소크로만 열린다. |
 
 ## Evidence
 
@@ -224,10 +224,10 @@ Claude Code · hermes-agent · OpenClaw 연결 안내는
 
 | 증거 표면 | 현재 결과 |
 | --- | --- |
-| 공개 제품 스위트 | `283`개 테스트 통과 (`tests/core` + `tests/conformance`) |
-| 컨포먼스 시나리오 | P3–P13 + 영수증 정합성에 걸쳐 `88`개 |
+| 공개 제품 스위트 | `291`개 테스트 통과 (`tests/core` + `tests/conformance`) |
+| 컨포먼스 테스트 | P3–P13 + 영수증 정합성에 걸쳐 `102`개 |
 | 린트 | `ruff` 클린 |
-| 패키지 메타데이터 | `zeus-agent==1.0.0a5` (알파 리셋; 메이저는 컨포먼스 게이트) |
+| 패키지 메타데이터 | `zeus-agent==1.0.0a6` (알파 리셋; 메이저는 컨포먼스 게이트) |
 | 원시 비밀 저장 증명 | 바이트 수준 스캔: 키가 담긴 기억 후보가 SQLite 파일에 마스킹 없이 닿지 않음 |
 
 **정직한 경계.** 컨포먼스는 합성입니다 — 시뮬레이션된 호스트에 대해 계약을

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -59,7 +61,7 @@ def test_hermes_hook_uses_tool_input_for_path_payload(tmp_path: Path) -> None:
     assert pending[0]["payload"] == {"path": "/tmp/dogfood-note.txt"}
 
 
-def test_proxy_approval_hands_off_once_to_hermes_hook(tmp_path: Path) -> None:
+def test_proxy_approval_replays_once_at_first_releasing_gate(tmp_path: Path) -> None:
     home = str(tmp_path / "zeus")
     proxy_req = _decision_request(
         session_id="llm-proxy.default",
@@ -75,6 +77,7 @@ def test_proxy_approval_hands_off_once_to_hermes_hook(tmp_path: Path) -> None:
         runner.invoke(app, ["approve", "--parked", asked["parked_action_id"], "--home", home]).stdout
     )
     assert approved["status"] == "approved"
+    assert approved["replay"] == "approved_for_exact_payload_once"
 
     wrong_hook_req = _decision_request(
         session_id="20260611_154742_0066de",
@@ -89,7 +92,9 @@ def test_proxy_approval_hands_off_once_to_hermes_hook(tmp_path: Path) -> None:
 
     proxy_retry = json.loads(runner.invoke(app, ["decide", "--request-json", proxy_req, "--home", home]).stdout)
     assert proxy_retry["decision"] == "auto"
-    assert proxy_retry["reason"] == "covered_by_grant_once"
+    assert proxy_retry["reason"] == "covered_by_replay_once"
+    grants = json.loads(runner.invoke(app, ["approvals", "--home", home]).stdout)
+    assert grants == []
 
     hook_req = _decision_request(
         session_id="20260611_154742_0066de",
@@ -98,8 +103,39 @@ def test_proxy_approval_hands_off_once_to_hermes_hook(tmp_path: Path) -> None:
         path="/tmp/dogfood-note.txt",
     )
     hook_retry = json.loads(runner.invoke(app, ["decide", "--request-json", hook_req, "--home", home]).stdout)
-    assert hook_retry["decision"] == "auto"
-    assert hook_retry["reason"] == "covered_by_grant_once"
+    assert hook_retry["decision"] == "ask"
+
+
+def test_replay_token_consumes_once_under_concurrent_proxy_retries(tmp_path: Path) -> None:
+    home_path = tmp_path / "zeus"
+    home = str(home_path)
+    proxy_req = _decision_request(
+        session_id="llm-proxy.default",
+        run_id="run.proxy.llmproxydefa",
+        surface="llm_proxy",
+        path="/tmp/race-once.txt",
+        defer_ask_to_owner=True,
+    )
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", proxy_req, "--home", home]).stdout)
+    assert asked["decision"] == "ask"
+    approved = json.loads(
+        runner.invoke(app, ["approve", "--parked", asked["parked_action_id"], "--home", home]).stdout
+    )
+    assert approved["replay"] == "approved_for_exact_payload_once"
+
+    request = DecisionRequest.model_validate_json(proxy_req)
+    barrier = threading.Barrier(2)
+
+    def _retry() -> str:
+        engine = ControlPlaneState(home_path).build_engine(capabilities=seed_proxy_capability_store())
+        barrier.wait(timeout=5)
+        return engine.decide(request).reason
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        reasons = sorted(pool.map(lambda _idx: _retry(), range(2)))
+
+    assert reasons.count("covered_by_replay_once") == 1
+    assert len(reasons) == 2
 
 
 def test_long_lived_proxy_engine_reloads_approval_grants(tmp_path: Path) -> None:

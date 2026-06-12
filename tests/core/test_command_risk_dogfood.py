@@ -38,6 +38,10 @@ def test_dogfood_python_module_diagnostics_stay_read_only() -> None:
         "python -m src.zeus_agent --help",
         "python -m pip show zeus-agent || true",
         "python -m pip list && printf '\\n---\\n' && python -m pip check || true",
+        "python -m pip show zeus-agent pytest hatchling 2>/dev/null || true && "
+        "printf '\\n---\\n' && python -m pip list --format=columns | head -40",
+        "python -m zeus_agent.cli_main --help 2>&1 || true && printf '\\n---\\n' && "
+        "python -m zeus_agent.cli_main connect --help 2>&1 || true",
         "python --version && printf '\\n---\\n' && python -m pytest --version && "
         "printf '\\n---\\n' && python -m zeus_agent --help",
         "pwd && printf '\\n---\\n' && git status --short --branch && printf '\\n---\\n' && "
@@ -49,3 +53,12 @@ def test_dogfood_python_module_diagnostics_stay_read_only() -> None:
         assert risk.side_effect is SideEffectClass.none, command
         assert risk.reversibility is Reversibility.reversible, command
         assert risk.risk is ActionRisk.low, command
+
+
+def test_compileall_is_local_write_not_external() -> None:
+    risk = classify_command("python -m compileall -q src")
+
+    assert risk.side_effect is SideEffectClass.local_write
+    assert risk.reversibility is Reversibility.compensable
+    assert risk.risk is ActionRisk.medium
+    assert "python_module_local_write" in risk.reasons

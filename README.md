@@ -7,12 +7,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.5-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.6-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-283%20passed-1f883d">
-  <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-291%20passed-1f883d">
+  <img alt="Conformance" src="https://img.shields.io/badge/conformance-102%20tests-8250df">
 </p>
 
 <p align="center">
@@ -220,7 +220,7 @@ product CLI or release evidence.
 | Completion gate | Claimed-done Stop/post-task hooks require deterministic evidence for claimed artifacts and test commands. |
 | Operator inbox | Pending asks are inspectable as cards, resolvable by short ID or `--last --confirm`, deliverable by webhook, and freezeable during incidents. |
 | Cognition organs (default-OFF) | Long-term memory writes land as redacted candidates (poisoned candidates store hash + preview only and can never be promoted); skills/plugins install quarantined, hash-pinned, and injection-scanned. |
-| Conformance | 88 frozen scenarios across gates 0–4, governance UX, loop governance, both host adapters, hygiene, remote safety, and receipt coherence. Majors are gated on a *pinned real host*: ≥95% plus a 7-day zero-bypass soak with independent out-of-Zeus measurement. |
+| Conformance | 102 frozen tests across gates 0–4, governance UX, loop governance, both host adapters, hygiene, remote safety, and receipt coherence. Majors are gated on a *pinned real host*: ≥95% plus a 7-day zero-bypass soak with independent out-of-Zeus measurement. |
 
 ## Evidence
 
@@ -229,10 +229,10 @@ local regression evidence, not as proof of production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public product suite | `283` tests passed (`tests/core` + `tests/conformance`) |
-| Conformance scenarios | `88` across P3–P13 + receipt coherence |
+| Public product suite | `291` tests passed (`tests/core` + `tests/conformance`) |
+| Conformance tests | `102` across P3–P13 + receipt coherence |
 | Lint | `ruff` clean |
-| Package metadata | `zeus-agent==1.0.0a5` (alpha reset; majors are conformance-gated) |
+| Package metadata | `zeus-agent==1.0.0a6` (alpha reset; majors are conformance-gated) |
 | Raw-secret storage proof | byte-level scan: a proposed memory containing a key never reaches the SQLite file unredacted |
 
 **Honest boundary.** The conformance suite is synthetic: contracts are frozen
