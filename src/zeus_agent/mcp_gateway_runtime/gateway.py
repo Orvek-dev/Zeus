@@ -302,7 +302,8 @@ class McpGateway:
                 ok=False,
                 error=(
                     "[Zeus] approval required: {0} (parked: {1}); "
-                    "re-issue after the operator approves".format(
+                    "operator resolves this in Zeus control tower or a separate terminal, "
+                    "then re-issue the same request".format(
                         response.reason, response.parked_action_id
                     )
                 ),

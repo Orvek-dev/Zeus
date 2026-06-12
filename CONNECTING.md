@@ -32,16 +32,28 @@ Every tool call now flows through `decide()`; outcomes flow back through
 ## hermes-agent (blocking pre_tool_call hook + proxy + gateway)
 
 ```
-zeus connect hermes      # prints the config.yaml patch + pairing steps
+zeus connect hermes          # prints the config.yaml patch + pairing steps
+zeus connect hermes --check  # preflight: proxy up / home ready / manual checklist
 ```
 
-- `model.base_url` → `http://127.0.0.1:8788/v1` (cost metering, budget 429,
-  tool_call interception)
-- `pre_tool_call` hook → `POST /zeus/decide` (pairing-signed, blocking)
-- `mcp_servers` → `zeus gateway` (quarantine, rug-pull defense)
+- **Named provider, not a bare base_url.** The patch sets a `providers.zeus`
+  entry (`api: http://127.0.0.1:8788/v1`, `key_env: OPENAI_API_KEY`) and
+  `model.provider: zeus`. A bare loopback `base_url` makes hermes treat Zeus as
+  a keyless local LLM and send `no-key-required` upstream. The patch also sets
+  `model.default_headers.x-zeus-host: hermes`, which is how the `/v1` proxy
+  selects the Hermes tool catalog.
+- **Shell hooks** (the schema hermes v0.16.x accepts): `pre_tool_call` /
+  `post_tool_call` run `zeus hook hermes --event pre|post` (JSON on stdin,
+  decision JSON on stdout). Allowlist them once: `hermes hooks doctor`.
+- `mcp_servers` → `zeus gateway` (quarantine, rug-pull defense).
+- Run the proxy with `--hook-owned-host hermes` so the tool_call gate **defers
+  a soft ask to the blocking hook** — you are asked once, not twice.
 - Subagents are attenuated child principals: out-of-envelope is **denied**.
 - Session recovery: `GET /zeus/brief?session_id=...` returns the receipt
   timeline — scoped, masked, ledgered, and tagged untrusted.
+- A parked ASK is resolvable: `zeus approvals --pending` then
+  `zeus approve --parked <id>` (a soft ask becomes a one-time pass; hard-risk
+  is approved per-instance, never licensed).
 
 ## OpenClaw (proxy-primary + exec approval relay)
 

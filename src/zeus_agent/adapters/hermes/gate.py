@@ -37,6 +37,8 @@ class HermesGate:
         session_id = _text(payload.get("session_id")) or "hermes.default"
         tool = _text(payload.get("tool")) or _text(payload.get("tool_name")) or "unknown"
         args = payload.get("args")
+        if not isinstance(args, dict):
+            args = payload.get("tool_input")
         args_dict = args if isinstance(args, dict) else {}
         agent_id = _text(payload.get("agent_id"))
         parent_agent_id = _text(payload.get("parent_agent_id"))
@@ -72,16 +74,11 @@ class HermesGate:
             governed=True,
             decision_receipt_record_id=response.receipt_id,
         )
-        # hermes' hook is blocking: allow / block are terminal; "ask" lets the
-        # hook pack use the host-native prompt (sync surface, GAP-3 resolution)
-        # while the parked action keeps the fail-closed TTL on our side.
         if response.decision in {TrustDecision.AUTO, TrustDecision.NOTIFY}:
             action = "allow"
-        elif response.decision is TrustDecision.DENY:
-            action = "block"
         else:
-            action = "ask"
-        return {
+            action = "block"
+        result: dict[str, JsonValue] = {
             "action": action,
             "reason": "[Zeus] {0}: {1}".format(response.decision.value, response.reason),
             "capability_id": mapped.capability_id,
@@ -89,6 +86,13 @@ class HermesGate:
             "parked_action_id": response.parked_action_id,
             "principal_id": principal_id,
         }
+        if response.decision is TrustDecision.ASK:
+            result["retry"] = "reissue_after_operator_replay_approval"
+            result["operator_hint"] = (
+                "resolve in Zeus control tower or a separate operator terminal; "
+                "do not paste Zeus commands into Hermes"
+            )
+        return result
 
     def post_tool_call(self, payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
         receipt_id = _text(payload.get("receipt_id"))

@@ -16,6 +16,10 @@ _FS_READ: Final = frozenset({"read_file", "file_read", "list_files", "search_fil
 _FS_WRITE: Final = frozenset({"write_file", "file_write", "edit_file", "create_file"})
 _WEB: Final = frozenset({"web_search", "fetch_url", "browser", "http_request"})
 _SEND: Final = frozenset({"send_message", "send_email", "post_message"})
+_TODO: Final = frozenset({"todo", "todos", "todo_list", "update_todo", "task_list"})
+_META_READ: Final = frozenset(
+    {"skills_list", "skills", "skill_view", "skill_search", "list_skills", "skill_info"}
+)
 
 _TERMINAL_BY_RISK: Final[dict[tuple[SideEffectClass, Reversibility], str]] = {
     (SideEffectClass.none, Reversibility.reversible): "terminal.run.read",
@@ -42,6 +46,8 @@ def map_hermes_tool_call(tool: str, args: dict[str, JsonValue]) -> MappedHermesC
         return MappedHermesCall(capability_id, {"command": command, "command_risk": list(risk.reasons)})
     if name in _FS_READ:
         return MappedHermesCall("fs.read", _path_args(args))
+    if name in _META_READ:
+        return MappedHermesCall("fs.read", {})  # read-only host introspection
     if name in _FS_WRITE:
         return MappedHermesCall("fs.write", _path_args(args))
     if name in _WEB:
@@ -57,6 +63,8 @@ def map_hermes_tool_call(tool: str, args: dict[str, JsonValue]) -> MappedHermesC
         if isinstance(host, str) and host.strip():
             mapped["network_host"] = host.strip()
         return MappedHermesCall("msg.send", mapped)
+    if name in _TODO:
+        return MappedHermesCall("agent.todo.update", {})
     if name.startswith("mcp__"):
         parts = tool.split("__")
         server = parts[1] if len(parts) > 1 else "unknown"
