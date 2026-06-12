@@ -3,7 +3,8 @@ from __future__ import annotations
 import copy
 import json
 from datetime import datetime, timezone
-from typing import Callable, Final, Iterator, Optional
+from itertools import chain
+from typing import Any, Callable, Final, Iterator, Optional
 
 from pydantic import BaseModel, ConfigDict, JsonValue
 
@@ -39,7 +40,7 @@ from .hygiene import (
     redact_chat_body,
     redact_responses_body,
 )
-from .mapping import map_proxy_tool_call
+from .mapping import map_tool_call_for_host
 
 _RELEASED_DECISIONS: Final = {TrustDecision.AUTO, TrustDecision.NOTIFY}
 # A tool_call fragment buffer past this size is hostile or broken; the call is
@@ -50,6 +51,9 @@ _HYGIENE_SCAN_CAP: Final = 1_000_000
 # this many buffered characters is withheld fail-closed instead of buffered
 # without bound (memory/latency hostage by a hostile or runaway upstream).
 _STREAM_BUFFER_CAP: Final = 2_000_000
+
+# Sentinel: the upstream stream opened cleanly but yielded nothing.
+_STREAM_EXHAUSTED: Final = object()
 
 KV_LAST_REQUEST_AT: Final = "proxy.last_request_at"
 KV_LAST_RESPONSE_AT: Final = "proxy.last_response_at"
@@ -136,12 +140,18 @@ class LlmProxyEngine:
         policy: Optional[WalletPolicy] = None,
         store: Optional[SQLiteControlPlaneStore] = None,
         persist_taint: Optional[Callable[[SessionTaintTracker, tuple[str, ...]], None]] = None,
+        hook_owned_hosts: frozenset[HostKind] = frozenset(),
     ) -> None:
         self.engine = engine
         self.meter = meter if meter is not None else CostMeter()
         self.policy = policy if policy is not None else WalletPolicy()
         self.store = store
         self._persist_taint = persist_taint
+        # D9: hosts whose own blocking pre_tool_call hook owns the synchronous
+        # ASK. For these, the proxy's tool_call gate defers a SOFT ask to the
+        # hook (no double prompt) but still records + still enforces DENY walls.
+        # Opt-in: only set when that hook is actually configured and live.
+        self._hook_owned_hosts = hook_owned_hosts
 
     # ------------------------------------------------------------ /v1/models
     def models(self) -> ProxyHttpResult:
@@ -215,8 +225,50 @@ class LlmProxyEngine:
             # withhold/park if it carries a secret (no silent degrade to redact).
             return self._stream_buffered_hygiene(sent_body, session, upstream_stream, ingress, mode)
         redactor = RollingRedactor() if mode is HygieneMode.redact else None
+        # D1: open the upstream BEFORE the server commits 200 + SSE headers, so
+        # an upstream error becomes a governed 502 + failure outcome — never an
+        # empty "200 text/event-stream" the host reads as a silent truncation.
+        self._stamp(KV_LAST_REQUEST_AT)
+        try:
+            first_chunk, upstream_iter = _open_upstream(upstream_stream, sent_body)
+        except Exception as exc:  # provider/network failure on connect
+            return StreamOutcome(error=self._stream_upstream_error(ingress, exc))
+        if first_chunk is _STREAM_EXHAUSTED:
+            return StreamOutcome(error=self._stream_empty_error(ingress))
         return StreamOutcome(
-            chunks=self._stream_chunks(sent_body, session, upstream_stream, ingress, redactor)
+            chunks=self._stream_chunks(
+                sent_body, session, ingress, redactor, first_chunk, upstream_iter
+            )
+        )
+
+    def _stream_upstream_error(self, ingress: DecisionResponse, exc: Exception) -> ProxyHttpResult:
+        self.engine.record(
+            ingress.receipt_id,
+            ExecutionOutcome(
+                status=ExecutionStatus.error,
+                notes="llm_proxy stream upstream error: {0}".format(exc),
+            ),
+        )
+        return ProxyHttpResult(
+            status=502,
+            body=_error_body(
+                "[Zeus] upstream provider error: {0}".format(exc), code="upstream_error"
+            ),
+            receipt_id=ingress.receipt_id,
+        )
+
+    def _stream_empty_error(self, ingress: DecisionResponse) -> ProxyHttpResult:
+        self.engine.record(
+            ingress.receipt_id,
+            ExecutionOutcome(
+                status=ExecutionStatus.error,
+                notes="llm_proxy stream upstream error: empty stream",
+            ),
+        )
+        return ProxyHttpResult(
+            status=502,
+            body=_error_body("[Zeus] upstream provider error: empty stream", code="upstream_empty_stream"),
+            receipt_id=ingress.receipt_id,
         )
 
     # --------------------------------------------------------- /v1/responses
@@ -308,7 +360,8 @@ class LlmProxyEngine:
             status = 429
             message = (
                 "[Zeus] approval required: {0} (parked: {1}); "
-                "retry after the operator approves".format(
+                "operator resolves this in Zeus control tower or a separate terminal, "
+                "then re-issue the same request".format(
                     response.reason, response.parked_action_id
                 )
             )
@@ -397,7 +450,7 @@ class LlmProxyEngine:
     def _decide_tool_call(
         self, name: str, arguments_json: str, session: ProxySession
     ) -> tuple[DecisionResponse, str]:
-        mapped = map_proxy_tool_call(name, arguments_json)
+        mapped = map_tool_call_for_host(session.host, name, arguments_json)
         request = DecisionRequest(
             principal_id=session.principal_id,
             session_id=session.session_id,
@@ -408,6 +461,7 @@ class LlmProxyEngine:
                 host=session.host,
                 surface=GateSurface.llm_proxy,
                 objective_id=session.objective_id,
+                defer_ask_to_owner=session.host in self._hook_owned_hosts,
             ),
         )
         response = self.engine.decide(request)
@@ -513,9 +567,10 @@ class LlmProxyEngine:
         self,
         body: dict[str, JsonValue],
         session: ProxySession,
-        upstream_stream: UpstreamStream,
         ingress: DecisionResponse,
-        redactor: Optional[RollingRedactor] = None,
+        redactor: Optional[RollingRedactor],
+        first_chunk: Any,
+        upstream_iter: Iterator[Any],
     ) -> Iterator[dict[str, JsonValue]]:
         buffers: dict[int, dict[int, _ToolCallEntry]] = {}
         released_by_choice: dict[int, int] = {}
@@ -524,37 +579,56 @@ class LlmProxyEngine:
         usage: Optional[dict[str, JsonValue]] = None
         hygiene_text: list[str] = []
         hygiene_size = 0
-        # redactor is supplied by the caller: set for redact mode, None for
-        # count (and for the clean replay of a buffered block/ask response).
-        self._stamp(KV_LAST_REQUEST_AT)
-        first_chunk = True
-        for chunk in upstream_stream(body):
-            if not isinstance(chunk, dict):
-                continue
-            if first_chunk:
-                self._stamp(KV_LAST_RESPONSE_AT)
-                first_chunk = False
-            for key in ("id", "model", "created", "object", "system_fingerprint"):
-                if key in chunk and key not in meta:
-                    meta[key] = chunk[key]
-            chunk_usage = chunk.get("usage")
-            if isinstance(chunk_usage, dict):
-                usage = chunk_usage
-            choices = chunk.get("choices")
-            if not isinstance(choices, list) or not choices:
-                yield chunk
-                continue
-            for out in self._stream_handle_choices(
-                chunk, choices, buffers, released_by_choice, blocked_by_choice,
-                meta, session, redactor,
-            ):
-                if isinstance(out, str):  # hygiene accumulation marker (count mode)
-                    if hygiene_size < _HYGIENE_SCAN_CAP:
-                        hygiene_text.append(out)
-                        hygiene_size += len(out)
+        # The upstream is already OPEN (the caller pulled first_chunk so connect
+        # errors surfaced before headers). redactor: set for redact, None for
+        # count and for the clean replay of a buffered block/ask response.
+        upstream = upstream_iter if first_chunk is _STREAM_EXHAUSTED else chain([first_chunk], upstream_iter)
+        first_seen = True
+        stream_error: Optional[Exception] = None
+        try:
+            for chunk in upstream:
+                if not isinstance(chunk, dict):
                     continue
-                yield out
+                if first_seen:
+                    self._stamp(KV_LAST_RESPONSE_AT)
+                    first_seen = False
+                for key in ("id", "model", "created", "object", "system_fingerprint"):
+                    if key in chunk and key not in meta:
+                        meta[key] = chunk[key]
+                chunk_usage = chunk.get("usage")
+                if isinstance(chunk_usage, dict):
+                    usage = chunk_usage
+                choices = chunk.get("choices")
+                if not isinstance(choices, list) or not choices:
+                    yield chunk
+                    continue
+                for out in self._stream_handle_choices(
+                    chunk, choices, buffers, released_by_choice, blocked_by_choice,
+                    meta, session, redactor,
+                ):
+                    if isinstance(out, str):  # hygiene accumulation marker (count mode)
+                        if hygiene_size < _HYGIENE_SCAN_CAP:
+                            hygiene_text.append(out)
+                            hygiene_size += len(out)
+                        continue
+                    yield out
+        except Exception as exc:  # D1: a mid-stream upstream failure must not look like a clean end
+            stream_error = exc
         self._stamp(KV_LAST_RESPONSE_AT)
+        if stream_error is not None:
+            # tell the host the stream was cut short, and bind a FAILURE outcome
+            # (a silent truncation would let the ledger overstate success).
+            yield _content_chunk(
+                meta, 0, "[Zeus] upstream stream aborted: {0}".format(stream_error)
+            )
+            self.engine.record(
+                ingress.receipt_id,
+                ExecutionOutcome(
+                    status=ExecutionStatus.error,
+                    notes="llm_proxy stream mid-abort: {0}".format(stream_error),
+                ),
+            )
+            return
         if redactor is not None:
             if redactor.redactions:
                 self._bump_findings(redactor.redactions)
@@ -621,6 +695,8 @@ class LlmProxyEngine:
                 )
             )
         self._stamp(KV_LAST_RESPONSE_AT)
+        if not chunks and not overflow:
+            return StreamOutcome(error=self._stream_empty_error(ingress))
         if overflow:
             # a response too large to examine is withheld, not released unread
             # (same fail-closed doctrine as the tool_call buffer cap).
@@ -647,10 +723,12 @@ class LlmProxyEngine:
             )
         findings = _count_secret_findings(_assemble_stream_text(chunks)[:_HYGIENE_SCAN_CAP])
         if not findings:
-            # clean → replay through the normal path with NO redactor (count
-            # behavior); _stream_chunks records the cost.
+            # clean → replay the already-drained chunks through the normal path
+            # with NO redactor (count behavior); _stream_chunks records the cost.
+            first = chunks[0] if chunks else _STREAM_EXHAUSTED
+            rest: Iterator[Any] = iter(chunks[1:]) if chunks else iter(())
             return StreamOutcome(
-                chunks=self._stream_chunks(body, session, lambda _b: iter(chunks), ingress, None)
+                chunks=self._stream_chunks(body, session, ingress, None, first, rest)
             )
         # the upstream call cost money even though we withhold the body — record
         # the spend, then enforce the configured mode on the full response.
@@ -1009,7 +1087,7 @@ def _block_notice(verdict: DecisionResponse, name: str, capability_id: str) -> s
         )
     return (
         "[Zeus] approval required for tool call {0} ({1}): {2} (parked: {3}). "
-        "Re-issue the call after the operator approves.".format(
+        "Operator resolves this outside the governed host; then re-issue the same call.".format(
             name or "unnamed", capability_id, verdict.reason, verdict.parked_action_id
         )
     )
@@ -1070,6 +1148,16 @@ def _count_secret_findings(text: str) -> int:
     if not text:
         return 0
     return 1 if contains_secret_material(text) else 0
+
+
+def _open_upstream(upstream_stream: UpstreamStream, body: dict[str, JsonValue]) -> tuple[Any, Iterator[Any]]:
+    """Start the upstream stream and pull its first item NOW, so a connect/auth
+    failure (e.g. 401) raises here — before SSE headers go out — instead of
+    surfacing to the host as an empty 200 stream. Returns (first, iterator);
+    first is _STREAM_EXHAUSTED when the stream opened but yielded nothing."""
+    iterator = iter(upstream_stream(body))
+    first = next(iterator, _STREAM_EXHAUSTED)
+    return first, iterator
 
 
 def _assemble_stream_text(chunks: list[dict[str, JsonValue]]) -> str:

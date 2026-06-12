@@ -61,6 +61,11 @@ class DecisionContext(BaseModel):
     # decide() short-circuits to DENY so the receipt is the truth of the final
     # action — never a post-hoc mutation of an AUTO response.
     boundary_violation: Optional[str] = None
+    # Another gate on this surface owns the synchronous ASK (e.g. hermes' own
+    # blocking pre_tool_call hook). When set, a SOFT ask here is downgraded to
+    # NOTIFY (released + digested) so the operator is asked ONCE, not twice —
+    # DENY walls are unaffected. Opt-in: the owning gate MUST actually run.
+    defer_ask_to_owner: bool = False
 
 
 class DecisionRequest(BaseModel):

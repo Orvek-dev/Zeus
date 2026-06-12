@@ -27,6 +27,7 @@ from zeus_agent.capability_registry_runtime import (
 from zeus_agent.decision_api_runtime import ZeusDecisionEngine
 from zeus_agent.governor_runtime import GovernorBank
 from zeus_agent.proxy_runtime import (
+    KV_HYGIENE_MODE,
     KV_LAST_REQUEST_AT,
     KV_LAST_RESPONSE_AT,
     LlmProxyEngine,
@@ -392,6 +393,92 @@ def test_streaming_oversized_tool_call_fails_closed(tmp_path: Path) -> None:
         if str(r["kind"]) == "decision_receipt"
     ]
     assert "toolcall_buffer_overflow" in reasons
+
+
+# ----------------------------------------- D1: streaming upstream truthfulness
+def test_streaming_upstream_connect_error_is_governed_not_empty_200(tmp_path: Path) -> None:
+    proxy, _engine, _store, recorder = _proxy(tmp_path)
+
+    def boom(_body: dict[str, JsonValue]):
+        raise RuntimeError("HTTP Error 401: Unauthorized")
+        yield {}  # pragma: no cover - makes boom a generator
+
+    outcome = proxy.chat_completion_stream(_body(), ProxySession(), boom)
+    # the host gets a governed 502, never an empty "200 text/event-stream"
+    assert outcome.chunks is None
+    assert outcome.error is not None
+    assert outcome.error.status == 502
+    assert outcome.error.body["error"]["code"] == "upstream_error"  # type: ignore[index]
+    outcomes = [
+        json.loads(str(r["payload_json"]))
+        for r in recorder.ledger.records()
+        if str(r["kind"]) == "execution_outcome"
+    ]
+    assert any(o.get("status") == "error" for o in outcomes), "upstream failure must bind a failure outcome"
+
+
+def test_streaming_empty_upstream_is_governed_failure(tmp_path: Path) -> None:
+    proxy, _engine, _store, recorder = _proxy(tmp_path)
+
+    outcome = proxy.chat_completion_stream(_body(), ProxySession(), lambda _body: iter(()))
+    assert outcome.chunks is None
+    assert outcome.error is not None
+    assert outcome.error.status == 502
+    assert outcome.error.body["error"]["code"] == "upstream_empty_stream"  # type: ignore[index]
+    outcomes = [
+        json.loads(str(r["payload_json"]))
+        for r in recorder.ledger.records()
+        if str(r["kind"]) == "execution_outcome"
+    ]
+    assert any(o.get("status") == "error" for o in outcomes)
+
+
+def test_streaming_empty_upstream_in_buffered_hygiene_is_failure(tmp_path: Path) -> None:
+    proxy, _engine, store, recorder = _proxy(tmp_path)
+    store.kv_set(KV_HYGIENE_MODE, "block")
+
+    outcome = proxy.chat_completion_stream(_body(), ProxySession(), lambda _body: iter(()))
+    assert outcome.chunks is None
+    assert outcome.error is not None
+    assert outcome.error.status == 502
+    assert outcome.error.body["error"]["code"] == "upstream_empty_stream"  # type: ignore[index]
+    outcomes = [
+        json.loads(str(r["payload_json"]))
+        for r in recorder.ledger.records()
+        if str(r["kind"]) == "execution_outcome"
+    ]
+    assert any(o.get("status") == "error" for o in outcomes)
+
+
+def test_streaming_midstream_abort_emits_notice_and_failure_outcome(tmp_path: Path) -> None:
+    proxy, _engine, _store, recorder = _proxy(tmp_path)
+
+    def flaky(_body: dict[str, JsonValue]):
+        yield {
+            "id": "c", "object": "chat.completion.chunk", "model": MODEL,
+            "choices": [{"index": 0, "delta": {"content": "partial "}, "finish_reason": None}],
+        }
+        raise RuntimeError("connection reset mid-stream")
+
+    outcome = proxy.chat_completion_stream(_body(), ProxySession(), flaky)
+    assert outcome.error is None  # first chunk opened fine
+    assert outcome.chunks is not None
+    produced = list(outcome.chunks)
+    text = "".join(
+        str(choice.get("delta", {}).get("content", ""))
+        for chunk in produced
+        if isinstance(chunk, dict)
+        for choice in (chunk.get("choices") or [])
+        if isinstance(choice, dict)
+    )
+    assert "partial " in text
+    assert "upstream stream aborted" in text  # not a silent truncation
+    outcomes = [
+        json.loads(str(r["payload_json"]))
+        for r in recorder.ledger.records()
+        if str(r["kind"]) == "execution_outcome"
+    ]
+    assert any(o.get("status") == "error" for o in outcomes)
 
 
 # -------------------------------------------- cost-attribution-per-objective

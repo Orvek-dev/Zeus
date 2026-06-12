@@ -50,6 +50,22 @@ class MappedToolCall:
         self.args = args
 
 
+def map_tool_call_for_host(host, name: str, arguments_json: str) -> MappedToolCall:
+    """Host-aware mapping at the proxy gate. The proxy intercepts a model's
+    tool_call BEFORE the host's own pre-tool hook runs, so when we know the
+    host we consult ITS authoritative table first — otherwise hermes meta/read
+    tools (search_files, skills_list, ...) would fall through to host.tool.* and
+    ASK-storm. Composition, not duplication: defer to the adapter's mapper."""
+    from zeus_agent.decision_api_runtime import HostKind
+
+    if host is HostKind.hermes:
+        from zeus_agent.adapters.hermes.mapping import map_hermes_tool_call
+
+        mapped = map_hermes_tool_call(name, _parse_arguments(arguments_json))
+        return MappedToolCall(mapped.capability_id, dict(mapped.args))
+    return map_proxy_tool_call(name, arguments_json)
+
+
 def map_proxy_tool_call(name: str, arguments_json: str) -> MappedToolCall:
     tool = name.strip().lower()
     arguments = _parse_arguments(arguments_json)
@@ -90,6 +106,8 @@ def seed_proxy_capability_store() -> CapabilityStore:
                      "Call a language model through the governed proxy"),
             _builtin("llm.model_switch", VerbClass.transform, SideEffectClass.none, Reversibility.reversible,
                      "Rewrite a request to a policy-approved alternate model"),
+            _builtin("agent.todo.update", VerbClass.transform, SideEffectClass.none, Reversibility.reversible,
+                     "Update the host agent's internal task plan"),
             _builtin("fs.read", VerbClass.fetch, SideEffectClass.none, Reversibility.reversible,
                      "Read files and search the workspace"),
             _builtin("fs.write", VerbClass.store, SideEffectClass.local_write, Reversibility.compensable,
