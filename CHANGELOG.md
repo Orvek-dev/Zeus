@@ -2,6 +2,36 @@
 
 All notable changes to Zeus Agent are recorded here.
 
+## v1.0.0-alpha.2 - 2026-06-12
+
+### Fixed
+
+- Preserved receipt/action coherence on the OpenAI-compatible streaming proxy:
+  upstream failures now surface before success headers are emitted, malformed
+  empty streams fail closed, and stream failures are recorded as failures.
+- Made Hermes proxy gating host-aware so Hermes tool calls use the Hermes
+  capability catalog before falling back to conservative `host.tool.*` mapping.
+- Added a parked-ASK operator handoff: pending actions are inspectable,
+  approvable once by payload, and replayed without granting standing high-risk
+  authority.
+- Reduced ASK spirals by deduplicating pending parks and counting only
+  released decisions toward the loop governor.
+- Tightened command-risk classification for dogfood diagnostics: read-only git
+  probes, Python module/version probes, shell builtins, and `/dev/null` sinks
+  no longer escalate as writes while destructive compound commands stay
+  fail-closed.
+- Improved Hermes operator UX and observability with shell-hook-compatible
+  connect output, hook checks, cleaner approval guidance, grant status
+  reporting, and precise `zeus why --parked` timelines.
+
+### Evidence
+
+- `ruff` clean.
+- `.venv/bin/python -m pytest` passed: `1911` tests.
+- Clean Hermes dogfood home `dogfood-clean-r3`: observed `37`, governed `37`,
+  `chain_ok=true`, pending approvals `[]`, secret findings `0`; write approval
+  replay succeeded and destructive delete remained blocked.
+
 ## v1.0.0-alpha.1 - 2026-06-11
 
 ### Refoundation

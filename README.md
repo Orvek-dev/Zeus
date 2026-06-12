@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.1-2ea44f"></a>
+  <a href="https://github.com/Orvek-dev/Zeus/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.0.0--alpha.2-2ea44f"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-0969da"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Local first" src="https://img.shields.io/badge/local--first-control%20plane-6f42c1">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-1881%20passed-1f883d">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-1911%20passed-1f883d">
   <img alt="Conformance" src="https://img.shields.io/badge/conformance-88%20scenarios-8250df">
 </p>
 
@@ -190,15 +190,15 @@ surface lives under `zeus dev` — see [docs/commands.md](docs/commands.md).
 
 ## Evidence
 
-Measured 2026-06-11 on the public source tree. Read these as deterministic
+Measured 2026-06-12 on the public source tree. Read these as deterministic
 local regression evidence, not as proof of production readiness.
 
 | Evidence surface | Current result |
 | --- | --- |
-| Public unit and scenario suite | `1881` tests passed |
+| Public unit and scenario suite | `1911` tests passed |
 | Conformance scenarios | `88` across P3–P13 + receipt coherence |
 | Lint | `ruff` clean |
-| Package metadata | `zeus-agent==1.0.0a1` (alpha reset; majors are conformance-gated) |
+| Package metadata | `zeus-agent==1.0.0a2` (alpha reset; majors are conformance-gated) |
 | Raw-secret storage proof | byte-level scan: a proposed memory containing a key never reaches the SQLite file unredacted |
 
 **Honest boundary.** The conformance suite is synthetic: contracts are frozen
