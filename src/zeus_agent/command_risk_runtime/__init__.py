@@ -8,6 +8,7 @@ approval-gated as a graph property — no special-casing in the executor.
 
 from __future__ import annotations
 
-from .classifier import CommandRisk, classify_command
+from .classifier import classify_command
+from .models import CommandRisk
 
 __all__ = ["CommandRisk", "classify_command"]

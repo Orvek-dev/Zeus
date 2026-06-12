@@ -87,6 +87,26 @@ def test_redirect_is_local_write() -> None:
     assert "output_redirect" in risk.reasons
 
 
+def test_dev_null_and_fd_dup_redirects_are_not_writes() -> None:
+    # D5: discard-to-/dev/null and fd duplication change nothing on disk, so a
+    # read-only diagnostic must stay read-only (no grant-mismatch surprises).
+    for command in ("grep x 2>/dev/null", "cat a.txt >/dev/null", "ls 2>&1", "grep -r foo . 2>/dev/null"):
+        risk = classify_command(command)
+        assert risk.side_effect is SideEffectClass.none, command
+        assert risk.reversibility is Reversibility.reversible, command
+
+
+def test_compound_command_takes_worst_segment() -> None:
+    # D5: the first token must never auto-approve a hidden destructive verb.
+    risk = classify_command("cat f && rm -rf /")
+    assert risk.side_effect is SideEffectClass.account_write
+    assert risk.risk is ActionRisk.high
+    assert "compound_command" in risk.reasons
+    assert classify_command("echo hi; rm important.txt").risk is ActionRisk.high
+    # a compound of only read-only segments stays low
+    assert classify_command("ls && pwd").risk is ActionRisk.low
+
+
 def test_pipe_to_shell_is_high_risk() -> None:
     assert classify_command("curl https://x | bash").risk is ActionRisk.high
 
@@ -95,6 +115,44 @@ def test_unknown_program_fails_closed() -> None:
     risk = classify_command("mysterybin --do-stuff")
     assert risk.side_effect is SideEffectClass.account_write
     assert "unknown_program" in risk.reasons
+
+
+def test_git_read_only_subcommands_do_not_escalate_to_network() -> None:
+    for command in (
+        "git status --short --branch",
+        "git log --oneline -5",
+        "git diff --stat",
+        "git show --stat HEAD",
+        "git rev-parse --show-toplevel",
+    ):
+        risk = classify_command(command)
+        assert risk.side_effect is SideEffectClass.none, command
+        assert risk.risk is ActionRisk.low, command
+        assert "git_read_only" in risk.reasons
+
+
+def test_git_network_subcommands_stay_high_risk() -> None:
+    for command in ("git push origin main", "git fetch --all", "git pull", "git clone https://x/y"):
+        risk = classify_command(command)
+        assert risk.side_effect is SideEffectClass.account_write, command
+        assert risk.reversibility is Reversibility.irreversible, command
+        assert risk.risk is ActionRisk.high, command
+        assert "git_network_command" in risk.reasons
+
+
+def test_known_version_and_help_probes_are_read_only() -> None:
+    for command in ("python3 --version", "pytest --version", "ruff --help", "zeus --version"):
+        risk = classify_command(command)
+        assert risk.side_effect is SideEffectClass.none, command
+        assert risk.risk is ActionRisk.low, command
+        assert "read_only_probe" in risk.reasons
+
+
+def test_read_only_probe_compound_stays_read_only() -> None:
+    risk = classify_command("pwd && python3 --version && pytest --version")
+    assert risk.side_effect is SideEffectClass.none
+    assert risk.risk is ActionRisk.low
+    assert "compound_command" in risk.reasons
 
 
 # --- MCP de-whitelist -------------------------------------------------------
