@@ -42,7 +42,30 @@ def test_exec_relay_allows_read_only_immediately(tmp_path: Path) -> None:
     assert len(resolutions) == 1
     assert resolutions[0]["approved"] is True
     assert resolutions[0]["id"] == "req-1"
+    assert resolutions[0]["decision"] == "allow-once"
+    assert resolutions[0]["params"] == {"id": "req-1", "decision": "allow-once"}
     assert str(resolutions[0]["receipt_id"]).startswith("trust.ev.")
+
+
+def test_exec_relay_accepts_real_openclaw_requested_event_shape(tmp_path: Path) -> None:
+    relay, resolutions, _engine = _relay(tmp_path)
+    outcome = relay.handle_approval_request(
+        {
+            "id": "req-live",
+            "request": {
+                "command": "ls -la",
+                "sessionKey": "oc.live",
+                "host": "gateway",
+                "cwd": "/tmp",
+            },
+            "createdAtMs": 1,
+            "expiresAtMs": 2,
+        }
+    )
+    assert outcome["resolution"] == "allow"
+    assert outcome["capability_id"] == "terminal.run.read"
+    assert resolutions[-1]["method"] == "exec.approval.resolve"
+    assert resolutions[-1]["params"] == {"id": "req-live", "decision": "allow-once"}
 
 
 def test_exec_relay_parks_dangerous_until_operator(tmp_path: Path) -> None:
@@ -58,6 +81,8 @@ def test_exec_relay_parks_dangerous_until_operator(tmp_path: Path) -> None:
     assert resolved == {"resolved": True, "status": "rejected"}
     assert len(resolutions) == 1
     assert resolutions[0]["approved"] is False
+    assert resolutions[0]["decision"] == "deny"
+    assert resolutions[0]["params"] == {"id": "req-2", "decision": "deny"}
     assert "operator_rejected" in str(resolutions[0]["reason"])
 
     # the verdict chain is in the ledger: decision receipt ← outcome record
@@ -103,6 +128,7 @@ def test_expired_parked_approval_resolves_denied_to_host(tmp_path: Path) -> None
     assert resolved == {"resolved": True, "status": "expired"}
     assert emits, "the host still gets an answer — a denial, not silence"
     assert emits[-1]["approved"] is False
+    assert emits[-1]["params"] == {"id": "req-late", "decision": "deny"}
     assert "expired" in str(emits[-1]["reason"])
 
     # and the ledger outcome records a failure, not a success
@@ -167,6 +193,7 @@ def test_tui_resolved_exec_approval_can_be_flushed_to_openclaw_host(tmp_path: Pa
     assert after_tui.flush_resolved(parked_id) == {"flushed": True, "status": "approved"}
     assert emits[-1]["id"] == "req-tui"
     assert emits[-1]["approved"] is True
+    assert emits[-1]["params"] == {"id": "req-tui", "decision": "allow-once"}
     assert after_tui.flush_resolved(parked_id) == {"flushed": False, "reason": "unknown_parked_action"}
 
 

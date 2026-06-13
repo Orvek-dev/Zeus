@@ -64,8 +64,9 @@ class ExecApprovalRelay:
     # ----------------------------------------------------------------- ingest
     def handle_approval_request(self, event: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request_id = str(event.get("id", event.get("request_id", ""))).strip()
-        command = str(event.get("command", "")).strip()
-        session_id = str(event.get("session_id", "openclaw.default")).strip()
+        request = _request_payload(event)
+        command = _command_text(event, request)
+        session_id = _session_id(event, request)
         if not request_id or not command:
             return {"handled": False, "reason": "malformed_event"}
 
@@ -198,10 +199,14 @@ class ExecApprovalRelay:
         return {"resolved": True, "status": status}
 
     def _resolve(self, request_id: str, *, approved: bool, reason: str, receipt_id: str) -> None:
+        decision = "allow-once" if approved else "deny"
         self.emit(
             {
                 "type": "exec.approval.resolve",
+                "method": "exec.approval.resolve",
+                "params": {"id": request_id, "decision": decision},
                 "id": request_id,
+                "decision": decision,
                 "approved": approved,
                 "reason": "[Zeus] {0}".format(reason),
                 "receipt_id": receipt_id,
@@ -218,6 +223,32 @@ def _text(value: JsonValue | None) -> Optional[str]:
     if isinstance(value, str) and value.strip():
         return value.strip()
     return None
+
+
+def _request_payload(event: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    request = event.get("request")
+    return request if isinstance(request, dict) else event
+
+
+def _command_text(event: dict[str, JsonValue], request: dict[str, JsonValue]) -> str:
+    for value in (
+        request.get("command"),
+        request.get("commandText"),
+        request.get("commandPreview"),
+        event.get("command"),
+    ):
+        text = _text(value)
+        if text is not None:
+            return text
+    return ""
+
+
+def _session_id(event: dict[str, JsonValue], request: dict[str, JsonValue]) -> str:
+    for value in (event.get("session_id"), request.get("sessionKey"), request.get("agentId")):
+        text = _text(value)
+        if text is not None:
+            return text
+    return "openclaw.default"
 
 
 def _parse_context(raw: Optional[str]) -> Optional[dict[str, JsonValue]]:

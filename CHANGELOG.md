@@ -4,6 +4,29 @@ All notable changes to Zeus Agent are recorded here.
 
 ## Unreleased
 
+## v1.0.0-alpha.9 - 2026-06-13
+
+### Fixed
+
+- Aligned the OpenClaw approval relay with the live
+  `exec.approval.requested` event shape by reading nested request payloads,
+  deriving session keys from real OpenClaw fields, and resolving through
+  `exec.approval.resolve` with `allow-once` / `deny` decisions.
+- Preserved the legacy relay emission fields while adding OpenClaw-compatible
+  `method`, `params`, and `decision` fields so older tests and newer pinned
+  host transports can both consume the resolution event.
+
+### Evidence
+
+- `.venv/bin/python -m pytest -q` passed: `299` tests.
+- `ruff` clean.
+- `.venv/bin/pip install -e . --no-deps` succeeded, `zeus-agent 1.0.0a9`
+  reported through the installed console script, and `zeus status` passed on a
+  fresh smoke home.
+- Private live-host evidence stayed local-only: OpenClaw O4/O5 approval-cycle
+  dogfood passed with a separately connected approval observer, and Hermes
+  one-iteration soak rehearsal passed.
+
 ## v1.0.0-alpha.8 - 2026-06-13
 
 ### Added
