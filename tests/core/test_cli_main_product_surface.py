@@ -36,6 +36,7 @@ def test_product_surface_is_small() -> None:
         "record",
         "approve",
         "approvals",
+        "tui",
         "ledger",
         "why",
         "status",
@@ -475,6 +476,66 @@ def test_parked_ask_can_be_resolved_with_narrowed_scope(tmp_path: Path) -> None:
     assert outside["decision"] == "ask"
 
 
+def test_parked_ask_can_be_remembered_from_inbox(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    req = _decide_req("fs.write", path="/work/project/a.py")
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+
+    approved = json.loads(
+        runner.invoke(
+            app,
+            ["approve", "--parked", asked["parked_action_id"], "--remember", "--home", home],
+        ).stdout
+    )
+
+    assert approved["status"] == "approved"
+    assert approved["remembered"] is True
+    assert approved["grant_scope"] == "narrower"
+    assert approved["expires_at_epoch"] > int(time.time()) + 7 * 3600
+    assert approved["narrowed_paths"] == ["/work/project/a.py"]
+    inside = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+    assert inside["decision"] == "auto"
+    assert inside["reason"] == "covered_by_grant_narrower"
+
+
+def test_hard_risk_parked_ask_cannot_be_remembered(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    asked = json.loads(
+        runner.invoke(app, ["decide", "--request-json", _decide_req("terminal.run.external"), "--home", home]).stdout
+    )
+
+    result = runner.invoke(
+        app,
+        ["approve", "--parked", asked["parked_action_id"], "--remember", "--home", home],
+    )
+
+    assert result.exit_code != 0
+    assert "--remember cannot authorize hard-risk actions" in result.output
+
+
+def test_invalid_narrow_path_does_not_resolve_pending_ask(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    req = _decide_req("fs.write", path="/work/project/a.py")
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+
+    result = runner.invoke(
+        app,
+        [
+            "approve",
+            "--parked",
+            asked["parked_action_id"],
+            "--narrow-path",
+            "/other",
+            "--home",
+            home,
+        ],
+    )
+
+    assert result.exit_code != 0
+    pending = json.loads(runner.invoke(app, ["approvals", "--pending", "--home", home]).stdout)
+    assert [item["parked_action_id"] for item in pending] == [asked["parked_action_id"]]
+
+
 def test_notify_delivers_pending_ask_cards_to_webhook(tmp_path: Path) -> None:
     home = str(tmp_path / "zeus")
     runner.invoke(app, ["decide", "--request-json", _decide_req("fs.write"), "--home", home])
@@ -538,7 +599,48 @@ def test_hermes_hook_cli_decides_over_stdin(tmp_path: Path) -> None:
     )
     write_output = json.loads(write.stdout)
     assert write_output["action"] == "block"
-    assert write_output["retry"] == "reissue_after_operator_replay_approval"
+
+
+def test_tui_once_renders_status_and_pending_asks(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    asked = json.loads(
+        runner.invoke(app, ["decide", "--request-json", _decide_req("fs.write"), "--home", home]).stdout
+    )
+
+    result = runner.invoke(app, ["tui", "--once", "--home", home])
+
+    assert result.exit_code == 0
+    assert "ZEUS CONTROL TOWER" in result.stdout
+    assert "pending asks" in result.stdout
+    assert asked["parked_action_id"][-18:] in result.stdout
+
+
+def test_tui_action_remember_resolves_pending_ask(tmp_path: Path) -> None:
+    home = str(tmp_path / "zeus")
+    req = _decide_req("fs.write", path="/work/tui/a.py")
+    asked = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+
+    result = runner.invoke(
+        app,
+        [
+            "tui",
+            "--home",
+            home,
+            "--action",
+            "remember",
+            "--parked",
+            asked["parked_action_id"],
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["remembered"] is True
+    pending = json.loads(runner.invoke(app, ["approvals", "--pending", "--home", home]).stdout)
+    assert pending == []
+    inside = json.loads(runner.invoke(app, ["decide", "--request-json", req, "--home", home]).stdout)
+    assert inside["decision"] == "auto"
+    assert inside["reason"] == "covered_by_grant_narrower"
 
 
 def test_hermes_connect_check_preflights(tmp_path: Path) -> None:

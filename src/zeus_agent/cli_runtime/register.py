@@ -10,11 +10,13 @@ from .mcp_commands import register_mcp_commands
 from .ops_commands import register_ops_commands
 from .policy_commands import register_policy_commands
 from .proxy_commands import register_proxy_commands
+from .tui_commands import register_tui_commands
 
 
 def register_product_commands(app: typer.Typer) -> None:
     register_core_commands(app)
     register_approval_commands(app)
+    register_tui_commands(app)
     register_evidence_commands(app)
     register_ops_commands(app)
     register_proxy_commands(app)

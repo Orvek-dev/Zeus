@@ -138,26 +138,23 @@ class ExecApprovalRelay:
         if context is None:
             return {"resolved": False, "reason": "unknown_parked_action"}
         parked = self.engine.queue.resolve(parked_action_id, approved=approved)
-        # what reaches the host is the QUEUE's verdict, not the caller's
-        # intent: an expired/superseded park resolves approved=False even if
-        # the operator clicked approve after the deadline (TTL fail-closed).
-        effective = approved and parked.status == "approved"
-        self._resolve(
-            str(context["request_id"]),
-            approved=effective,
-            reason="operator_{0}".format(parked.status),
-            receipt_id=str(context["receipt_id"]),
-        )
-        self.engine.record(
-            str(context["receipt_id"]),
-            ExecutionOutcome(
-                status=ExecutionStatus.success if effective else ExecutionStatus.failure,
-                notes="exec approval {0} by operator".format(parked.status),
-            ),
-            capability_id=str(context["capability_id"]),
-            session_id=str(context["session_id"]),
-        )
-        return {"resolved": True, "status": parked.status}
+        return self._emit_resolved_context(context, parked.status)
+
+    def flush_resolved(self, parked_action_id: str) -> dict[str, JsonValue]:
+        context = self._peek(parked_action_id)
+        if context is None:
+            return {"flushed": False, "reason": "unknown_parked_action"}
+        try:
+            parked = self.engine.queue.get(parked_action_id)
+        except KeyError:
+            return {"flushed": False, "reason": "unknown_parked_action"}
+        if parked.status == "pending":
+            return {"flushed": False, "reason": "still_pending"}
+        consumed = self._recall(parked_action_id)
+        if consumed is None:
+            return {"flushed": False, "reason": "unknown_parked_action"}
+        result = self._emit_resolved_context(consumed, parked.status)
+        return {"flushed": True, "status": result["status"]}
 
     # ------------------------------------------------------------- parked map
     def _remember(self, parked_action_id: str, context: dict[str, JsonValue]) -> None:
@@ -166,19 +163,39 @@ class ExecApprovalRelay:
         else:
             self._parked[parked_action_id] = context
 
+    def _peek(self, parked_action_id: str) -> Optional[dict[str, JsonValue]]:
+        if self.store is None:
+            return self._parked.get(parked_action_id)
+        return _parse_context(self.store.kv_get(_PARKED_PREFIX + parked_action_id))
+
     def _recall(self, parked_action_id: str) -> Optional[dict[str, JsonValue]]:
         """Read-and-consume the parked context (it resolves exactly once)."""
         if self.store is None:
             return self._parked.pop(parked_action_id, None)
-        raw = self.store.kv_get(_PARKED_PREFIX + parked_action_id)
-        if not raw:  # absent or already-consumed tombstone
-            return None
-        try:
-            parsed = json.loads(raw)
-        except ValueError:
+        parsed = _parse_context(self.store.kv_get(_PARKED_PREFIX + parked_action_id))
+        if parsed is None:
             return None
         self.store.kv_set(_PARKED_PREFIX + parked_action_id, "")  # consume-once tombstone
-        return parsed if isinstance(parsed, dict) else None
+        return parsed
+
+    def _emit_resolved_context(self, context: dict[str, JsonValue], status: str) -> dict[str, JsonValue]:
+        effective = status == "approved"
+        self._resolve(
+            str(context["request_id"]),
+            approved=effective,
+            reason="operator_{0}".format(status),
+            receipt_id=str(context["receipt_id"]),
+        )
+        self.engine.record(
+            str(context["receipt_id"]),
+            ExecutionOutcome(
+                status=ExecutionStatus.success if effective else ExecutionStatus.failure,
+                notes="exec approval {0} by operator".format(status),
+            ),
+            capability_id=str(context["capability_id"]),
+            session_id=str(context["session_id"]),
+        )
+        return {"resolved": True, "status": status}
 
     def _resolve(self, request_id: str, *, approved: bool, reason: str, receipt_id: str) -> None:
         self.emit(
@@ -201,3 +218,13 @@ def _text(value: JsonValue | None) -> Optional[str]:
     if isinstance(value, str) and value.strip():
         return value.strip()
     return None
+
+
+def _parse_context(raw: Optional[str]) -> Optional[dict[str, JsonValue]]:
+    if not raw:
+        return None
+    try:
+        parsed = json.loads(raw)
+    except ValueError:
+        return None
+    return parsed if isinstance(parsed, dict) else None

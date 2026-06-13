@@ -148,6 +148,28 @@ def test_parked_exec_approval_survives_relay_restart(tmp_path: Path) -> None:
     assert relay2.resolve_parked(parked_id, approved=True)["resolved"] is False
 
 
+def test_tui_resolved_exec_approval_can_be_flushed_to_openclaw_host(tmp_path: Path) -> None:
+    state = ControlPlaneState(tmp_path / "zeus")
+    engine = state.build_engine(capabilities=seed_proxy_capability_store())
+    store = SQLiteControlPlaneStore(state.state_path)
+
+    emits: list[dict[str, JsonValue]] = []
+    relay = ExecApprovalRelay(engine=engine, emit=emits.append, store=store)
+    outcome = relay.handle_approval_request(
+        {"id": "req-tui", "command": "git push --force origin main", "session_id": "oc.tui"}
+    )
+    parked_id = str(outcome["parked_action_id"])
+    assert emits == []
+    assert relay.flush_resolved(parked_id) == {"flushed": False, "reason": "still_pending"}
+
+    engine.queue.resolve(parked_id, approved=True)
+    after_tui = ExecApprovalRelay(engine=engine, emit=emits.append, store=store)
+    assert after_tui.flush_resolved(parked_id) == {"flushed": True, "status": "approved"}
+    assert emits[-1]["id"] == "req-tui"
+    assert emits[-1]["approved"] is True
+    assert after_tui.flush_resolved(parked_id) == {"flushed": False, "reason": "unknown_parked_action"}
+
+
 # ------------------------------------------------------ toolcall-via-proxy-gated
 def test_openclaw_toolcalls_gated_at_proxy_with_host_attribution(tmp_path: Path) -> None:
     state = ControlPlaneState(tmp_path / "zeus")

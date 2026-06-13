@@ -4,6 +4,37 @@ All notable changes to Zeus Agent are recorded here.
 
 ## Unreleased
 
+## v1.0.0-alpha.8 - 2026-06-13
+
+### Added
+
+- Added a minimal `zeus tui` control tower surface for the approval loop:
+  current decision mix, pending parked actions, active grants, replay approvals,
+  chain health, and one-shot approval actions from the operator side.
+- Added remembered parked approvals with `zeus approve --parked ... --remember`
+  and bounded `--hours` expiry, while preserving one-shot replay approval for
+  the default path.
+- Added an OpenClaw relay bridge that can flush externally resolved parked
+  approvals back to an OpenClaw host transport through
+  `exec.approval.resolve`.
+
+### Fixed
+
+- Split parked approval resolution out of command parsing so CLI, TUI, and
+  future cockpit surfaces use the same approval effect.
+- Blocked remembered grants for hard-risk parked actions and kept invalid
+  narrowed-path approvals from consuming pending actions.
+
+### Evidence
+
+- `.venv/bin/python -m pytest -q` passed: `298` tests.
+- `ruff` clean.
+- `.venv/bin/pip install -e . --no-deps` succeeded and
+  `zeus-agent 1.0.0a8` reported through the installed console script.
+- Private live-host evidence stayed local-only: Hermes hard-egress + segmented
+  + TUI rehearsal passed, and OpenClaw `openclaw@2026.6.6` pin smoke resolved
+  to upstream commit `8c802aa`.
+
 ## v1.0.0-alpha.7 - 2026-06-13
 
 ### Fixed

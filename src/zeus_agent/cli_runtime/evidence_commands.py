@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import typer
 
-from .approval_commands import _approval_effect
+from .approval_resolution import approval_effect
 from .context import echo_json, parse_ts, state_for_home
 
 if TYPE_CHECKING:
@@ -63,7 +63,7 @@ def register_evidence_commands(app: typer.Typer) -> None:
                 "capability_id": item.action.capability_id,
                 "host": item.host,
                 "session_id": item.session_id,
-                "approval_effect": _approval_effect(item),
+                "approval_effect": approval_effect(item),
                 "operator_note": (
                     "resolve in Zeus control tower or a separate operator terminal; "
                     "do not paste Zeus commands into the governed host"
