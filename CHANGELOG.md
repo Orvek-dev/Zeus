@@ -4,6 +4,26 @@ All notable changes to Zeus Agent are recorded here.
 
 ## Unreleased
 
+## v1.0.0-alpha.7 - 2026-06-13
+
+### Fixed
+
+- Reduced a Hermes dogfood false positive by treating `python -m hermes --help`
+  and `python -m hermes_agent --help` as read-only module probes instead of
+  high-risk unknown execution.
+- Serialized append-only evidence ledger writes with `BEGIN IMMEDIATE`,
+  connection busy timeouts, and schema-initialization retry logic so concurrent
+  exact-payload replay checks cannot race on `seq` or `prev_hash`.
+
+### Evidence
+
+- `.venv/bin/python -m pytest` passed: `292` tests.
+- `ruff` clean.
+- Hermes R13 segmented dogfood on the final tree: `21/21` pass,
+  host-tool fall-through `0`, proxy secret findings `0`, and `chain_ok=true`
+  for all cases. OpenClaw remains blocked on a real pinned host before any
+  95% control claim.
+
 ## v1.0.0-alpha.6 - 2026-06-13
 
 ### Fixed

@@ -61,7 +61,9 @@ _GIT_READ_ONLY: Final = frozenset(
 )
 _GIT_NETWORK: Final = frozenset({"push", "pull", "fetch", "clone", "ls-remote"})
 _FIND_WRITE_FLAGS: Final = frozenset({"-delete", "-exec", "-execdir", "-ok", "-okdir", "-fls", "-fprint", "-fprintf"})
-_SAFE_ZEUS_MODULE_PROBES: Final = frozenset({"zeus_agent", "zeus_agent.cli_main", "src.zeus_agent"})
+_SAFE_ZEUS_MODULE_PROBES: Final = frozenset(
+    {"zeus_agent", "zeus_agent.cli_main", "src.zeus_agent", "hermes", "hermes_agent"}
+)
 _PYTHON_VERSIONED_RE: Final = re.compile(r"python3(?:\.\d+)?")
 _REDIRECT_RE: Final = re.compile(r"\d*&?>>?\s*(?P<target>&?\S+)")
 _DISCARD_TARGETS: Final = frozenset({"/dev/null", "/dev/stdout", "/dev/stderr"})

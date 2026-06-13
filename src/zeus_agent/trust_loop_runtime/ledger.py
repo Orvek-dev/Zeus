@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -39,7 +40,9 @@ class SQLiteEvidenceLedger:
     ) -> LedgerEvent:
         kind_value = require_text(kind, "kind")
         run_id_value = require_text(run_id, "run_id")
-        with self._connect() as connection:
+        connection = self._connect()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
             seq = _next_seq(connection)
             prev_hash = _previous_hash(connection)
             redacted_payload = _redact_json(payload)
@@ -73,6 +76,9 @@ class SQLiteEvidenceLedger:
                     payload_json,
                 ),
             )
+            connection.commit()
+        finally:
+            connection.close()
         return LedgerEvent(seq=seq, record_id=record_id, entry_hash=entry_hash)
 
     def record_by_id(self, record_id: str) -> Optional[dict[str, JsonValue]]:
@@ -133,6 +139,20 @@ class SQLiteEvidenceLedger:
             )
 
     def _ensure_schema(self) -> None:
+        last_error: sqlite3.OperationalError | None = None
+        for attempt in range(20):
+            try:
+                self._ensure_schema_once()
+                return
+            except sqlite3.OperationalError as exc:
+                if "locked" not in str(exc).lower():
+                    raise
+                last_error = exc
+                time.sleep(0.02 * (attempt + 1))
+        if last_error is not None:
+            raise last_error
+
+    def _ensure_schema_once(self) -> None:
         with self._connect() as connection:
             _ensure_known_schema_version(connection)
             connection.execute("PRAGMA journal_mode=WAL")
@@ -152,7 +172,9 @@ class SQLiteEvidenceLedger:
             connection.execute("PRAGMA user_version = {0}".format(_SCHEMA_VERSION))
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self.path)
+        connection = sqlite3.connect(self.path, timeout=30)
+        connection.execute("PRAGMA busy_timeout = 30000")
+        return connection
 
 
 def _next_seq(connection: sqlite3.Connection) -> int:

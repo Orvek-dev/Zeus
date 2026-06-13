@@ -42,6 +42,7 @@ def test_dogfood_python_module_diagnostics_stay_read_only() -> None:
         "printf '\\n---\\n' && python -m pip list --format=columns | head -40",
         "python -m zeus_agent.cli_main --help 2>&1 || true && printf '\\n---\\n' && "
         "python -m zeus_agent.cli_main connect --help 2>&1 || true",
+        "python -m hermes --help || hermes --help",
         "python --version && printf '\\n---\\n' && python -m pytest --version && "
         "printf '\\n---\\n' && python -m zeus_agent --help",
         "pwd && printf '\\n---\\n' && git status --short --branch && printf '\\n---\\n' && "
